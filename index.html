@@ -46,7 +46,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .fi::placeholder{color:#bbb}
 .sw{flex:1;padding:8px 12px;display:flex;gap:6px}
 .sb{flex:1;padding:9px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;background:var(--border);color:var(--muted)}
-.sb.se{background:var(--orange);color:#fff}.sb.si{background:var(--green);color:#fff}.sb.sx{background:var(--teal);color:#fff}.sb.sg{background:var(--purple);color:#fff}
+.sb.se{background:var(--orange);color:#fff}.sb.si{background:var(--green);color:#fff}.sb.sx{background:var(--teal);color:#fff}.sb.sg{background:var(--purple);color:#fff}.sb.soc{background:var(--navy);color:#fff}.sb.stu{background:var(--green);color:#fff}.sb.sge{background:var(--muted);color:#fff}
 #fm,#cm2{font-size:22px;font-weight:700;color:var(--navy)}
 #fm::placeholder,#cm2::placeholder{font-size:16px;font-weight:400;color:#bbb}
 .btn{width:100%;padding:18px;border:none;border-radius:16px;color:#fff;font-size:17px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s;margin-bottom:14px}
@@ -132,12 +132,13 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
   <div class="card">
     <div class="ch cg">Detalle</div>
-    <div class="fr">
+    <div class="fr" style="min-height:54px">
       <span class="fl req">Sucursal</span>
-      <select class="fi" id="fsuc">
-        <option value="">— Seleccionar —</option>
-        <option>Ocampo</option><option>Tucuman</option><option>General</option>
-      </select>
+      <div class="sw">
+        <button class="sb" id="msoc" onclick="setMovSuc('Ocampo')">Ocampo</button>
+        <button class="sb" id="mstu" onclick="setMovSuc('Tucuman')">Tucumán</button>
+        <button class="sb" id="msge" onclick="setMovSuc('General')">General</button>
+      </div>
     </div>
     <div class="fr"><span class="fl req">Categoria</span><select class="fi" id="fcat" onchange="updateSub()"><option value="">— Seleccionar —</option></select></div>
     <div class="fr" id="rowsub" style="display:none"><span class="fl req">Subcateg.</span><select class="fi" id="fsub"><option value="">— Seleccionar —</option></select></div>
@@ -158,6 +159,14 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div class="card">
     <div class="ch ct">📅 Fecha</div>
     <div class="fr"><span class="fl req">Fecha</span><input type="date" class="fi" id="cf" onchange="renderCajaResumen()"></div>
+    <div class="fr" style="min-height:54px">
+      <span class="fl req">Sucursal</span>
+      <div class="sw">
+        <button class="sb" id="csoc" onclick="setCajaSuc('Ocampo')">Ocampo</button>
+        <button class="sb" id="cstu" onclick="setCajaSuc('Tucuman')">Tucumán</button>
+        <button class="sb" id="csge" onclick="setCajaSuc('General')">General</button>
+      </div>
+    </div>
   </div>
   <div class="card">
     <div class="ch ct">Tipo de movimiento</div>
@@ -245,6 +254,8 @@ var records  = [];
 var cajaRecs = [];
 var tipoMov  = "Egreso";
 var tipoCaja = "Extraccion";
+var movSuc   = "";
+var cajaSuc  = "";
 var filterAct= "todos";
 
 // ── DATOS MAESTROS ─────────────────────────────────
@@ -252,9 +263,9 @@ var CATS = {
   Ingreso: {"Ventas Alimentos":[],"Ventas Accesorios":[],"Servicios Peluqueria":[],"Servicios Veterinaria":[],"Otros Ingresos":[]},
   Egreso:  {
     "Personal":   ["Gabriel Yapura","Damian Blas","Peluquero/a","Candela Vend","Auxiliar Ocampo","Auxiliar Tucuman","Administracion","F931 Cargas"],
-    "Proveedores":["Baza Cosmi","La Cabania","Josmayo","Zonas Aridas","Central La Mascotera","Alif","Dinsumed Los Cardones","Prov Accesorios"],
+    "Proveedores":["Baza Cosmi","La Cabania","Josmayo","Zonas Aridas","Central La Mascotera","Alif","Dinsumed Los Cardones","Prov Accesorios","Otros"],
     "Local":      ["Alquiler","Servicios","Mejoras","Otros"],
-    "Publicidad": [],"Otros Gastos":[]
+    "Impuestos":[],"Publicidad":[],"Otros Gastos":[]
   }
 };
 var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -300,7 +311,6 @@ window.addEventListener("offline", function(){ setSync("offline"); document.getE
 // ── INIT UI ────────────────────────────────────────
 document.getElementById("ff").value = hoy();
 document.getElementById("cf").value = hoy();
-updateCats();
 
 function updateBadges() {
   document.getElementById("breg").textContent = records.length  +" mov.";
@@ -314,6 +324,20 @@ function setLoading(id, on) {
 }
 
 // ── TIPO MOVIMIENTO ────────────────────────────────
+function setMovSuc(s) {
+  movSuc=s;
+  ["msoc","mstu","msge"].forEach(function(id){ document.getElementById(id).className="sb"; });
+  if(s==="Ocampo")   document.getElementById("msoc").className="sb soc";
+  if(s==="Tucuman")  document.getElementById("mstu").className="sb stu";
+  if(s==="General")  document.getElementById("msge").className="sb sge";
+}
+function setCajaSuc(s) {
+  cajaSuc=s;
+  ["csoc","cstu","csge"].forEach(function(id){ document.getElementById(id).className="sb"; });
+  if(s==="Ocampo")   document.getElementById("csoc").className="sb soc";
+  if(s==="Tucuman")  document.getElementById("cstu").className="sb stu";
+  if(s==="General")  document.getElementById("csge").className="sb sge";
+}
 function setTipo(t) {
   tipoMov=t;
   document.getElementById("beg").className="sb"+(t==="Egreso" ?" se":"");
@@ -355,7 +379,7 @@ function updateSub() {
 // ── CARGAR MOVIMIENTO ──────────────────────────────
 function cargarMov() {
   var fecha=document.getElementById("ff").value;
-  var suc  =document.getElementById("fsuc").value;
+  var suc  =movSuc;
   var cat  =document.getElementById("fcat").value;
   var sub  =document.getElementById("fsub").value;
   var monto=parseFloat(document.getElementById("fm").value);
@@ -375,7 +399,9 @@ function cargarMov() {
     ts:firebase.firestore.FieldValue.serverTimestamp()
   }).then(function(){
     toast("✓ Guardado en la nube","ok");
-    ["fsuc","fcat","fm","fn","fsub"].forEach(function(id){ document.getElementById(id).value=""; });
+    movSuc="";
+    setMovSuc("");
+    ["fcat","fm","fn","fsub"].forEach(function(id){ document.getElementById(id).value=""; });
     document.getElementById("rowsub").style.display="none";
     document.getElementById("ff").value=hoy();
     updateCats();
@@ -386,18 +412,22 @@ function cargarMov() {
 // ── CARGAR CAJA ────────────────────────────────────
 function cargarCaja() {
   var fecha=document.getElementById("cf").value;
+  var suc=cajaSuc;
   var monto=parseFloat(document.getElementById("cm2").value);
   var notas=document.getElementById("cn2").value.trim();
   if(!fecha)           return toast("Completá la fecha","err");
+  if(!suc)             return toast("Elegí una sucursal","err");
   if(!monto||monto<=0) return toast("Ingresá un monto válido","err");
   setLoading("bcc",true);
   db.collection("caja").add({
-    fecha:fecha, tipo:tipoCaja, monto:monto, notas:notas,
+    fecha:fecha, suc:suc, tipo:tipoCaja, monto:monto, notas:notas,
     ts:firebase.firestore.FieldValue.serverTimestamp()
   }).then(function(){
     toast("✓ Caja guardada en la nube","tel");
     document.getElementById("cm2").value="";
     document.getElementById("cn2").value="";
+    cajaSuc="";
+    setCajaSuc("");
     document.getElementById("cf").value=hoy();
     setLoading("bcc",false);
   }).catch(function(e){ toast("Error: "+e.message,"err"); setLoading("bcc",false); });
@@ -427,7 +457,7 @@ function renderCajaList() {
     var col=r.tipo==="Extraccion"?"var(--teal)":"var(--purple)";
     var ico=r.tipo==="Extraccion"?"💸":"🧾";
     return '<div class="ri"><div class="rdot" style="background:'+col+'"></div>'
-      +'<div class="rb"><div class="rt" style="color:'+col+'">'+ico+' '+r.tipo+'</div>'
+      +'<div class="rb"><div class="rt" style="color:'+col+'">'+ico+' '+r.tipo+(r.suc?' · '+r.suc:'')+'</div>'
       +'<div class="rs">'+r.fecha.split("-").reverse().join("/")+(r.notas?" · "+r.notas:"")+'</div></div>'
       +'<span class="rm" style="color:'+col+'">$'+r.monto.toLocaleString("es-AR")+'</span>'
       +'<button class="rdel" onclick="delCaja(\''+r._id+'\')">✕</button></div>';
@@ -520,10 +550,14 @@ function exportXLSX() {
   var ws1=xl.utils.aoa_to_sheet([h1].concat(r1));
   ws1["!cols"]=[{wch:12},{wch:12},{wch:10},{wch:22},{wch:22},{wch:12},{wch:7},{wch:5},{wch:28}];
   xl.utils.book_append_sheet(wb,ws1,"Registro Diario");
-  var h2=["Fecha","Tipo","Monto","Notas"];
-  var r2=cajaRecs.map(function(r){ return [(r.fecha||"").split("-").reverse().join("/"),r.tipo,r.monto,r.notas||""]; });
+  var h2=["Fecha","Sucursal","Extraccion","Gasto bolsillo","Notas"];
+  var r2=cajaRecs.map(function(r){
+    var ext = r.tipo==="Extraccion" ? r.monto : "";
+    var gst = r.tipo==="Gasto"      ? r.monto : "";
+    return [(r.fecha||"").split("-").reverse().join("/"), r.suc||"", ext, gst, r.notas||""];
+  });
   var ws2=xl.utils.aoa_to_sheet([h2].concat(r2));
-  ws2["!cols"]=[{wch:12},{wch:18},{wch:14},{wch:30}];
+  ws2["!cols"]=[{wch:12},{wch:12},{wch:16},{wch:18},{wch:30}];
   xl.utils.book_append_sheet(wb,ws2,"Caja Diaria");
   xl.writeFile(wb,"Mascotera_"+new Date().toISOString().slice(0,10)+".xlsx");
   toast("✓ Descargado","ok");
@@ -557,6 +591,12 @@ function showTab(t) {
   if(t==="exportar")  renderStats();
   if(t==="caja")      { renderCajaResumen(); renderCajaList(); }
 }
+
+// ── INIT ─────────────────────────────────────────────
+window.addEventListener("load", function() {
+  updateCats();
+  renderCajaResumen();
+});
 
 // ── TOAST ──────────────────────────────────────────
 var tt;

@@ -10,15 +10,15 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMWEyNzQ0Ii8+PGVsbGlwc2UgY3g9IjkwIiBjeT0iMTA4IiByeD0iMjgiIHJ5PSIyMiIgZmlsbD0iI2YwYzA0MCIvPjxlbGxpcHNlIGN4PSI2MCIgY3k9IjgyIiByeD0iMTMiIHJ5PSIxMCIgZmlsbD0iI2YwYzA0MCIvPjxlbGxpcHNlIGN4PSI4MCIgY3k9IjY4IiByeD0iMTMiIHJ5PSIxMCIgZmlsbD0iI2YwYzA0MCIvPjxlbGxpcHNlIGN4PSIxMDAiIGN5PSI2OCIgcng9IjEzIiByeT0iMTAiIGZpbGw9IiNmMGMwNDAiLz48ZWxsaXBzZSBjeD0iMTIwIiBjeT0iODIiIHJ4PSIxMyIgcnk9IjEwIiBmaWxsPSIjZjBjMDQwIi8+PC9zdmc+">
 <title>La Mascotera</title>
 <style>
-:root{--navy:#1a2744;--navy2:#243460;--green:#1e7145;--purple:#5c2680;--orange:#c55a11;--teal:#0e6b72;--gold:#f0c040;--red:#c0392b;--bg:#f0f2f7;--card:#fff;--text:#1a1a2e;--muted:#6b7280;--border:#e2e8f0;--safe-top:env(safe-area-inset-top);--safe-bot:env(safe-area-inset-bottom)}
+:root{--navy:#1a2744;--navy2:#243460;--green:#1e7145;--purple:#5c2680;--orange:#c55a11;--teal:#0e6b72;--gold:#f0c040;--red:#c0392b;--blue:#2563eb;--bg:#f0f2f7;--card:#fff;--text:#1a1a2e;--muted:#6b7280;--border:#e2e8f0;--input:#f8faff;--safe-top:env(safe-area-inset-top);--safe-bot:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden}
 .sync-bar{height:3px;background:var(--border);position:relative;overflow:hidden}
 .sync-bar.syncing::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:var(--gold);animation:ss 1s linear infinite}
 @keyframes ss{to{left:140%}}
 .sdot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
-.sdot.online{background:#34c759}.sdot.syncing{background:var(--gold);animation:pulse .8s ease infinite}.sdot.offline{background:var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sdot.online{background:#34c759}.sdot.syncing{background:var(--gold);animation:pu .8s ease infinite}.sdot.offline{background:var(--red)}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
 .offbanner{background:var(--orange);color:#fff;text-align:center;padding:8px;font-size:12px;font-weight:700;display:none}
 .offbanner.show{display:block}
 .header{background:var(--navy);padding:calc(var(--safe-top) + 14px) 16px 12px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.3)}
@@ -28,15 +28,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg
 .hbadges{margin-left:auto;display:flex;gap:6px;align-items:center}
 .badge{background:var(--gold);color:var(--navy);font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;white-space:nowrap}
 .badge.t{background:var(--teal);color:#fff}
-.tabs{display:flex;background:var(--navy2);border-bottom:1px solid rgba(255,255,255,.08)}
-.tab{flex:1;padding:10px 2px;text-align:center;color:rgba(255,255,255,.4);font-size:10px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;transition:all .2s}
+.tabs{display:flex;background:var(--navy2);border-bottom:1px solid rgba(255,255,255,.08);overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:10px 10px;text-align:center;color:rgba(255,255,255,.4);font-size:9px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;white-space:nowrap;transition:all .2s}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-.tabi{font-size:15px;display:block;margin-bottom:2px}
+.tabi{font-size:14px;display:block;margin-bottom:2px}
 .screen{display:none;padding:16px 16px calc(var(--safe-bot) + 80px)}
 .screen.active{display:block}
 .card{background:var(--card);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;margin-bottom:14px}
 .ch{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff}
-.cn{background:var(--navy)}.cg{background:var(--green)}.co{background:var(--orange)}.ct{background:var(--teal)}.cm{background:var(--muted)}
+.cn{background:var(--navy)}.cg{background:var(--green)}.co{background:var(--orange)}.ct{background:var(--teal)}.cm{background:var(--muted)}.cp{background:var(--purple)}.cb{background:var(--blue)}
 .fr{display:flex;align-items:stretch;border-bottom:1px solid var(--border)}
 .fr:last-child{border-bottom:none}
 .fl{width:110px;flex-shrink:0;padding:0 0 0 16px;display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--muted)}
@@ -45,8 +46,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg
 select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
 .fi::placeholder{color:#bbb}
 .sw{flex:1;padding:8px 12px;display:flex;gap:6px}
-.sb{flex:1;padding:9px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;background:var(--border);color:var(--muted)}
-.sb.se{background:var(--orange);color:#fff}.sb.si{background:var(--green);color:#fff}.sb.sx{background:var(--teal);color:#fff}.sb.sg{background:var(--purple);color:#fff}.sb.soc{background:var(--navy);color:#fff}.sb.stu{background:var(--green);color:#fff}.sb.sge{background:var(--muted);color:#fff}
+.sb{flex:1;padding:9px;border-radius:10px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;background:var(--border);color:var(--muted)}
+.sb.se{background:var(--orange);color:#fff}.sb.si{background:var(--green);color:#fff}
+.sb.sx{background:var(--teal);color:#fff}.sb.sg{background:var(--purple);color:#fff}
+.sb.soc{background:var(--navy);color:#fff}.sb.stu{background:var(--green);color:#fff}.sb.sge{background:var(--muted);color:#fff}
 #fm,#cm2{font-size:22px;font-weight:700;color:var(--navy)}
 #fm::placeholder,#cm2::placeholder{font-size:16px;font-weight:400;color:#bbb}
 .btn{width:100%;padding:18px;border:none;border-radius:16px;color:#fff;font-size:17px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s;margin-bottom:14px}
@@ -56,11 +59,12 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .btn-n{background:linear-gradient(135deg,var(--navy),var(--navy2));box-shadow:0 4px 20px rgba(26,39,68,.3)}
 .btn-g{background:linear-gradient(135deg,var(--green),#155a30)}
 .btn-r{background:linear-gradient(135deg,var(--red),#a93226)}
+.btn-b{background:linear-gradient(135deg,var(--blue),#1d4ed8);box-shadow:0 4px 20px rgba(37,99,235,.3)}
 .spin::after{content:'';width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:ro .7s linear infinite;margin-left:8px}
 @keyframes ro{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:calc(var(--safe-bot) + 90px);left:50%;transform:translateX(-50%) translateY(20px);color:#fff;padding:12px 24px;border-radius:30px;font-size:14px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:999;background:var(--green)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.err{background:var(--red)}.toast.tel{background:var(--teal)}.toast.warn{background:var(--orange)}
+.toast.err{background:var(--red)}.toast.tel{background:var(--teal)}.toast.warn{background:var(--orange)}.toast.blu{background:var(--blue)}
 .mhdr{padding:6px 16px;background:var(--bg);font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--border)}
 .ri{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
 .ri:last-child{border-bottom:none}
@@ -77,17 +81,49 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .fc{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
 .fc.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 .fc.ateal{background:var(--teal);color:#fff;border-color:var(--teal)}
+.fc.ablu{background:var(--blue);color:#fff;border-color:var(--blue)}
 .sg2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
 .sc{background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 .sl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.sv{font-size:20px;font-weight:800;color:var(--navy)}
-.sv.g{color:var(--green)}.sv.r{color:var(--red)}.sv.t{color:var(--teal)}.sv.o{color:var(--orange)}
+.sv{font-size:18px;font-weight:800;color:var(--navy)}
+.sv.g{color:var(--green)}.sv.r{color:var(--red)}.sv.t{color:var(--teal)}.sv.o{color:var(--orange)}.sv.b{color:var(--blue)}
 .sdiv{display:flex;align-items:center;gap:10px;margin:18px 0 12px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
 .sdiv::before,.sdiv::after{content:'';flex:1;height:1px;background:var(--border)}
 .enote{background:var(--card);border-radius:12px;padding:14px 16px;font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:14px}
 .enote strong{color:var(--navy)}
 .neto-row{background:#e8f7f8}
 .nv{flex:1;padding:14px 16px 14px 10px;font-size:20px;font-weight:800;color:var(--teal)}
+/* Caja impact toggle */
+.trow{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.tlbl{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.tsub{font-size:11px;color:var(--muted);margin-top:2px}
+.tswitch{position:relative;width:44px;height:26px;flex-shrink:0}
+.tswitch input{opacity:0;width:0;height:0;position:absolute}
+.ttrack{position:absolute;inset:0;background:var(--border);border-radius:13px;cursor:pointer;transition:.2s}
+.ttrack::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.tswitch input:checked+.ttrack{background:var(--teal)}
+.tswitch input:checked+.ttrack::after{transform:translateX(18px)}
+/* Dashboard */
+.chart-card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px}
+.chart-card h3{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px}
+canvas{max-width:100%;display:block}
+.dtable-wrap{overflow-x:auto;margin-bottom:14px;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.dtable{width:100%;border-collapse:collapse;background:var(--card);font-size:11px;min-width:380px}
+.dtable th{padding:8px 10px;background:var(--navy);color:#fff;font-weight:700;text-align:right;white-space:nowrap;font-size:10px;letter-spacing:.5px}
+.dtable th:first-child{text-align:left;border-radius:16px 0 0 0}
+.dtable th:last-child{border-radius:0 16px 0 0}
+.dtable td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap;color:var(--text)}
+.dtable td:first-child{text-align:left;font-weight:700;color:var(--muted);font-size:12px}
+.dtable tr.total-row td{font-weight:800;background:var(--bg);font-size:12px}
+.dtable .pos{color:var(--green)}.dtable .neg{color:var(--red)}.dtable .neut{color:var(--teal)}
+/* Import progress */
+.iprog{background:var(--card);border-radius:12px;padding:16px;margin-bottom:14px;display:none}
+.iprog.show{display:block}
+.ibar-wrap{background:var(--border);border-radius:4px;height:6px;margin:10px 0 6px;overflow:hidden}
+.ibar{height:100%;background:var(--teal);border-radius:4px;transition:width .3s;width:0}
+.itxt{font-size:12px;color:var(--muted)}
+.ititl{font-size:13px;font-weight:700;color:var(--navy)}
 </style>
 </head>
 <body>
@@ -114,10 +150,11 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div class="tab active"  onclick="showTab('cargar')">  <span class="tabi">📝</span>Movim.</div>
   <div class="tab"         onclick="showTab('caja')">    <span class="tabi">💵</span>Caja</div>
   <div class="tab"         onclick="showTab('historial')"><span class="tabi">📋</span>Historial</div>
+  <div class="tab"         onclick="showTab('dashboard')"><span class="tabi">📊</span>Dashboard</div>
   <div class="tab"         onclick="showTab('exportar')"> <span class="tabi">📤</span>Exportar</div>
 </div>
 
-<!-- CARGAR -->
+<!-- ══ CARGAR MOVIMIENTO ══ -->
 <div class="screen active" id="screen-cargar">
   <div class="card">
     <div class="ch cn">Fecha &amp; Tipo</div>
@@ -147,6 +184,31 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <div class="ch co">Monto</div>
     <div class="fr"><span class="fl req" style="width:40px">$</span><input type="number" class="fi" id="fm" inputmode="decimal" placeholder="0.00" min="0" step="0.01"></div>
   </div>
+
+  <!-- Impacto en Caja (opcional) -->
+  <div class="card">
+    <div class="ch ct">💵 Impacto en Caja <span style="font-weight:400;opacity:.75;font-size:9px"> — OPCIONAL</span></div>
+    <div class="trow">
+      <div>
+        <div class="tlbl">Registrar también en Caja</div>
+        <div class="tsub">Vincula este movimiento con Extracción o Gasto bolsillo</div>
+      </div>
+      <label class="tswitch">
+        <input type="checkbox" id="caj-toggle" onchange="onCajToggle()">
+        <div class="ttrack"></div>
+      </label>
+    </div>
+    <div id="caj-tipo-row" style="display:none">
+      <div class="fr" style="min-height:54px">
+        <span class="fl">Tipo caja</span>
+        <div class="sw">
+          <button class="sb" id="btn-caj-ext" onclick="setCajImpactTipo('Extraccion')">💸 Extracción</button>
+          <button class="sb" id="btn-caj-gst" onclick="setCajImpactTipo('Gasto')">🧾 Gasto bolsillo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="ch cm">Notas (opcional)</div>
     <div class="fr"><input type="text" class="fi" id="fn" placeholder="Descripción..." style="padding-left:16px"></div>
@@ -154,10 +216,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <button class="btn btn-o" id="bcm" onclick="cargarMov()">► CARGAR MOVIMIENTO</button>
 </div>
 
-<!-- CAJA -->
+<!-- ══ CAJA DIARIA ══ -->
 <div class="screen" id="screen-caja">
   <div class="card">
-    <div class="ch ct">📅 Fecha</div>
+    <div class="ch ct">📅 Fecha &amp; Sucursal</div>
     <div class="fr"><span class="fl req">Fecha</span><input type="date" class="fi" id="cf" onchange="renderCajaResumen()"></div>
     <div class="fr" style="min-height:54px">
       <span class="fl req">Sucursal</span>
@@ -178,7 +240,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       </div>
     </div>
     <div style="padding:8px 16px 12px;font-size:12px;color:var(--muted);line-height:1.5" id="chint">
-      💸 <strong>Extracción:</strong> Retiro en efectivo o transferencia personal desde la caja.
+      💸 <strong>Extracción:</strong> Retiro en efectivo o transferencia personal.
     </div>
   </div>
   <div class="card">
@@ -196,11 +258,11 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <div class="fr"><input type="text" class="fi" id="cn2" placeholder="Descripción..." style="padding-left:16px"></div>
   </div>
   <button class="btn btn-t" id="bcc" onclick="cargarCaja()">💵 CARGAR CAJA</button>
-  <div class="sdiv">Últimas entradas de caja</div>
+  <div class="sdiv">Últimas entradas</div>
   <div class="card" id="cajalist"></div>
 </div>
 
-<!-- HISTORIAL -->
+<!-- ══ HISTORIAL ══ -->
 <div class="screen" id="screen-historial">
   <div class="fbar">
     <div class="fc active" onclick="setFilter('todos',this)">Todos</div>
@@ -213,15 +275,58 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div class="card" id="reclist"></div>
 </div>
 
-<!-- EXPORTAR -->
+<!-- ══ DASHBOARD ══ -->
+<div class="screen" id="screen-dashboard">
+  <div class="fbar" id="dash-fbar">
+    <div class="fc ablu" onclick="setDash('todos',this)">Consolidado</div>
+    <div class="fc"      onclick="setDash('Ocampo',this)">Ocampo</div>
+    <div class="fc"      onclick="setDash('Tucuman',this)">Tucumán</div>
+  </div>
+  <div class="sg2" id="dash-kpis"></div>
+  <div class="chart-card">
+    <h3>Ingresos vs Egresos por mes</h3>
+    <canvas id="chart-bar" height="200"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Resultado &amp; Margen % mensual</h3>
+    <canvas id="chart-line" height="180"></canvas>
+  </div>
+  <div class="sdiv">Detalle mensual</div>
+  <div class="dtable-wrap">
+    <table class="dtable">
+      <thead><tr>
+        <th>Mes</th><th>Ingresos</th><th>Egresos</th><th>Resultado</th><th>Margen</th><th>Caja neto</th>
+      </tr></thead>
+      <tbody id="dash-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ EXPORTAR ══ -->
 <div class="screen" id="screen-exportar">
-  <div class="sdiv">Movimientos</div><div class="sg2" id="smov"></div>
-  <div class="sdiv">Caja diaria</div><div class="sg2" id="scaj"></div>
+  <div class="sdiv">Importar datos</div>
   <div class="enote">
-    <strong>El .xlsx tiene 2 hojas:</strong><br>
-    • <em>Registro Diario</em> → pegás en la planilla Excel<br>
-    • <em>Caja Diaria</em> → pegás en la hoja Caja Diaria<br><br>
-    Datos exportados desde Firebase — siempre sincronizados.
+    <strong>Importar desde Excel (.xlsx):</strong><br>
+    El archivo debe tener el mismo formato del export:<br>
+    • Hoja <em>Registro Diario</em> → col: Fecha | Sucursal | Tipo | Categoria | Subcategoria | Monto | … | Notas<br>
+    • Hoja <em>Caja Diaria</em> → col: Fecha | Sucursal | Extraccion | Gasto bolsillo | Notas<br>
+    Los datos se <strong>agregan</strong> a Firebase sin borrar los existentes.
+  </div>
+  <button class="btn btn-b" onclick="document.getElementById('file-import').click()">📂 Importar archivo .xlsx</button>
+  <input type="file" id="file-import" accept=".xlsx,.xls" style="display:none" onchange="importXLSX(this)">
+  <div class="iprog" id="iprog">
+    <div class="ititl" id="ititle">Importando...</div>
+    <div class="ibar-wrap"><div class="ibar" id="ibar"></div></div>
+    <div class="itxt"  id="itxt">Preparando...</div>
+  </div>
+
+  <div class="sdiv">Estadísticas</div>
+  <div class="sg2" id="smov"></div>
+  <div class="sg2" id="scaj"></div>
+  <div class="enote">
+    <strong>El .xlsx exportado tiene 2 hojas</strong> compatibles con la planilla Excel 2026:<br>
+    • <em>Registro Diario</em> → pegás desde fila 4<br>
+    • <em>Caja Diaria</em> → pegás desde fila 4 (col A=Fecha, B=Sucursal, C=Extraccion, D=Gasto, E=Notas)
   </div>
   <button class="btn btn-n" onclick="exportXLSX()">📥 Descargar .xlsx (2 hojas)</button>
   <button class="btn btn-g" onclick="exportCSV()">📄 Descargar .csv</button>
@@ -235,153 +340,144 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <!-- SheetJS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
 <script>
-// ── FIREBASE INIT ──────────────────────────────────
 firebase.initializeApp({
-  apiKey:            "AIzaSyBC-577HdFXC2JpDotMGdl94LXyBkwGoqA",
-  authDomain:        "mascoapp-701c6.firebaseapp.com",
-  projectId:         "mascoapp-701c6",
-  storageBucket:     "mascoapp-701c6.firebasestorage.app",
-  messagingSenderId: "243761804030",
-  appId:             "1:243761804030:web:b4050a26f110820e7fabaf"
+  apiKey:"AIzaSyBC-577HdFXC2JpDotMGdl94LXyBkwGoqA",
+  authDomain:"mascoapp-701c6.firebaseapp.com",
+  projectId:"mascoapp-701c6",
+  storageBucket:"mascoapp-701c6.firebasestorage.app",
+  messagingSenderId:"243761804030",
+  appId:"1:243761804030:web:b4050a26f110820e7fabaf"
 });
-var db = firebase.firestore();
+var db=firebase.firestore();
 db.enablePersistence().catch(function(){});
 
-// ── ESTADO ─────────────────────────────────────────
-var records  = [];
-var cajaRecs = [];
-var tipoMov  = "Egreso";
-var tipoCaja = "Extraccion";
-var movSuc   = "";
-var cajaSuc  = "";
-var filterAct= "todos";
+// ── ESTADO ─────────────────────────────────────────────────────────────────
+var records=[],cajaRecs=[],tipoMov="Egreso",tipoCaja="Extraccion";
+var movSuc="",cajaSuc="",filterAct="todos",dashFilter="todos";
+var cajImpact=false,cajImpactTipo="";
+var chartBar=null,chartLine=null;
 
-// ── DATOS MAESTROS ─────────────────────────────────
-var CATS = {
-  Ingreso: {"Ventas Alimentos":[],"Ventas Accesorios":[],"Servicios Peluqueria":[],"Servicios Veterinaria":[],"Otros Ingresos":[]},
-  Egreso:  {
-    "Personal":   ["Gabriel Yapura","Damian Blas","Peluquero/a","Candela Vend","Auxiliar Ocampo","Auxiliar Tucuman","Administracion","F931 Cargas"],
-    "Proveedores":["Baza Cosmi","La Cabania","Josmayo","Zonas Aridas","Central La Mascotera","Alif","Dinsumed Los Cardones","Prov Accesorios","Otros"],
-    "Local":      ["Alquiler","Servicios","Mejoras","Otros"],
-    "Impuestos":[],"Publicidad":[],"Otros Gastos":[]
-  }
+var CATS={
+  Ingreso:{"Ventas Alimentos":[],"Ventas Accesorios":[],"Servicios Peluqueria":[],"Servicios Veterinaria":[],"Otros Ingresos":[]},
+  Egreso: {"Personal":["Gabriel Yapura","Damian Blas","Peluquero/a","Candela Vend","Auxiliar Ocampo","Auxiliar Tucuman","Administracion","F931 Cargas"],
+            "Proveedores":["Baza Cosmi","La Cabania","Josmayo","Zonas Aridas","Central La Mascotera","Alif","Dinsumed Los Cardones","Prov Accesorios","Otros"],
+            "Local":["Alquiler","Servicios","Mejoras","Otros"],
+            "Impuestos":[],"Publicidad":[],"Otros Gastos":[]}
 };
-var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+var MESES=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+var MESES_L=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-function hoy() {
-  var d=new Date();
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function hoy(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function fp(v){return"$"+Math.abs(v).toLocaleString("es-AR",{maximumFractionDigits:0});}
+function gm(f){if(!f)return 0;return parseInt((f+"").split("-")[1])||0;}
+
+// ── FIREBASE LISTENERS ─────────────────────────────────────────────────────
+function setSync(s){
+  var dot=document.getElementById("sdot"),txt=document.getElementById("stxt"),bar=document.getElementById("syncbar");
+  dot.className="sdot "+s;
+  txt.textContent={online:"Sincronizado ✓",syncing:"Sincronizando...",offline:"Sin conexión"}[s]||s;
+  bar.className="sync-bar"+(s==="syncing"?" syncing":"");
 }
-
-// ── SYNC STATUS ────────────────────────────────────
-function setSync(state) {
-  var dot=document.getElementById("sdot");
-  var txt=document.getElementById("stxt");
-  var bar=document.getElementById("syncbar");
-  var msgs={online:"Sincronizado ✓",syncing:"Sincronizando...",offline:"Sin conexión"};
-  dot.className="sdot "+state;
-  txt.textContent=msgs[state]||state;
-  bar.className="sync-bar"+(state==="syncing"?" syncing":"");
-}
-
-// ── ESCUCHA FIRESTORE ──────────────────────────────
 setSync("syncing");
 
-db.collection("movimientos").orderBy("ts","asc").onSnapshot(function(snap) {
-  records = snap.docs.map(function(d){ var r=d.data(); r._id=d.id; return r; });
-  setSync("online");
-  updateBadges();
-  if(document.getElementById("screen-historial").classList.contains("active")) renderHistorial();
-  if(document.getElementById("screen-exportar").classList.contains("active"))  renderStats();
-}, function(){ setSync("offline"); });
+db.collection("movimientos").orderBy("ts","asc").onSnapshot(function(snap){
+  records=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
+  setSync("online"); updateBadges();
+  if(isActive("screen-historial")) renderHistorial();
+  if(isActive("screen-exportar"))  renderStats();
+  if(isActive("screen-dashboard")) renderDashboard();
+},function(){setSync("offline");});
 
-db.collection("caja").orderBy("ts","asc").onSnapshot(function(snap) {
-  cajaRecs = snap.docs.map(function(d){ var r=d.data(); r._id=d.id; return r; });
-  updateBadges();
-  renderCajaResumen();
-  renderCajaList();
-  if(document.getElementById("screen-exportar").classList.contains("active")) renderStats();
-}, function(){ setSync("offline"); });
+db.collection("caja").orderBy("ts","asc").onSnapshot(function(snap){
+  cajaRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
+  updateBadges(); renderCajaResumen(); renderCajaList();
+  if(isActive("screen-exportar"))  renderStats();
+  if(isActive("screen-dashboard")) renderDashboard();
+},function(){setSync("offline");});
 
-window.addEventListener("online",  function(){ setSync("online");  document.getElementById("offbanner").classList.remove("show"); });
-window.addEventListener("offline", function(){ setSync("offline"); document.getElementById("offbanner").classList.add("show"); });
+window.addEventListener("online", function(){setSync("online"); document.getElementById("offbanner").classList.remove("show");});
+window.addEventListener("offline",function(){setSync("offline");document.getElementById("offbanner").classList.add("show");});
+window.addEventListener("load",function(){
+  document.getElementById("ff").value=hoy();
+  document.getElementById("cf").value=hoy();
+  updateCats();renderCajaResumen();renderCajaList();
+});
 
-// ── INIT UI ────────────────────────────────────────
-document.getElementById("ff").value = hoy();
-document.getElementById("cf").value = hoy();
-
-function updateBadges() {
-  document.getElementById("breg").textContent = records.length  +" mov.";
-  document.getElementById("bcaj").textContent = cajaRecs.length +" caja";
+function isActive(id){return document.getElementById(id).classList.contains("active");}
+function updateBadges(){
+  document.getElementById("breg").textContent=records.length+" mov.";
+  document.getElementById("bcaj").textContent=cajaRecs.length+" caja";
 }
-function setLoading(id, on) {
-  var b=document.getElementById(id);
-  if(!b) return;
-  b.disabled=on;
-  if(on) b.classList.add("spin"); else b.classList.remove("spin");
-}
+function setLoading(id,on){var b=document.getElementById(id);if(!b)return;b.disabled=on;if(on)b.classList.add("spin");else b.classList.remove("spin");}
 
-// ── TIPO MOVIMIENTO ────────────────────────────────
-function setMovSuc(s) {
-  movSuc=s;
-  ["msoc","mstu","msge"].forEach(function(id){ document.getElementById(id).className="sb"; });
-  if(s==="Ocampo")   document.getElementById("msoc").className="sb soc";
-  if(s==="Tucuman")  document.getElementById("mstu").className="sb stu";
-  if(s==="General")  document.getElementById("msge").className="sb sge";
-}
-function setCajaSuc(s) {
-  cajaSuc=s;
-  ["csoc","cstu","csge"].forEach(function(id){ document.getElementById(id).className="sb"; });
-  if(s==="Ocampo")   document.getElementById("csoc").className="sb soc";
-  if(s==="Tucuman")  document.getElementById("cstu").className="sb stu";
-  if(s==="General")  document.getElementById("csge").className="sb sge";
-}
-function setTipo(t) {
+// ── TIPOS / SUCURSALES ──────────────────────────────────────────────────────
+function setTipo(t){
   tipoMov=t;
-  document.getElementById("beg").className="sb"+(t==="Egreso" ?" se":"");
+  document.getElementById("beg").className="sb"+(t==="Egreso"?" se":"");
   document.getElementById("bin").className="sb"+(t==="Ingreso"?" si":"");
   updateCats();
 }
-
-// ── TIPO CAJA ──────────────────────────────────────
-function setCajaTipo(t) {
+function setMovSuc(s){
+  movSuc=s;
+  ["msoc","mstu","msge"].forEach(function(id){document.getElementById(id).className="sb";});
+  if(s==="Ocampo") document.getElementById("msoc").className="sb soc";
+  if(s==="Tucuman")document.getElementById("mstu").className="sb stu";
+  if(s==="General")document.getElementById("msge").className="sb sge";
+}
+function setCajaSuc(s){
+  cajaSuc=s;
+  ["csoc","cstu","csge"].forEach(function(id){document.getElementById(id).className="sb";});
+  if(s==="Ocampo") document.getElementById("csoc").className="sb soc";
+  if(s==="Tucuman")document.getElementById("cstu").className="sb stu";
+  if(s==="General")document.getElementById("csge").className="sb sge";
+}
+function setCajaTipo(t){
   tipoCaja=t;
   document.getElementById("bex").className="sb"+(t==="Extraccion"?" sx":"");
-  document.getElementById("bga").className="sb"+(t==="Gasto"    ?" sg":"");
+  document.getElementById("bga").className="sb"+(t==="Gasto"?" sg":"");
   document.getElementById("chint").innerHTML=t==="Extraccion"
     ?"💸 <strong>Extracción:</strong> Retiro en efectivo o transferencia personal."
-    :"🧾 <strong>Gasto bolsillo:</strong> Pago de gasto del negocio con tu propio dinero.";
+    :"🧾 <strong>Gasto bolsillo:</strong> Pago del negocio con tu propio dinero.";
 }
 
-// ── DROPDOWNS ──────────────────────────────────────
-function updateCats() {
+// ── IMPACTO CAJA ───────────────────────────────────────────────────────────
+function onCajToggle(){
+  cajImpact=document.getElementById("caj-toggle").checked;
+  document.getElementById("caj-tipo-row").style.display=cajImpact?"block":"none";
+  if(cajImpact&&!cajImpactTipo) setCajImpactTipo("Extraccion");
+}
+function setCajImpactTipo(t){
+  cajImpactTipo=t;
+  document.getElementById("btn-caj-ext").className="sb"+(t==="Extraccion"?" sx":"");
+  document.getElementById("btn-caj-gst").className="sb"+(t==="Gasto"?" sg":"");
+}
+
+// ── DROPDOWNS ──────────────────────────────────────────────────────────────
+function updateCats(){
   var s=document.getElementById("fcat");
   s.innerHTML='<option value="">— Seleccionar —</option>';
-  Object.keys(CATS[tipoMov]).forEach(function(c){
-    var o=document.createElement("option"); o.value=o.textContent=c; s.appendChild(o);
-  });
+  Object.keys(CATS[tipoMov]).forEach(function(c){var o=document.createElement("option");o.value=o.textContent=c;s.appendChild(o);});
   updateSub();
 }
-function updateSub() {
+function updateSub(){
   var cat=document.getElementById("fcat").value;
   var subs=(CATS[tipoMov]||{})[cat]||[];
-  var row=document.getElementById("rowsub");
-  var s=document.getElementById("fsub");
+  var row=document.getElementById("rowsub"),s=document.getElementById("fsub");
   if(subs.length){
     s.innerHTML='<option value="">— Seleccionar —</option>';
-    subs.forEach(function(v){ var o=document.createElement("option"); o.value=o.textContent=v; s.appendChild(o); });
+    subs.forEach(function(v){var o=document.createElement("option");o.value=o.textContent=v;s.appendChild(o);});
     row.style.display="flex";
-  } else { row.style.display="none"; s.value=""; }
+  }else{row.style.display="none";s.value="";}
 }
 
-// ── CARGAR MOVIMIENTO ──────────────────────────────
-function cargarMov() {
+// ── CARGAR MOVIMIENTO ──────────────────────────────────────────────────────
+function cargarMov(){
   var fecha=document.getElementById("ff").value;
-  var suc  =movSuc;
-  var cat  =document.getElementById("fcat").value;
-  var sub  =document.getElementById("fsub").value;
+  var suc=movSuc,cat=document.getElementById("fcat").value,sub=document.getElementById("fsub").value;
   var monto=parseFloat(document.getElementById("fm").value);
   var notas=document.getElementById("fn").value.trim();
   if(!fecha)           return toast("Completá la fecha","err");
@@ -390,29 +486,41 @@ function cargarMov() {
   if(tipoMov==="Egreso"&&["Personal","Proveedores","Local"].indexOf(cat)>=0&&!sub)
                        return toast("Esta categoría requiere subcategoría","err");
   if(!monto||monto<=0) return toast("Ingresá un monto válido","err");
+  if(cajImpact&&!cajImpactTipo) return toast("Elegí tipo de impacto en caja","err");
+
   var d=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
   setLoading("bcm",true);
-  db.collection("movimientos").add({
-    fecha:fecha, tipo:tipoMov, suc:suc, cat:cat, sub:sub||"",
-    monto:monto, semana:sem, mes:d.getMonth()+1, notas:notas,
+
+  var ops=[db.collection("movimientos").add({
+    fecha:fecha,tipo:tipoMov,suc:suc,cat:cat,sub:sub||"",monto:monto,
+    semana:sem,mes:d.getMonth()+1,notas:notas,
     ts:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(){
-    toast("✓ Guardado en la nube","ok");
-    movSuc="";
-    setMovSuc("");
-    ["fcat","fm","fn","fsub"].forEach(function(id){ document.getElementById(id).value=""; });
+  })];
+  if(cajImpact){
+    ops.push(db.collection("caja").add({
+      fecha:fecha,suc:suc,tipo:cajImpactTipo,monto:monto,
+      notas:(notas?"["+cat+(sub?" / "+sub:"")+"] "+notas:"["+cat+(sub?" / "+sub:"")+"]"),
+      ts:firebase.firestore.FieldValue.serverTimestamp()
+    }));
+  }
+
+  Promise.all(ops).then(function(){
+    toast(cajImpact?"✓ Movimiento + Caja guardados":"✓ Guardado en la nube","ok");
+    movSuc="";setMovSuc("");
+    ["fcat","fm","fn","fsub"].forEach(function(id){document.getElementById(id).value="";});
     document.getElementById("rowsub").style.display="none";
     document.getElementById("ff").value=hoy();
-    updateCats();
-    setLoading("bcm",false);
-  }).catch(function(e){ toast("Error: "+e.message,"err"); setLoading("bcm",false); });
+    document.getElementById("caj-toggle").checked=false;
+    cajImpact=false;cajImpactTipo="";
+    document.getElementById("caj-tipo-row").style.display="none";
+    updateCats();setLoading("bcm",false);
+  }).catch(function(e){toast("Error: "+e.message,"err");setLoading("bcm",false);});
 }
 
-// ── CARGAR CAJA ────────────────────────────────────
-function cargarCaja() {
-  var fecha=document.getElementById("cf").value;
-  var suc=cajaSuc;
+// ── CARGAR CAJA ────────────────────────────────────────────────────────────
+function cargarCaja(){
+  var fecha=document.getElementById("cf").value,suc=cajaSuc;
   var monto=parseFloat(document.getElementById("cm2").value);
   var notas=document.getElementById("cn2").value.trim();
   if(!fecha)           return toast("Completá la fecha","err");
@@ -420,141 +528,224 @@ function cargarCaja() {
   if(!monto||monto<=0) return toast("Ingresá un monto válido","err");
   setLoading("bcc",true);
   db.collection("caja").add({
-    fecha:fecha, suc:suc, tipo:tipoCaja, monto:monto, notas:notas,
+    fecha:fecha,suc:suc,tipo:tipoCaja,monto:monto,notas:notas,
     ts:firebase.firestore.FieldValue.serverTimestamp()
   }).then(function(){
-    toast("✓ Caja guardada en la nube","tel");
-    document.getElementById("cm2").value="";
-    document.getElementById("cn2").value="";
-    cajaSuc="";
-    setCajaSuc("");
+    toast("✓ Caja guardada","tel");
+    document.getElementById("cm2").value="";document.getElementById("cn2").value="";
     document.getElementById("cf").value=hoy();
-    setLoading("bcc",false);
-  }).catch(function(e){ toast("Error: "+e.message,"err"); setLoading("bcc",false); });
+    cajaSuc="";setCajaSuc("");setLoading("bcc",false);
+  }).catch(function(e){toast("Error: "+e.message,"err");setLoading("bcc",false);});
 }
 
-// ── RESUMEN DÍA CAJA ───────────────────────────────
-function renderCajaResumen() {
+// ── RESUMEN CAJA ───────────────────────────────────────────────────────────
+function renderCajaResumen(){
   var d=document.getElementById("cf")?document.getElementById("cf").value:hoy();
-  var day=cajaRecs.filter(function(r){ return r.fecha===d; });
-  var ext=day.filter(function(r){ return r.tipo==="Extraccion"; }).reduce(function(s,r){ return s+r.monto; },0);
-  var gst=day.filter(function(r){ return r.tipo==="Gasto"; }).reduce(function(s,r){ return s+r.monto; },0);
+  var day=cajaRecs.filter(function(r){return r.fecha===d;});
+  var ext=day.filter(function(r){return r.tipo==="Extraccion";}).reduce(function(s,r){return s+r.monto;},0);
+  var gst=day.filter(function(r){return r.tipo==="Gasto";}).reduce(function(s,r){return s+r.monto;},0);
   var net=ext-gst;
-  function fmt(v){ return "$"+v.toLocaleString("es-AR",{maximumFractionDigits:0}); }
-  document.getElementById("rex").textContent=fmt(ext);
-  document.getElementById("rgs").textContent=fmt(gst);
-  document.getElementById("rnt").textContent=fmt(Math.abs(net));
+  document.getElementById("rex").textContent=fp(ext);
+  document.getElementById("rgs").textContent=fp(gst);
+  document.getElementById("rnt").textContent=fp(Math.abs(net));
   document.getElementById("rnt").style.color=net>=0?"var(--teal)":"var(--red)";
 }
-
-// ── LISTA CAJA ─────────────────────────────────────
-function renderCajaList() {
-  var list=document.getElementById("cajalist");
-  if(!list) return;
-  var data=cajaRecs.slice().reverse().slice(0,12);
-  if(!data.length){ list.innerHTML='<div class="empty"><div class="eico">💵</div><p>Sin registros de caja.</p></div>'; return; }
+function renderCajaList(){
+  var list=document.getElementById("cajalist");if(!list)return;
+  var data=[...cajaRecs].reverse().slice(0,10);
+  if(!data.length){list.innerHTML='<div class="empty"><div class="eico">💵</div><p>Sin registros.</p></div>';return;}
   list.innerHTML=data.map(function(r){
     var col=r.tipo==="Extraccion"?"var(--teal)":"var(--purple)";
-    var ico=r.tipo==="Extraccion"?"💸":"🧾";
-    return '<div class="ri"><div class="rdot" style="background:'+col+'"></div>'
-      +'<div class="rb"><div class="rt" style="color:'+col+'">'+ico+' '+r.tipo+(r.suc?' · '+r.suc:'')+'</div>'
-      +'<div class="rs">'+r.fecha.split("-").reverse().join("/")+(r.notas?" · "+r.notas:"")+'</div></div>'
-      +'<span class="rm" style="color:'+col+'">$'+r.monto.toLocaleString("es-AR")+'</span>'
+    return'<div class="ri"><div class="rdot" style="background:'+col+'"></div>'
+      +'<div class="rb"><div class="rt" style="color:'+col+'">'+(r.tipo==="Extraccion"?"💸":"🧾")+' '+r.tipo+(r.suc?' · '+r.suc:'')+'</div>'
+      +'<div class="rs">'+r.fecha.split("-").reverse().join("/")+(r.notas?' · '+r.notas:'')+'</div></div>'
+      +'<span class="rm" style="color:'+col+'">'+fp(r.monto)+'</span>'
       +'<button class="rdel" onclick="delCaja(\''+r._id+'\')">✕</button></div>';
   }).join("");
 }
+function delCaja(id){if(!confirm("¿Eliminar?"))return;db.collection("caja").doc(id).delete().then(function(){toast("Eliminado","warn");});}
+function delRec(id){if(!confirm("¿Eliminar?"))return;db.collection("movimientos").doc(id).delete().then(function(){toast("Eliminado","warn");});}
 
-function delCaja(id) {
-  if(!confirm("¿Eliminar?")) return;
-  db.collection("caja").doc(id).delete()
-    .then(function(){ toast("Eliminado","warn"); })
-    .catch(function(e){ toast("Error: "+e.message,"err"); });
-}
-function delRec(id) {
-  if(!confirm("¿Eliminar?")) return;
-  db.collection("movimientos").doc(id).delete()
-    .then(function(){ toast("Eliminado","warn"); })
-    .catch(function(e){ toast("Error: "+e.message,"err"); });
-}
-
-// ── HISTORIAL ──────────────────────────────────────
-function setFilter(f,el) {
+// ── HISTORIAL ──────────────────────────────────────────────────────────────
+function setFilter(f,el){
   filterAct=f;
-  document.querySelectorAll(".fc").forEach(function(c){ c.classList.remove("active","ateal"); });
+  document.querySelectorAll("#screen-historial .fc").forEach(function(c){c.classList.remove("active","ateal");});
   el.classList.add(f==="caja"?"ateal":"active");
   renderHistorial();
 }
-function renderHistorial() {
-  var list=document.getElementById("reclist");
-  var html="", lastMes=null;
+function renderHistorial(){
+  var list=document.getElementById("reclist"),html="",lm=null;
   if(filterAct==="caja"){
-    if(!cajaRecs.length){ list.innerHTML='<div class="empty"><div class="eico">💵</div><p>Sin registros de caja.</p></div>'; return; }
-    cajaRecs.slice().reverse().forEach(function(r){
-      var ml=MESES[new Date(r.fecha+"T12:00:00").getMonth()]+" "+r.fecha.slice(0,4);
-      if(ml!==lastMes){ html+='<div class="mhdr">'+ml+'</div>'; lastMes=ml; }
+    if(!cajaRecs.length){list.innerHTML='<div class="empty"><div class="eico">💵</div><p>Sin registros.</p></div>';return;}
+    [...cajaRecs].reverse().forEach(function(r){
+      var ml=MESES_L[new Date(r.fecha+"T12:00:00").getMonth()]+" "+r.fecha.slice(0,4);
+      if(ml!==lm){html+='<div class="mhdr">'+ml+'</div>';lm=ml;}
       var col=r.tipo==="Extraccion"?"var(--teal)":"var(--purple)";
       html+='<div class="ri"><div class="rdot" style="background:'+col+'"></div>'
-        +'<div class="rb"><div class="rt" style="color:'+col+'">'+(r.tipo==="Extraccion"?"💸":"🧾")+' '+r.tipo+'</div>'
-        +'<div class="rs">'+r.fecha.split("-").reverse().join("/")+(r.notas?" · "+r.notas:"")+'</div></div>'
-        +'<span class="rm" style="color:'+col+'">$'+r.monto.toLocaleString("es-AR")+'</span>'
+        +'<div class="rb"><div class="rt" style="color:'+col+'">'+(r.tipo==="Extraccion"?"💸":"🧾")+' '+r.tipo+(r.suc?' · '+r.suc:'')+'</div>'
+        +'<div class="rs">'+r.fecha.split("-").reverse().join("/")+(r.notas?' · '+r.notas:'')+'</div></div>'
+        +'<span class="rm" style="color:'+col+'">'+fp(r.monto)+'</span>'
         +'<button class="rdel" onclick="delCaja(\''+r._id+'\')">✕</button></div>';
     });
-    list.innerHTML=html; return;
+    list.innerHTML=html;return;
   }
-  var data=records.slice().reverse();
-  if(filterAct==="Ingreso"||filterAct==="Egreso") data=data.filter(function(r){ return r.tipo===filterAct; });
-  else if(filterAct!=="todos") data=data.filter(function(r){ return r.suc===filterAct; });
-  if(!data.length){ list.innerHTML='<div class="empty"><div class="eico">📭</div><p>No hay registros.</p></div>'; return; }
+  var data=[...records].reverse();
+  if(filterAct==="Ingreso"||filterAct==="Egreso") data=data.filter(function(r){return r.tipo===filterAct;});
+  else if(filterAct!=="todos") data=data.filter(function(r){return r.suc===filterAct;});
+  if(!data.length){list.innerHTML='<div class="empty"><div class="eico">📭</div><p>No hay registros.</p></div>';return;}
   data.forEach(function(r){
-    var ml=MESES[(r.mes||1)-1]+" "+(r.fecha||"").slice(0,4);
-    if(ml!==lastMes){ html+='<div class="mhdr">'+ml+'</div>'; lastMes=ml; }
+    var ml=MESES_L[(r.mes||1)-1]+" "+(r.fecha||"").slice(0,4);
+    if(ml!==lm){html+='<div class="mhdr">'+ml+'</div>';lm=ml;}
     var col=r.tipo==="Ingreso"?"var(--green)":"var(--orange)";
-    var sgn=r.tipo==="Ingreso"?"+":"−";
     html+='<div class="ri"><div class="rdot" style="background:'+col+'"></div>'
-      +'<div class="rb"><div class="rt">'+r.suc+' · '+r.cat+(r.sub?" · "+r.sub:"")+'</div>'
-      +'<div class="rs">'+((r.fecha||"").split("-").reverse().join("/"))+(r.notas?" · "+r.notas:"")+'</div></div>'
-      +'<span class="rm" style="color:'+col+'">'+sgn+'$'+r.monto.toLocaleString("es-AR")+'</span>'
+      +'<div class="rb"><div class="rt">'+r.suc+' · '+r.cat+(r.sub?' · '+r.sub:'')+'</div>'
+      +'<div class="rs">'+(r.fecha||"").split("-").reverse().join("/")+(r.notas?' · '+r.notas:'')+'</div></div>'
+      +'<span class="rm" style="color:'+col+'">'+(r.tipo==="Ingreso"?"+":"−")+fp(r.monto)+'</span>'
       +'<button class="rdel" onclick="delRec(\''+r._id+'\')">✕</button></div>';
   });
   list.innerHTML=html;
 }
 
-// ── STATS ──────────────────────────────────────────
-function renderStats() {
-  var ing=records.filter(function(r){ return r.tipo==="Ingreso"; }).reduce(function(s,r){ return s+r.monto; },0);
-  var egr=records.filter(function(r){ return r.tipo==="Egreso";  }).reduce(function(s,r){ return s+r.monto; },0);
+// ── DASHBOARD ──────────────────────────────────────────────────────────────
+function setDash(f,el){
+  dashFilter=f;
+  document.querySelectorAll("#dash-fbar .fc").forEach(function(c){c.classList.remove("ablu","active");});
+  el.classList.add("ablu");
+  renderDashboard();
+}
+
+function computeMonthly(){
+  return Array.from({length:12},function(_,i){
+    var m=i+1;
+    var movs=records.filter(function(r){
+      return gm(r.fecha)===m&&(dashFilter==="todos"||r.suc===dashFilter||r.suc==="General");
+    });
+    var cajM=cajaRecs.filter(function(r){
+      return gm(r.fecha)===m&&(dashFilter==="todos"||!r.suc||r.suc===dashFilter);
+    });
+    var movDirect=records.filter(function(r){
+      return gm(r.fecha)===m&&(dashFilter==="todos"||r.suc===dashFilter);
+    });
+    var ing=movDirect.filter(function(r){return r.tipo==="Ingreso";}).reduce(function(s,r){return s+r.monto;},0);
+    var egr=movDirect.filter(function(r){return r.tipo==="Egreso";}).reduce(function(s,r){return s+r.monto;},0);
+    var ext=cajM.filter(function(r){return r.tipo==="Extraccion";}).reduce(function(s,r){return s+r.monto;},0);
+    var gst=cajM.filter(function(r){return r.tipo==="Gasto";}).reduce(function(s,r){return s+r.monto;},0);
+    return{m:m,ing:ing,egr:egr,res:ing-egr,margen:ing>0?(ing-egr)/ing:0,ext:ext,gst:gst,neto:ext-gst};
+  });
+}
+
+function renderDashboard(){
+  var months=computeMonthly();
+  var tIng=months.reduce(function(s,m){return s+m.ing;},0);
+  var tEgr=months.reduce(function(s,m){return s+m.egr;},0);
+  var tRes=tIng-tEgr;
+  var tCaj=months.reduce(function(s,m){return s+m.neto;},0);
+  var tMar=tIng>0?tRes/tIng:0;
+
+  // KPIs
+  document.getElementById("dash-kpis").innerHTML=[
+    ["Ingresos",fp(tIng),"g"],
+    ["Egresos",fp(tEgr),"o"],
+    ["Resultado",fp(tRes),tRes>=0?"g":"r"],
+    ["Margen",(tMar*100).toFixed(1)+"%",tMar>=0?"t":"r"],
+    ["Caja neta",fp(tCaj),tCaj>=0?"t":"r"],
+    ["Registros",records.length+" mov.","b"]
+  ].map(function(k){
+    return'<div class="sc"><div class="sl">'+k[0]+'</div><div class="sv '+k[2]+'">'+k[1]+'</div></div>';
+  }).join("");
+
+  // Tabla
+  var tbody=document.getElementById("dash-tbody");
+  var rows=months.filter(function(m){return m.ing>0||m.egr>0||m.ext>0;}).map(function(m){
+    return'<tr>'
+      +'<td>'+MESES[m.m-1]+'</td>'
+      +'<td class="pos">'+fp(m.ing)+'</td>'
+      +'<td class="neg">'+fp(m.egr)+'</td>'
+      +'<td class="'+(m.res>=0?"pos":"neg")+'">'+fp(m.res)+'</td>'
+      +'<td class="neut">'+(m.ing>0?(m.margen*100).toFixed(1)+'%':'-')+'</td>'
+      +'<td class="'+(m.neto>=0?"pos":"neg")+'">'+fp(m.neto)+'</td>'
+      +'</tr>';
+  }).join("");
+  rows+='<tr class="total-row">'
+    +'<td>TOTAL</td>'
+    +'<td class="pos">'+fp(tIng)+'</td><td class="neg">'+fp(tEgr)+'</td>'
+    +'<td class="'+(tRes>=0?"pos":"neg")+'">'+fp(tRes)+'</td>'
+    +'<td class="neut">'+(tIng>0?(tMar*100).toFixed(1)+'%':'-')+'</td>'
+    +'<td class="'+(tCaj>=0?"pos":"neg")+'">'+fp(tCaj)+'</td></tr>';
+  tbody.innerHTML=rows||'<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Sin datos aún</td></tr>';
+
+  // Charts
+  var labels=MESES;
+  var ingArr=months.map(function(m){return m.ing;});
+  var egrArr=months.map(function(m){return m.egr;});
+  var resArr=months.map(function(m){return m.res;});
+  var marArr=months.map(function(m){return+(m.margen*100).toFixed(1);});
+
+  if(chartBar){chartBar.destroy();}
+  chartBar=new Chart(document.getElementById("chart-bar").getContext("2d"),{
+    type:"bar",
+    data:{labels:labels,datasets:[
+      {label:"Ingresos",data:ingArr,backgroundColor:"rgba(30,113,69,.8)",borderRadius:4},
+      {label:"Egresos", data:egrArr,backgroundColor:"rgba(197,90,17,.8)",borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:"#6b7280",font:{size:11},boxWidth:12}}},
+      scales:{
+        x:{ticks:{color:"#6b7280",font:{size:9}},grid:{display:false}},
+        y:{ticks:{color:"#6b7280",font:{size:9},callback:function(v){return"$"+v.toLocaleString("es-AR");}},grid:{color:"rgba(0,0,0,.04)"}}
+      }}
+  });
+
+  if(chartLine){chartLine.destroy();}
+  chartLine=new Chart(document.getElementById("chart-line").getContext("2d"),{
+    type:"line",
+    data:{labels:labels,datasets:[
+      {label:"Resultado ($)",data:resArr,borderColor:"#0e6b72",backgroundColor:"rgba(14,107,114,.1)",borderWidth:2.5,fill:true,tension:.3,pointRadius:3,pointBackgroundColor:"#0e6b72"},
+      {label:"Margen (%)", data:marArr,borderColor:"#5c2680",backgroundColor:"transparent",borderWidth:2,fill:false,tension:.3,pointRadius:3,pointBackgroundColor:"#5c2680",yAxisID:"yp"}
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:"#6b7280",font:{size:11},boxWidth:12}}},
+      scales:{
+        x:{ticks:{color:"#6b7280",font:{size:9}},grid:{display:false}},
+        y:{ticks:{color:"#6b7280",font:{size:9},callback:function(v){return"$"+v.toLocaleString("es-AR");}},grid:{color:"rgba(0,0,0,.04)"}},
+        yp:{position:"right",ticks:{color:"#5c2680",font:{size:9},callback:function(v){return v+"%";}},grid:{display:false}}
+      }}
+  });
+}
+
+// ── STATS EXPORTAR ─────────────────────────────────────────────────────────
+function renderStats(){
+  var ing=records.filter(function(r){return r.tipo==="Ingreso";}).reduce(function(s,r){return s+r.monto;},0);
+  var egr=records.filter(function(r){return r.tipo==="Egreso";}).reduce(function(s,r){return s+r.monto;},0);
   var res=ing-egr;
-  var ext=cajaRecs.filter(function(r){ return r.tipo==="Extraccion"; }).reduce(function(s,r){ return s+r.monto; },0);
-  var gst=cajaRecs.filter(function(r){ return r.tipo==="Gasto";      }).reduce(function(s,r){ return s+r.monto; },0);
-  var net=ext-gst;
-  function f(v){ return "$"+Math.abs(v).toLocaleString("es-AR",{maximumFractionDigits:0}); }
+  var ext=cajaRecs.filter(function(r){return r.tipo==="Extraccion";}).reduce(function(s,r){return s+r.monto;},0);
+  var gst=cajaRecs.filter(function(r){return r.tipo==="Gasto";}).reduce(function(s,r){return s+r.monto;},0);
   document.getElementById("smov").innerHTML=
-    '<div class="sc"><div class="sl">Ingresos</div><div class="sv g">'+f(ing)+'</div></div>'
-   +'<div class="sc"><div class="sl">Egresos</div><div class="sv o">'+f(egr)+'</div></div>'
-   +'<div class="sc"><div class="sl">Resultado</div><div class="sv '+(res>=0?"g":"r")+'">'+(res>=0?"+":"−")+f(res)+'</div></div>'
+    '<div class="sc"><div class="sl">Ingresos</div><div class="sv g">'+fp(ing)+'</div></div>'
+   +'<div class="sc"><div class="sl">Egresos</div><div class="sv o">'+fp(egr)+'</div></div>'
+   +'<div class="sc"><div class="sl">Resultado</div><div class="sv '+(res>=0?"g":"r")+'">'+fp(res)+'</div></div>'
    +'<div class="sc"><div class="sl">Registros</div><div class="sv">'+records.length+'</div></div>';
   document.getElementById("scaj").innerHTML=
-    '<div class="sc"><div class="sl">Extracciones</div><div class="sv t">'+f(ext)+'</div></div>'
-   +'<div class="sc"><div class="sl">Gastos bolsillo</div><div class="sv o">'+f(gst)+'</div></div>'
-   +'<div class="sc"><div class="sl">Neto caja</div><div class="sv '+(net>=0?"t":"r")+'">'+(net>=0?"+":"−")+f(net)+'</div></div>'
+    '<div class="sc"><div class="sl">Extracciones</div><div class="sv t">'+fp(ext)+'</div></div>'
+   +'<div class="sc"><div class="sl">Gastos bolsillo</div><div class="sv o">'+fp(gst)+'</div></div>'
+   +'<div class="sc"><div class="sl">Neto caja</div><div class="sv '+(ext-gst>=0?"t":"r")+'">'+fp(ext-gst)+'</div></div>'
    +'<div class="sc"><div class="sl">Entradas</div><div class="sv">'+cajaRecs.length+'</div></div>';
 }
 
-// ── EXPORTAR ───────────────────────────────────────
-function exportXLSX() {
-  if(!records.length&&!cajaRecs.length) return toast("No hay datos","err");
-  if(!window.XLSX) return toast("Recargá la página e intentá de nuevo","err");
-  var xl=window.XLSX, wb=xl.utils.book_new();
+// ── EXPORT XLSX ────────────────────────────────────────────────────────────
+function exportXLSX(){
+  if(!records.length&&!cajaRecs.length)return toast("No hay datos","err");
+  var xl=window.XLSX;if(!xl)return toast("Recargá la página","err");
+  var wb=xl.utils.book_new();
   var h1=["Fecha","Sucursal","Tipo","Categoria","Subcategoria","Monto","Semana","Mes","Notas"];
-  var r1=records.map(function(r){ return [(r.fecha||"").split("-").reverse().join("/"),r.suc,r.tipo,r.cat,r.sub||"",r.monto,r.semana,r.mes,r.notas||""]; });
+  var r1=records.map(function(r){return[(r.fecha||"").split("-").reverse().join("/"),r.suc,r.tipo,r.cat,r.sub||"",r.monto,r.semana,r.mes,r.notas||""];});
   var ws1=xl.utils.aoa_to_sheet([h1].concat(r1));
   ws1["!cols"]=[{wch:12},{wch:12},{wch:10},{wch:22},{wch:22},{wch:12},{wch:7},{wch:5},{wch:28}];
   xl.utils.book_append_sheet(wb,ws1,"Registro Diario");
   var h2=["Fecha","Sucursal","Extraccion","Gasto bolsillo","Notas"];
   var r2=cajaRecs.map(function(r){
-    var ext = r.tipo==="Extraccion" ? r.monto : "";
-    var gst = r.tipo==="Gasto"      ? r.monto : "";
-    return [(r.fecha||"").split("-").reverse().join("/"), r.suc||"", ext, gst, r.notas||""];
+    return[(r.fecha||"").split("-").reverse().join("/"),r.suc||"",
+           r.tipo==="Extraccion"?r.monto:"",r.tipo==="Gasto"?r.monto:"",r.notas||""];
   });
   var ws2=xl.utils.aoa_to_sheet([h2].concat(r2));
   ws2["!cols"]=[{wch:12},{wch:12},{wch:16},{wch:18},{wch:30}];
@@ -562,49 +753,131 @@ function exportXLSX() {
   xl.writeFile(wb,"Mascotera_"+new Date().toISOString().slice(0,10)+".xlsx");
   toast("✓ Descargado","ok");
 }
-function exportCSV() {
-  if(!records.length) return toast("No hay movimientos","err");
-  function esc(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }
+function exportCSV(){
+  if(!records.length)return toast("No hay movimientos","err");
+  function esc(v){return'"'+String(v).replace(/"/g,'""')+'"';}
   var h="Fecha,Sucursal,Tipo,Categoria,Subcategoria,Monto,Semana,Mes,Notas\n";
-  var r=records.map(function(r){ return [(r.fecha||"").split("-").reverse().join("/"),r.suc,r.tipo,r.cat,r.sub||"",r.monto,r.semana,r.mes,r.notas||""].map(esc).join(","); }).join("\n");
+  var r=records.map(function(r){return[(r.fecha||"").split("-").reverse().join("/"),r.suc,r.tipo,r.cat,r.sub||"",r.monto,r.semana,r.mes,r.notas||""].map(esc).join(",");}).join("\n");
   var a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([h+r],{type:"text/csv;charset=utf-8;"}));
-  a.download="Mascotera_"+new Date().toISOString().slice(0,10)+".csv"; a.click();
+  a.download="Mascotera_"+new Date().toISOString().slice(0,10)+".csv";a.click();
   toast("✓ CSV descargado","ok");
 }
-function clearAll() {
-  var total=records.length+cajaRecs.length;
-  if(!confirm("¿Borrar "+total+" registros de la NUBE? No se puede deshacer.")) return;
-  var dels=records.map(function(r){ return db.collection("movimientos").doc(r._id).delete(); })
-    .concat(cajaRecs.map(function(r){ return db.collection("caja").doc(r._id).delete(); }));
-  Promise.all(dels).then(function(){ toast("Borrado","warn"); }).catch(function(e){ toast("Error: "+e.message,"err"); });
+
+// ── IMPORTAR EXCEL ─────────────────────────────────────────────────────────
+function importXLSX(input){
+  var file=input.files[0];if(!file)return;input.value="";
+  var xl=window.XLSX;if(!xl)return toast("Recargá la página","err");
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=new Uint8Array(e.target.result);
+      var wb=xl.read(data,{type:"array",cellDates:true,raw:false});
+      var movRows=[],cajRows=[];
+
+      var shRD=wb.Sheets["Registro Diario"];
+      if(shRD){
+        var raws=xl.utils.sheet_to_json(shRD,{header:1,raw:false,dateNF:"DD/MM/YYYY"});
+        for(var i=1;i<raws.length;i++){
+          var row=raws[i];
+          if(!row||!row[0]||!row[5])continue;
+          var fecha=parseFecha(row[0]);if(!fecha)continue;
+          var monto=parseFloat(String(row[5]).replace(/[^0-9.-]/g,""));if(!monto||monto<=0)continue;
+          var d=new Date(fecha+"T12:00:00");
+          var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
+          movRows.push({fecha:fecha,suc:row[1]||"",tipo:row[2]||"",cat:row[3]||"",sub:row[4]||"",
+            monto:monto,semana:sem,mes:d.getMonth()+1,notas:row[8]||"",
+            ts:firebase.firestore.FieldValue.serverTimestamp()});
+        }
+      }
+
+      var shCJ=wb.Sheets["Caja Diaria"];
+      if(shCJ){
+        var rawc=xl.utils.sheet_to_json(shCJ,{header:1,raw:false,dateNF:"DD/MM/YYYY"});
+        for(var j=1;j<rawc.length;j++){
+          var cr=rawc[j];if(!cr||!cr[0])continue;
+          var cf=parseFecha(cr[0]);if(!cf)continue;
+          var cext=parseFloat(String(cr[2]||"").replace(/[^0-9.-]/g,""))||0;
+          var cgst=parseFloat(String(cr[3]||"").replace(/[^0-9.-]/g,""))||0;
+          var csuc=cr[1]||"",cnotas=cr[4]||"";
+          if(cext>0)cajRows.push({fecha:cf,suc:csuc,tipo:"Extraccion",monto:cext,notas:cnotas,ts:firebase.firestore.FieldValue.serverTimestamp()});
+          if(cgst>0)cajRows.push({fecha:cf,suc:csuc,tipo:"Gasto",monto:cgst,notas:cnotas,ts:firebase.firestore.FieldValue.serverTimestamp()});
+        }
+      }
+
+      var total=movRows.length+cajRows.length;
+      if(total===0)return toast("No se encontraron datos válidos en el archivo","err");
+      if(!confirm("Se importarán "+movRows.length+" movimientos y "+cajRows.length+" entradas de caja.\n¿Continuar?"))return;
+      batchImport(movRows,cajRows);
+    }catch(err){toast("Error al leer el archivo: "+err.message,"err");}
+  };
+  reader.readAsArrayBuffer(file);
 }
 
-// ── NAVEGACIÓN ─────────────────────────────────────
-function showTab(t) {
-  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); });
-  document.querySelectorAll(".tab").forEach(function(x){ x.classList.remove("active"); });
+function parseFecha(val){
+  if(!val)return null;
+  var s=String(val).trim();
+  var m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m)return m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  if(val instanceof Date&&!isNaN(val))
+    return val.getFullYear()+"-"+String(val.getMonth()+1).padStart(2,"0")+"-"+String(val.getDate()).padStart(2,"0");
+  return null;
+}
+
+function batchImport(movRows,cajRows){
+  var prog=document.getElementById("iprog"),bar=document.getElementById("ibar");
+  var txt=document.getElementById("itxt"),title=document.getElementById("ititle");
+  prog.classList.add("show");title.textContent="Importando...";
+  var all=[];
+  movRows.forEach(function(r){all.push({col:"movimientos",data:r});});
+  cajRows.forEach(function(r){all.push({col:"caja",data:r});});
+  var idx=0;
+  function next(){
+    if(idx>=all.length){
+      bar.style.width="100%";
+      txt.textContent="✓ "+movRows.length+" movimientos y "+cajRows.length+" entradas de caja importados";
+      title.textContent="Importación completa ✓";
+      toast("✓ Importados "+all.length+" registros","blu");
+      setTimeout(function(){prog.classList.remove("show");},5000);
+      return;
+    }
+    var item=all[idx];
+    db.collection(item.col).add(item.data).then(function(){
+      idx++;bar.style.width=Math.round(idx/all.length*100)+"%";
+      txt.textContent=idx+" de "+all.length+" registros...";
+      if(idx%20===0){setTimeout(next,80);}else{next();}
+    }).catch(function(){idx++;next();});
+  }
+  next();
+}
+
+function clearAll(){
+  var total=records.length+cajaRecs.length;
+  if(!confirm("¿Borrar "+total+" registros de la NUBE? No se puede deshacer."))return;
+  var dels=records.map(function(r){return db.collection("movimientos").doc(r._id).delete();})
+    .concat(cajaRecs.map(function(r){return db.collection("caja").doc(r._id).delete();}));
+  Promise.all(dels).then(function(){toast("Borrado","warn");});
+}
+
+// ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
+function showTab(t){
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("active");});
   document.getElementById("screen-"+t).classList.add("active");
-  var idx={cargar:0,caja:1,historial:2,exportar:3}[t];
-  document.querySelectorAll(".tab")[idx].classList.add("active");
+  document.querySelectorAll(".tab")[{cargar:0,caja:1,historial:2,dashboard:3,exportar:4}[t]].classList.add("active");
   if(t==="historial") renderHistorial();
   if(t==="exportar")  renderStats();
-  if(t==="caja")      { renderCajaResumen(); renderCajaList(); }
+  if(t==="caja")      {renderCajaResumen();renderCajaList();}
+  if(t==="dashboard") renderDashboard();
 }
 
-// ── INIT ─────────────────────────────────────────────
-window.addEventListener("load", function() {
-  updateCats();
-  renderCajaResumen();
-});
-
-// ── TOAST ──────────────────────────────────────────
+// ── TOAST ──────────────────────────────────────────────────────────────────
 var tt;
-function toast(msg,type) {
-  var el=document.getElementById("toast");
-  el.textContent=msg;
-  el.className="toast show"+(type==="err"?" err":type==="tel"?" tel":type==="warn"?" warn":"");
-  clearTimeout(tt); tt=setTimeout(function(){ el.classList.remove("show"); },2400);
+function toast(msg,type){
+  var el=document.getElementById("toast");el.textContent=msg;
+  el.className="toast show"+(type==="err"?" err":type==="tel"?" tel":type==="warn"?" warn":type==="blu"?" blu":"");
+  clearTimeout(tt);tt=setTimeout(function(){el.classList.remove("show");},2600);
 }
 </script>
 </body>

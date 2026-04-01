@@ -327,11 +327,11 @@ canvas{max-width:100%;display:block}
     <strong>Importar desde Excel (.xlsx):</strong><br>
     El archivo debe tener el mismo formato del export:<br>
     • Hoja <em>Registro Diario</em> → Fecha | Sucursal | Tipo | Categoria | Subcategoria | Monto | … | Notas<br>
-    • Hoja <em>Caja Diaria</em> → Fecha | Sucursal | Extraccion | Gasto bolsillo | Notas<br>
-    Los datos se <strong>agregan</strong> a Firebase sin borrar los existentes.
+    • Hoja <em>Caja Diaria</em> → Fecha | Extraccion | Gasto bolsillo | … (planilla) <strong>o</strong> Fecha | Sucursal | Extraccion | Gasto | Notas (export app)<br>
+    Acepta archivos <strong>.xlsx y .xlsm</strong>. Los datos se <strong>agregan</strong> a Firebase sin borrar los existentes.
   </div>
   <button class="btn btn-b" onclick="document.getElementById('file-import').click()">📂 Importar archivo .xlsx</button>
-  <input type="file" id="file-import" accept=".xlsx,.xls" style="display:none" onchange="importXLSX(this)">
+  <input type="file" id="file-import" accept=".xlsx,.xls,.xlsm" style="display:none" onchange="importXLSX(this)">
   <div class="iprog" id="iprog">
     <div class="ititl" id="ititle">Importando...</div>
     <div class="ibar-wrap"><div class="ibar" id="ibar"></div></div>
@@ -963,19 +963,44 @@ function importXLSX(input){
       var shCJ=wb.Sheets["Caja Diaria"];
       if(shCJ){
         var rawc=xl.utils.sheet_to_json(shCJ,{header:1,raw:true,defval:""});
+        // Detectar formato automáticamente:
+        // Formato planilla: Fecha | Extraccion | Gasto | Neto | Acumulado | Notas  (sin Sucursal)
+        // Formato export app: Fecha | Sucursal | Extraccion | Gasto bolsillo | Notas  (con Sucursal)
+        // Si col B (cr[1]) es número o vacío → formato planilla; si es string tipo sucursal → formato app
+        var SUCS_CONOCIDAS=["Ocampo","Tucuman","General","ocampo","tucuman","general"];
+        var cajFormatoApp=false;
+        for(var jd=1;jd<rawc.length;jd++){
+          var td=rawc[jd];
+          if(!td||!td[0])continue;
+          if(xlDate(td[0])){
+            cajFormatoApp=(SUCS_CONOCIDAS.indexOf(String(td[1]||"").trim())>=0);
+            break;
+          }
+        }
         for(var j=1;j<rawc.length;j++){
           var cr=rawc[j];if(!cr||!cr[0])continue;
           var cf=xlDate(cr[0]);if(!cf)continue;
-          var cext=toNum(cr[2]);
-          var cgst=toNum(cr[3]);
-          var csuc=String(cr[1]||""),cnotas=String(cr[4]||"");
+          var csuc,cext,cgst,cnotas;
+          if(cajFormatoApp){
+            // Formato export app: A=Fecha B=Sucursal C=Extraccion D=Gasto E=Notas
+            csuc=String(cr[1]||"");
+            cext=toNum(cr[2]);cgst=toNum(cr[3]);cnotas=String(cr[4]||"");
+          } else {
+            // Formato planilla: A=Fecha B=Extraccion C=Gasto F=Notas (sin Sucursal)
+            csuc="";
+            cext=toNum(cr[1]);cgst=toNum(cr[2]);cnotas=String(cr[5]||"");
+          }
           if(cext>0)cajRows.push({fecha:cf,suc:csuc,tipo:"Extraccion",monto:cext,notas:cnotas,ts:firebase.firestore.FieldValue.serverTimestamp()});
           if(cgst>0)cajRows.push({fecha:cf,suc:csuc,tipo:"Gasto",monto:cgst,notas:cnotas,ts:firebase.firestore.FieldValue.serverTimestamp()});
         }
       }
 
       var total=movRows.length+cajRows.length;
-      if(total===0)return toast("No se encontraron datos válidos","err");
+      if(total===0){
+        var found=[];
+        if(wb.SheetNames) wb.SheetNames.forEach(function(n){found.push(n);});
+        return toast("Sin datos válidos. Hojas encontradas: "+(found.join(", ")||"ninguna"),"err");
+      }
       if(!confirm("Se importarán "+movRows.length+" movimientos y "+cajRows.length+" entradas de caja.\n¿Continuar?"))return;
       batchImport(movRows,cajRows);
     }catch(err){toast("Error al leer el archivo: "+err.message,"err");console.error(err);}

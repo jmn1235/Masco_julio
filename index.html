@@ -115,6 +115,17 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .cf-label span{display:block;font-size:10px;font-weight:400;margin-top:2px}
 .cf-input-wrap{display:flex;align-items:center;gap:4px;background:var(--bg);border:2px solid var(--teal);border-radius:10px;padding:6px 10px}
 .cf-input{width:56px;border:none;background:transparent;font-size:18px;font-weight:800;color:var(--teal);text-align:right;outline:none;font-family:inherit}
+.range-card{background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px}
+.range-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.range-field{display:flex;flex-direction:column;gap:4px}
+.range-lbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.range-field input{border:2px solid var(--teal);border-radius:10px;padding:8px 10px;font-size:14px;font-family:inherit;color:var(--navy);background:var(--bg);outline:none}
+.cf-card-multi{flex-direction:column;align-items:stretch;gap:8px}
+.cf-multi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cf-multi-item{display:flex;flex-direction:column;gap:4px}
+.cf-multi-lbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.cf-multi-item .cf-input-wrap{justify-content:flex-end}
+.cf-multi-item .cf-input{width:48px;font-size:16px}
 .cf-pct{font-size:14px;font-weight:700;color:var(--teal)}
 .chart-card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px}
 .chart-card h3{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px}
@@ -164,7 +175,8 @@ canvas{max-width:100%;display:block}
 .mbar-lbl{font-size:11px;font-weight:600;color:var(--text);width:140px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mbar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
 .mbar-fill{height:100%;border-radius:4px;transition:width .4s}
-.mbar-val{font-size:11px;font-weight:700;width:80px;text-align:right;flex-shrink:0}
+.mbar-val{font-size:11px;font-weight:700;width:112px;text-align:right;flex-shrink:0}
+.mbar-pct{font-size:9px;font-weight:700;color:var(--muted);display:inline-block;min-width:34px}
 /* Semana cards */
 .wk-sel{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .wk-sel select{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);-webkit-appearance:none}
@@ -180,7 +192,7 @@ canvas{max-width:100%;display:block}
 .ssc-delta.up{color:var(--green)}.ssc-delta.dn{color:var(--red)}.ssc-delta.neu{color:var(--muted)}
 /* Ratios table */
 .rtable-wrap{overflow-x:auto;margin-bottom:14px;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-.rtable{width:100%;border-collapse:collapse;background:var(--card);font-size:10px;min-width:560px}
+.rtable{width:100%;border-collapse:collapse;background:var(--card);font-size:10px;min-width:640px}
 .rtable th{padding:7px 8px;background:var(--navy);color:#fff;font-weight:700;text-align:right;white-space:nowrap;font-size:9px;letter-spacing:.3px}
 .rtable th:first-child{text-align:left;min-width:60px}
 .rtable td{padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap;font-size:10px}
@@ -374,6 +386,9 @@ canvas{max-width:100%;display:block}
 
   <div class="sdiv">Últimas entradas</div>
   <div class="card" id="stocklist"></div>
+
+  <div class="sdiv">Evolución mes a mes</div>
+  <div id="stock-hist"></div>
 </div>
 
 
@@ -396,7 +411,7 @@ canvas{max-width:100%;display:block}
   <div class="dst-bar">
     <div class="dst active" onclick="setDashView('resumen',this)">Resumen</div>
     <div class="dst" onclick="setDashView('mensual',this)">Mensual</div>
-    <div class="dst" onclick="setDashView('semanal',this)">Semanal</div>
+    <div class="dst" onclick="setDashView('rango',this)">Rango</div>
     <div class="dst" onclick="setDashView('categ',this)">Categorías</div>
     <div class="dst" onclick="setDashView('ratios',this)">Ratios</div>
   </div>
@@ -406,11 +421,17 @@ canvas{max-width:100%;display:block}
     <div class="fc"      onclick="setDash('Ocampo',this)">Ocampo</div>
     <div class="fc"      onclick="setDash('Tucuman',this)">Tucumán</div>
   </div>
-  <div class="cf-card">
-    <div class="cf-label">Costo Financiero <span>% sobre ventas</span></div>
-    <div class="cf-input-wrap">
-      <input class="cf-input" type="number" id="cf-pct" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()">
-      <span class="cf-pct">%</span>
+  <div class="cf-card cf-card-multi">
+    <div class="cf-label">Costo Financiero <span>% sobre ventas · por sucursal</span></div>
+    <div class="cf-multi-grid">
+      <div class="cf-multi-item">
+        <span class="cf-multi-lbl">Ocampo</span>
+        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-oc" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
+      </div>
+      <div class="cf-multi-item">
+        <span class="cf-multi-lbl">Tucumán</span>
+        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-tu" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
+      </div>
     </div>
   </div>
 
@@ -444,20 +465,15 @@ canvas{max-width:100%;display:block}
     <div id="mensual-content"></div>
   </div>
 
-  <!-- VIEW: SEMANAL -->
-  <div class="dview" id="dview-semanal">
-    <div class="wk-sel">
-      <select id="wk-mes-sel" onchange="renderSemanal()">
-        <option value="0">— Todas las semanas —</option>
-        <option value="1">Enero</option><option value="2">Febrero</option>
-        <option value="3">Marzo</option><option value="4">Abril</option>
-        <option value="5">Mayo</option><option value="6">Junio</option>
-        <option value="7">Julio</option><option value="8">Agosto</option>
-        <option value="9">Septiembre</option><option value="10">Octubre</option>
-        <option value="11">Noviembre</option><option value="12">Diciembre</option>
-      </select>
+  <!-- VIEW: RANGO (análisis fecha a fecha) -->
+  <div class="dview" id="dview-rango">
+    <div class="range-card">
+      <div class="range-row">
+        <div class="range-field"><span class="range-lbl">Desde</span><input type="date" id="rg-desde" onchange="renderRango()"></div>
+        <div class="range-field"><span class="range-lbl">Hasta</span><input type="date" id="rg-hasta" onchange="renderRango()"></div>
+      </div>
     </div>
-    <div id="semanal-content"></div>
+    <div id="rango-content"></div>
   </div>
 
   <!-- VIEW: CATEGORÍAS -->
@@ -592,6 +608,19 @@ canvas{max-width:100%;display:block}
         <div class="ch cm">Notas</div>
         <div class="fr"><input type="text" class="fi" id="efn" placeholder="Descripción..." style="padding-left:16px"></div>
       </div>
+      <div class="card" id="ecaj-card">
+        <div class="ch ct">💵 Impacto en Caja <span style="font-weight:400;opacity:.75;font-size:9px"> — GASTO BOLSILLO</span></div>
+        <div class="trow">
+          <div>
+            <div class="tlbl">Imputar este movimiento a Caja</div>
+            <div class="tsub" id="ecaj-hint">Se registra/actualiza como Gasto bolsillo en Caja Diaria.</div>
+          </div>
+          <label class="tswitch">
+            <input type="checkbox" id="ecaj-toggle" onchange="eCajToggle()">
+            <div class="ttrack"></div>
+          </label>
+        </div>
+      </div>
       <button class="btn btn-b" id="ebtn" onclick="guardarEdit()">💾 GUARDAR CAMBIOS</button>
     </div>
   </div>
@@ -680,6 +709,7 @@ var cajImpact=false;
 var stockRecs=[],stockSuc="";
 var chartBar=null,chartLine=null;
 var editId=null,editTipo="Egreso",editSuc="";
+var editCajaLinkId=null,editCajaWanted=false; // imputación a caja del movimiento en edición
 var editCajaId=null,editCajaTipo="Extraccion",editCajaSuc="";
 
 // ── DATOS MAESTROS ─────────────────────────────────────────────────────────
@@ -743,6 +773,9 @@ function startData(){
   document.getElementById("ff").value=hoy();
   document.getElementById("cf").value=hoy();
   document.getElementById("sf").value=hoy();
+  var rgd=document.getElementById("rg-desde"),rgh=document.getElementById("rg-hasta");
+  if(rgd&&!rgd.value){var d=new Date();rgd.value=d.getFullYear()+"-"+p2(d.getMonth()+1)+"-01";}
+  if(rgh&&!rgh.value){rgh.value=hoy();}
   updateCats();
 
   db.collection("movimientos").orderBy("ts","asc").onSnapshot(function(snap){
@@ -762,7 +795,7 @@ function startData(){
 
   db.collection("stock").orderBy("ts","asc").onSnapshot(function(snap){
     stockRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
-    renderStockCards(); renderStockList();
+    renderStockCards(); renderStockList(); renderStockHist();
     if(isA("dashboard")) renderDashboard();
   },function(){});
 }
@@ -773,7 +806,7 @@ window.addEventListener("load",function(){
   document.getElementById("ff").value=hoy();
   document.getElementById("cf").value=hoy();
   updateCats();renderCajaResumen();renderCajaList();
-  renderStockCards();renderStockList();
+  renderStockCards();renderStockList();renderStockHist();
   document.getElementById("sf").value=hoy();
 });
 
@@ -853,19 +886,19 @@ function cargarMov(){
   var d=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
   setLoading("bcm",true);
-  var ops=[db.collection("movimientos").add({
+  db.collection("movimientos").add({
     fecha:fecha,tipo:tipoMov,suc:suc,cat:cat,sub:sub||"",monto:monto,
     semana:sem,mes:d.getMonth()+1,notas:notas,
     ts:firebase.firestore.FieldValue.serverTimestamp()
-  })];
-  if(cajImpact){
-    ops.push(db.collection("caja").add({
-      fecha:fecha,suc:suc,tipo:"Gasto",monto:monto,
-      notas:"["+cat+(sub?" / "+sub:"")+"]"+(notas?" "+notas:""),
-      ts:firebase.firestore.FieldValue.serverTimestamp()
-    }));
-  }
-  Promise.all(ops).then(function(){
+  }).then(function(ref){
+    if(cajImpact){
+      return db.collection("caja").add({
+        fecha:fecha,suc:suc,tipo:"Gasto",monto:monto,movId:ref.id,
+        notas:"["+cat+(sub?" / "+sub:"")+"]"+(notas?" "+notas:""),
+        ts:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  }).then(function(){
     toast(cajImpact?"✓ Movimiento + Gasto caja guardados":"✓ Guardado","ok");
     movSuc="";setMovSuc("");
     ["fcat","fm","fn","fsub"].forEach(function(id){document.getElementById(id).value="";});
@@ -986,6 +1019,15 @@ function openEdit(id){
   buildCatSelect("efcat",editTipo,r.cat||"");
   var hasSubs=buildSubSelect("efsub",editTipo,r.cat||"",r.sub||"");
   document.getElementById("erowsub").style.display=hasSubs?"flex":"none";
+  // Detectar imputación a caja existente (link por movId o heurística)
+  var linked=findLinkedCaja(r);
+  editCajaLinkId=linked?linked._id:null;
+  editCajaWanted=!!linked;
+  var tg=document.getElementById("ecaj-toggle");
+  tg.checked=editCajaWanted;
+  eCajToggle();
+  // La imputación a caja sólo aplica a Egresos
+  document.getElementById("ecaj-card").style.display=(editTipo==="Egreso")?"block":"none";
   document.getElementById("modal-edit").classList.add("open");
 }
 function closeEdit(){
@@ -994,12 +1036,38 @@ function closeEdit(){
 }
 document.getElementById("modal-edit").addEventListener("click",function(e){if(e.target===this)closeEdit();});
 
+// Busca la entrada de caja imputada por un movimiento: primero por movId,
+// si no, heurística (misma fecha, suc, tipo Gasto, monto y notas con "[cat...").
+function findLinkedCaja(r){
+  var byId=cajaRecs.find(function(c){return c.movId&&c.movId===r._id;});
+  if(byId)return byId;
+  var expectNota="["+r.cat+(r.sub?" / "+r.sub:"")+"]";
+  return cajaRecs.find(function(c){
+    return !c.movId && c.tipo==="Gasto" && c.fecha===r.fecha && c.suc===r.suc &&
+           Math.abs(c.monto-r.monto)<0.01 && String(c.notas||"").indexOf(expectNota)===0;
+  })||null;
+}
+function eCajToggle(){
+  var on=document.getElementById("ecaj-toggle").checked;
+  editCajaWanted=on;
+  var hint=document.getElementById("ecaj-hint");
+  if(hint) hint.textContent=on
+    ?"Se registrará/actualizará como Gasto bolsillo en Caja Diaria."
+    :(editCajaLinkId?"Al guardar se eliminará la entrada de caja vinculada.":"No se imputa a caja.");
+}
+
 function eSetTipo(t){
   editTipo=t;
   document.getElementById("eeg").className="sb"+(t==="Egreso"?" se":"");
   document.getElementById("ein").className="sb"+(t==="Ingreso"?" si":"");
   buildCatSelect("efcat",t,"");
   document.getElementById("erowsub").style.display="none";
+  // Imputar a caja sólo tiene sentido para egresos
+  var card=document.getElementById("ecaj-card");
+  if(card){
+    card.style.display=(t==="Egreso")?"block":"none";
+    if(t!=="Egreso"){var tg=document.getElementById("ecaj-toggle");if(tg){tg.checked=false;editCajaWanted=false;}}
+  }
 }
 function eSetSuc(s){
   editSuc=s;
@@ -1026,11 +1094,22 @@ function guardarEdit(){
   var d=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
   setLoading("ebtn",true);
-  db.collection("movimientos").doc(editId).update({
+  var mId=editId, wantCaja=(editTipo==="Egreso")&&editCajaWanted, linkId=editCajaLinkId;
+  db.collection("movimientos").doc(mId).update({
     fecha:fecha,tipo:editTipo,suc:editSuc,cat:cat,sub:sub||"",monto:monto,
     semana:sem,mes:d.getMonth()+1,notas:notas
   }).then(function(){
-    toast("✓ Movimiento actualizado","ok");
+    // Reconciliar imputación a Caja
+    var cajaNota="["+cat+(sub?" / "+sub:"")+"]"+(notas?" "+notas:"");
+    if(wantCaja&&linkId){
+      return db.collection("caja").doc(linkId).update({fecha:fecha,suc:editSuc,tipo:"Gasto",monto:monto,notas:cajaNota,movId:mId});
+    } else if(wantCaja&&!linkId){
+      return db.collection("caja").add({fecha:fecha,suc:editSuc,tipo:"Gasto",monto:monto,movId:mId,notas:cajaNota,ts:firebase.firestore.FieldValue.serverTimestamp()});
+    } else if(!wantCaja&&linkId){
+      return db.collection("caja").doc(linkId).delete();
+    }
+  }).then(function(){
+    toast(wantCaja?"✓ Movimiento + Caja actualizados":(linkId&&!wantCaja?"✓ Movimiento actualizado · Caja eliminada":"✓ Movimiento actualizado"),"ok");
     setLoading("ebtn",false);
     closeEdit();
   }).catch(function(e){toast("Error: "+e.message,"err");setLoading("ebtn",false);});
@@ -1107,7 +1186,47 @@ function setDashView(v,el){
   document.getElementById("dview-"+v).classList.add("active");
   renderDashboard();
 }
-function getCFpct(){return(parseFloat(document.getElementById("cf-pct").value)||0)/100;}
+// Costo financiero % por sucursal (diferenciado). "todos" = ponderado por ventas.
+function getCFpctSuc(suc){
+  var oc=(parseFloat(document.getElementById("cf-pct-oc").value)||0)/100;
+  var tu=(parseFloat(document.getElementById("cf-pct-tu").value)||0)/100;
+  if(suc==="Ocampo") return oc;
+  if(suc==="Tucuman")return tu;
+  return {oc:oc,tu:tu}; // consolidado: se resuelve con ventas por sucursal
+}
+// CF consolidado: cf_ocampo + cf_tucuman calculado con % propio de cada una
+function cfConsolidado(mm){
+  var r=getCFpctSuc("todos");
+  var vOc=mm.filter(function(x){return x.suc==="Ocampo" &&x.tipo==="Ingreso";}).reduce(function(s,x){return s+x.monto;},0);
+  var vTu=mm.filter(function(x){return x.suc==="Tucuman"&&x.tipo==="Ingreso";}).reduce(function(s,x){return s+x.monto;},0);
+  var vGe=mm.filter(function(x){return x.suc==="General" &&x.tipo==="Ingreso";}).reduce(function(s,x){return s+x.monto;},0);
+  var base=vOc+vTu;
+  var gOc=base>0?vGe*(vOc/base):vGe/2;
+  var gTu=base>0?vGe*(vTu/base):vGe/2;
+  return (vOc+gOc)*r.oc + (vTu+gTu)*r.tu;
+}
+// ── AJUSTE GABRIEL YAPURA ────────────────────────────────────────────────
+// Su costo de Personal (donde figure) se reparte 85% Ocampo / 15% Tucumán.
+var GY_NAME="Gabriel Yapura", GY_OC=0.85, GY_TU=0.15;
+// Suma de Gabriel Yapura en un conjunto de movimientos, por sucursal de origen
+function gabrielTotal(mm,srcSuc){
+  return mm.filter(function(r){return r.tipo==="Egreso"&&r.cat==="Personal"&&r.sub===GY_NAME&&(srcSuc?r.suc===srcSuc:true);})
+           .reduce(function(s,r){return s+r.monto;},0);
+}
+// Ajuste al total de Personal de una sucursal para reflejar el split de Gabriel.
+// Devuelve el monto de Gabriel que corresponde a "suc" reemplazando su asignación directa/prorateada.
+function gabrielAjuste(mm,suc,pf){
+  var gTotal=gabrielTotal(mm,null); // todo Gabriel del mes (cualquier suc)
+  if(gTotal<=0)return {quita:0,pone:0};
+  if(suc==="todos")return {quita:0,pone:0}; // consolidado: el total no cambia
+  var factor=suc==="Ocampo"?GY_OC:GY_TU;
+  // lo que hoy se le imputa a "suc" por la lógica estándar (propio + General*pf)
+  var propio=gabrielTotal(mm,suc);
+  var gGen=gabrielTotal(mm,"General");
+  var actual=propio+gGen*pf;
+  var deseado=gTotal*factor;
+  return {quita:actual,pone:deseado};
+}
 
 // Filtro de movimientos por sucursal
 // ── PRORRATEO ─────────────────────────────────────────────────────────────
@@ -1139,7 +1258,6 @@ function filtCaja(arr, suc){
 
 // Datos mensuales completos con prorrateo correcto de "General"
 function computeMonthlyFull(suc){
-  var cfp=getCFpct();
   return Array.from({length:12},function(_,i){
     var m=i+1;
     var mm=records.filter(function(r){return gm(r.fecha)===m;});
@@ -1150,8 +1268,14 @@ function computeMonthlyFull(suc){
     var ingTotal=Object.values(ingCats).reduce(function(s,v){return s+v;},0);
     var egrCats={};
     EGR_CATS.forEach(function(c){egrCats[c]=sumCatP(mm,"Egreso",c,suc,pf);});
+    // Ajuste Gabriel Yapura: 85% Ocampo / 15% Tucumán (afecta Personal por sucursal)
+    var gAdj=gabrielAjuste(mm,suc,pf);
+    egrCats["Personal"]=egrCats["Personal"]-gAdj.quita+gAdj.pone;
     var egrTotal=Object.values(egrCats).reduce(function(s,v){return s+v;},0);
-    var cf=ingTotal*cfp;
+    // Costo financiero diferenciado por sucursal
+    var cf;
+    if(suc==="todos") cf=cfConsolidado(mm);
+    else cf=ingTotal*getCFpctSuc(suc);
     var res=ingTotal-egrTotal-cf;
     var cajSuc=filtCaja(cm,suc);
     var ext=cajSuc.filter(function(r){return r.tipo==="Extraccion";}).reduce(function(s,r){return s+r.monto;},0);
@@ -1168,7 +1292,15 @@ function getWeekLabel(fechaStr){
   return Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
 }
 function computeWeeklyFull(suc, filtMes){
-  var cfp=getCFpct();
+  // CF %: propio de la sucursal, o mezcla ponderada por ventas para consolidado
+  var cfp;
+  if(suc==="Ocampo"||suc==="Tucuman"){ cfp=getCFpctSuc(suc); }
+  else {
+    var r=getCFpctSuc("todos");
+    var vOc=records.filter(function(x){return x.suc==="Ocampo" &&x.tipo==="Ingreso";}).reduce(function(s,x){return s+x.monto;},0);
+    var vTu=records.filter(function(x){return x.suc==="Tucuman"&&x.tipo==="Ingreso";}).reduce(function(s,x){return s+x.monto;},0);
+    cfp=(vOc+vTu)>0?(vOc*r.oc+vTu*r.tu)/(vOc+vTu):(r.oc+r.tu)/2;
+  }
   // Pre-calcular factores de prorrateo por mes
   var pfByMes={};
   for(var mi=1;mi<=12;mi++){
@@ -1327,26 +1459,84 @@ function renderMensualDetalle(){
   document.getElementById("mensual-content").innerHTML=html;
 }
 
-// ── RENDER SEMANAL (Vista 3) ───────────────────────────────────────────────
-function renderSemanal(){
-  var filtMes=parseInt(document.getElementById("wk-mes-sel").value)||0;
-  var weeks=computeWeeklyFull(dashFilter, filtMes);
-  if(!weeks.length){document.getElementById("semanal-content").innerHTML='<div class="empty"><div class="eico">📅</div><p>Sin datos</p></div>';return;}
-  var html='<div class="cat-wrap"><table class="cat-table"><thead><tr><th>Semana</th><th>Ventas</th><th>Egresos</th><th>CF</th><th>Resultado</th><th>Margen</th><th>Caja</th></tr></thead><tbody>';
-  var tI=0,tE=0,tC=0,tN=0;
-  weeks.forEach(function(w){
-    if(w.ing===0&&w.egr===0)return;
-    tI+=w.ing;tE+=w.egr;tC+=w.cf;tN+=w.neto;
-    html+='<tr><td style="font-size:10px;color:var(--navy);">'+w.weekLabel+'</td>';
-    html+='<td class="pos">'+fp(w.ing)+'</td><td class="neg">'+fp(w.egr)+'</td><td class="cf">'+fp(w.cf)+'</td>';
-    html+='<td class="'+(w.res>=0?"pos":"neg")+'">'+fp(w.res)+'</td>';
-    html+='<td class="neut">'+(w.ing>0?(w.margen*100).toFixed(1)+"%":"-")+'</td>';
-    html+='<td class="'+(w.neto>=0?"pos":"neg")+'">'+fp(w.neto)+'</td></tr>';
+// ── RENDER RANGO (Vista 3: fecha a fecha manual) ───────────────────────────
+// Factor de prorrateo sobre un subconjunto arbitrario de movimientos
+function prorFactorSet(suc, movs){
+  if(suc==="todos")return 1;
+  var other=suc==="Ocampo"?"Tucuman":"Ocampo";
+  var sT=movs.filter(function(r){return r.suc===suc  &&r.tipo==="Ingreso";}).reduce(function(s,r){return s+r.monto;},0);
+  var oT=movs.filter(function(r){return r.suc===other&&r.tipo==="Ingreso";}).reduce(function(s,r){return s+r.monto;},0);
+  return (sT+oT)>0?sT/(sT+oT):0.5;
+}
+function renderRango(){
+  var el=document.getElementById("rango-content");if(!el)return;
+  var desde=document.getElementById("rg-desde").value;
+  var hasta=document.getElementById("rg-hasta").value;
+  if(!desde||!hasta){el.innerHTML='<div class="empty"><div class="eico">📅</div><p>Elegí fecha desde y hasta</p></div>';return;}
+  if(desde>hasta){el.innerHTML='<div class="empty"><div class="eico">⚠️</div><p>La fecha "Desde" es posterior a "Hasta"</p></div>';return;}
+  var mm=records.filter(function(r){return r.fecha>=desde&&r.fecha<=hasta;});
+  var cm=cajaRecs.filter(function(r){return r.fecha>=desde&&r.fecha<=hasta;});
+  var suc=dashFilter, pf=prorFactorSet(suc,mm);
+  // Ingresos por categoría
+  var ingCats={},egrCats={};
+  ING_CATS.forEach(function(c){ingCats[c]=sumCatSet(mm,"Ingreso",c,suc,pf);});
+  EGR_CATS.forEach(function(c){egrCats[c]=sumCatSet(mm,"Egreso",c,suc,pf);});
+  // Ajuste Gabriel Yapura
+  var gAdj=gabrielAjuste(mm,suc,pf);
+  egrCats["Personal"]=egrCats["Personal"]-gAdj.quita+gAdj.pone;
+  var ingTotal=Object.values(ingCats).reduce(function(s,v){return s+v;},0);
+  var egrTotal=Object.values(egrCats).reduce(function(s,v){return s+v;},0);
+  // CF diferenciado
+  var cf;
+  if(suc==="todos") cf=cfConsolidado(mm);
+  else cf=ingTotal*getCFpctSuc(suc);
+  var res=ingTotal-egrTotal-cf;
+  var margen=ingTotal>0?res/ingTotal:0;
+  var cajSuc=filtCaja(cm,suc);
+  var ext=cajSuc.filter(function(r){return r.tipo==="Extraccion";}).reduce(function(s,r){return s+r.monto;},0);
+  var gst=cajSuc.filter(function(r){return r.tipo==="Gasto";}).reduce(function(s,r){return s+r.monto;},0);
+  var neto=ext-gst;
+  var nDias=Math.round((new Date(hasta+"T12:00:00")-new Date(desde+"T12:00:00"))/86400000)+1;
+
+  var html='';
+  // KPIs
+  html+='<div class="sg2">';
+  html+='<div class="sc"><div class="sl">Días</div><div class="sv">'+nDias+'</div></div>';
+  html+='<div class="sc"><div class="sl">Ventas</div><div class="sv g">'+fp(ingTotal)+'</div></div>';
+  html+='<div class="sc"><div class="sl">Egresos</div><div class="sv o">'+fp(egrTotal)+'</div></div>';
+  html+='<div class="sc"><div class="sl">Costo Fin.</div><div class="sv o">'+fp(cf)+'</div></div>';
+  html+='<div class="sc"><div class="sl">Resultado</div><div class="sv '+(res>=0?"g":"r")+'">'+fp(res)+'</div></div>';
+  html+='<div class="sc"><div class="sl">Margen</div><div class="sv '+(margen>=0?"t":"r")+'">'+(ingTotal>0?(margen*100).toFixed(1)+"%":"—")+'</div></div>';
+  html+='<div class="sc"><div class="sl">Caja neto</div><div class="sv '+(neto>=0?"t":"r")+'">'+fp(neto)+'</div></div>';
+  html+='<div class="sc"><div class="sl">Movimientos</div><div class="sv">'+mm.length+'</div></div>';
+  html+='</div>';
+  // Tabla ingresos por categoría
+  html+='<div class="sdiv">Ingresos por categoría</div>';
+  html+='<div class="cat-wrap"><table class="cat-table"><thead><tr><th>Categoría</th><th>Monto</th><th>%</th></tr></thead><tbody>';
+  ING_CATS.forEach(function(cat,i){
+    var v=ingCats[cat]||0; if(v===0)return;
+    html+='<tr><td>'+ING_SHORT[i]+'</td><td class="pos">'+fp(v)+'</td><td class="neut">'+(ingTotal>0?(v/ingTotal*100).toFixed(1)+"%":"-")+'</td></tr>';
   });
-  var tR=tI-tE-tC;
-  html+='<tr><td>TOTAL</td><td class="pos">'+fp(tI)+'</td><td class="neg">'+fp(tE)+'</td><td class="cf">'+fp(tC)+'</td><td class="'+(tR>=0?"pos":"neg")+'">'+fp(tR)+'</td><td class="neut">'+(tI>0?(tR/tI*100).toFixed(1)+"%":"-")+'</td><td class="'+(tN>=0?"pos":"neg")+'">'+fp(tN)+'</td></tr>';
-  html+='</tbody></table></div>';
-  document.getElementById("semanal-content").innerHTML=html;
+  html+='<tr><td>TOTAL VENTAS</td><td class="pos">'+fp(ingTotal)+'</td><td class="neut">100%</td></tr></tbody></table></div>';
+  // Tabla egresos por categoría
+  html+='<div class="sdiv">Egresos por categoría</div>';
+  html+='<div class="cat-wrap"><table class="cat-table"><thead><tr><th>Categoría</th><th>Monto</th><th>%</th></tr></thead><tbody>';
+  var totE=egrTotal+cf;
+  EGR_CATS.forEach(function(cat){
+    var v=egrCats[cat]||0; if(v===0)return;
+    html+='<tr><td>'+cat+'</td><td class="neg">'+fp(v)+'</td><td>'+(totE>0?(v/totE*100).toFixed(1)+"%":"-")+'</td></tr>';
+  });
+  html+='<tr><td>Costo Financiero</td><td class="cf">'+fp(cf)+'</td><td>'+(totE>0?(cf/totE*100).toFixed(1)+"%":"-")+'</td></tr>';
+  html+='<tr><td>TOTAL EGRESOS</td><td class="neg">'+fp(totE)+'</td><td>100%</td></tr></tbody></table></div>';
+  el.innerHTML=html;
+}
+// Suma con prorrateo sobre un subconjunto (para rango de fechas)
+function sumCatSet(movs, tipo, cat, suc, pf){
+  var match=function(r){return r.tipo===tipo&&r.cat===cat;};
+  if(suc==="todos") return movs.filter(match).reduce(function(s,r){return s+r.monto;},0);
+  var d=movs.filter(function(r){return r.suc===suc&&match(r);}).reduce(function(s,r){return s+r.monto;},0);
+  var g=movs.filter(function(r){return r.suc==="General"&&match(r);}).reduce(function(s,r){return s+r.monto;},0);
+  return d+g*pf;
 }
 
 // ── RENDER CATEGORÍAS (Vista 4) ────────────────────────────────────────────
@@ -1387,6 +1577,11 @@ function renderCateg(){
   var movsAll=records;
   var pfAnual=prorFactor(dashFilter,movsAll); // factor global del año
   function sumSubP(cat,sub){
+    // Gabriel Yapura: split fijo 85% Ocampo / 15% Tucumán (ignora prorrateo estándar)
+    if(cat==="Personal"&&sub===GY_NAME&&dashFilter!=="todos"){
+      var gT=movsAll.filter(function(r){return r.tipo==="Egreso"&&r.cat==="Personal"&&r.sub===GY_NAME;}).reduce(function(s,r){return s+r.monto;},0);
+      return gT*(dashFilter==="Ocampo"?GY_OC:GY_TU);
+    }
     if(dashFilter==="todos"){
       return movsAll.filter(function(r){return r.tipo==="Egreso"&&r.cat===cat&&r.sub===sub;}).reduce(function(s,r){return s+r.monto;},0);
     }
@@ -1395,18 +1590,22 @@ function renderCateg(){
     return d+g*pfAnual;
   }
 
-  // Detalle Personal (mini-bars)
+  // Detalle Personal (mini-bars) con % sobre total de Personal
   var persData=PERSONAS.map(function(p){return{p:p,v:sumSubP("Personal",p)};}).filter(function(x){return x.v>0;}).sort(function(a,b){return b.v-a.v;});
   var maxP=persData.length?persData[0].v:1;
+  var totP=persData.reduce(function(s,x){return s+x.v;},0);
   document.getElementById("categ-personal").innerHTML=persData.map(function(x){
-    return'<div class="mbar-row"><div class="mbar-lbl">'+x.p+'</div><div class="mbar-track"><div class="mbar-fill" style="width:'+(x.v/maxP*100).toFixed(0)+'%;background:#c0392b"></div></div><div class="mbar-val neg">'+fp(x.v)+'</div></div>';
+    var pc=totP>0?(x.v/totP*100).toFixed(1):"0";
+    return'<div class="mbar-row"><div class="mbar-lbl">'+x.p+'</div><div class="mbar-track"><div class="mbar-fill" style="width:'+(x.v/maxP*100).toFixed(0)+'%;background:#c0392b"></div></div><div class="mbar-val neg">'+fp(x.v)+' <span class="mbar-pct">'+pc+'%</span></div></div>';
   }).join("")||'<p style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Sin datos</p>';
 
-  // Detalle Proveedores (mini-bars)
+  // Detalle Proveedores (mini-bars) con % sobre total de Proveedores
   var provsData=PROVS_LIST.map(function(p){return{p:p,v:sumSubP("Proveedores",p)};}).filter(function(x){return x.v>0;}).sort(function(a,b){return b.v-a.v;});
   var maxPr=provsData.length?provsData[0].v:1;
+  var totPr=provsData.reduce(function(s,x){return s+x.v;},0);
   document.getElementById("categ-provs").innerHTML=provsData.map(function(x){
-    return'<div class="mbar-row"><div class="mbar-lbl">'+x.p+'</div><div class="mbar-track"><div class="mbar-fill" style="width:'+(x.v/maxPr*100).toFixed(0)+'%;background:#e67e22"></div></div><div class="mbar-val" style="color:var(--orange)">'+fp(x.v)+'</div></div>';
+    var pc=totPr>0?(x.v/totPr*100).toFixed(1):"0";
+    return'<div class="mbar-row"><div class="mbar-lbl">'+x.p+'</div><div class="mbar-track"><div class="mbar-fill" style="width:'+(x.v/maxPr*100).toFixed(0)+'%;background:#e67e22"></div></div><div class="mbar-val" style="color:var(--orange)">'+fp(x.v)+' <span class="mbar-pct">'+pc+'%</span></div></div>';
   }).join("")||'<p style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Sin datos</p>';
 
   // Gráfico torta ingresos
@@ -1430,7 +1629,7 @@ function renderCateg(){
 function renderDashboard(){
   if(dashView==="resumen"){renderResumen();renderDashStock();}
   else if(dashView==="mensual")  renderMensualDetalle();
-  else if(dashView==="semanal")  renderSemanal();
+  else if(dashView==="rango")    renderRango();
   else if(dashView==="categ")    renderCateg();
   else if(dashView==="ratios")   renderRatios();
 }
@@ -1670,7 +1869,7 @@ function showTab(t){
   if(t==="historial") renderHistorial();
   if(t==="exportar")  renderStats();
   if(t==="caja")      {renderCajaResumen();renderCajaList();}
-  if(t==="stock")     {renderStockCards();renderStockList();}
+  if(t==="stock")     {renderStockCards();renderStockList();renderStockHist();}
   if(t==="dashboard") renderDashboard();
 }
 
@@ -1767,6 +1966,67 @@ function renderStockList(){
 }
 function delStock(id){if(!confirm("¿Eliminar?"))return;db.collection("stock").doc(id).delete().then(function(){toast("Eliminado","warn");});}
 
+// Evolución mensual del stock con crecimiento en % y $ (por sucursal + consolidado)
+function renderStockHist(){
+  var el=document.getElementById("stock-hist");if(!el)return;
+  if(!stockRecs.length){el.innerHTML='<div class="empty"><div class="eico">📦</div><p>Sin registros de stock.</p></div>';return;}
+  function tabla(suc,label,cls){
+    // último registro de cada mes (1..12) para la sucursal
+    var vals=[];
+    for(var m=1;m<=12;m++){
+      var recs=stockRecs.filter(function(r){return r.suc===suc&&gm(r.fecha)===m;});
+      if(recs.length) vals.push({m:m,v:recs[recs.length-1].monto,fecha:recs[recs.length-1].fecha});
+    }
+    if(!vals.length)return "";
+    var html='<div class="suc-hdr '+cls+'">'+label+'</div>';
+    html+='<div class="rtable-wrap"><table class="rtable"><thead><tr><th>Mes</th><th>Stock</th><th>Δ $</th><th>Δ %</th></tr></thead><tbody>';
+    vals.forEach(function(x,i){
+      var prev=i>0?vals[i-1].v:null;
+      var dMonto=prev!==null?(x.v-prev):null;
+      var dPct=prev!==null&&prev>0?((x.v-prev)/prev*100):null;
+      var mCls=dMonto===null?"neu":dMonto>0?"pos":dMonto<0?"neg":"neu";
+      var pCls=dPct===null?"neu":dPct>0?"up":dPct<0?"dn":"neu";
+      html+='<tr><td>'+MESES[x.m-1]+'</td>';
+      html+='<td class="pos">'+fp(x.v)+'</td>';
+      html+='<td class="'+mCls+'">'+(dMonto===null?"—":(dMonto>=0?"+":"−")+fp(dMonto))+'</td>';
+      html+='<td class="'+pCls+'">'+(dPct===null?"—":(dPct>=0?"+":"")+dPct.toFixed(1)+"%")+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+    return html;
+  }
+  // Consolidado: sumar último de cada mes de ambas sucursales
+  function tablaConsol(){
+    var vals=[];
+    for(var m=1;m<=12;m++){
+      var oc=stockRecs.filter(function(r){return r.suc==="Ocampo"&&gm(r.fecha)===m;});
+      var tu=stockRecs.filter(function(r){return r.suc==="Tucuman"&&gm(r.fecha)===m;});
+      if(!oc.length&&!tu.length)continue;
+      var v=(oc.length?oc[oc.length-1].monto:0)+(tu.length?tu[tu.length-1].monto:0);
+      vals.push({m:m,v:v});
+    }
+    if(!vals.length)return "";
+    var html='<div class="suc-hdr co">Consolidado</div>';
+    html+='<div class="rtable-wrap"><table class="rtable"><thead><tr><th>Mes</th><th>Stock</th><th>Δ $</th><th>Δ %</th></tr></thead><tbody>';
+    vals.forEach(function(x,i){
+      var prev=i>0?vals[i-1].v:null;
+      var dMonto=prev!==null?(x.v-prev):null;
+      var dPct=prev!==null&&prev>0?((x.v-prev)/prev*100):null;
+      var mCls=dMonto===null?"neu":dMonto>0?"pos":dMonto<0?"neg":"neu";
+      var pCls=dPct===null?"neu":dPct>0?"up":dPct<0?"dn":"neu";
+      html+='<tr><td>'+MESES[x.m-1]+'</td><td class="pos">'+fp(x.v)+'</td>';
+      html+='<td class="'+mCls+'">'+(dMonto===null?"—":(dMonto>=0?"+":"−")+fp(dMonto))+'</td>';
+      html+='<td class="'+pCls+'">'+(dPct===null?"—":(dPct>=0?"+":"")+dPct.toFixed(1)+"%")+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+    return html;
+  }
+  var out=tabla("Ocampo","Ocampo","oc");
+  out+=(out?'<div style="height:12px"></div>':"")+tabla("Tucuman","Tucumán","tu");
+  var c=tablaConsol();
+  out+=(c?'<div style="height:12px"></div>'+c:"");
+  el.innerHTML=out||'<div class="empty"><div class="eico">📦</div><p>Sin datos suficientes.</p></div>';
+}
+
 // Stock en Resumen dashboard
 function renderDashStock(){
   var el=document.getElementById("dash-stock-section");if(!el)return;
@@ -1809,20 +2069,21 @@ function computeRatiosSuc(suc){
     var crec=prev&&prev.ingTotal>0?(m.ingTotal/prev.ingTotal-1):null;
     var prov=(m.egrCats&&m.egrCats["Proveedores"])||0;
     var costPV=m.ingTotal>0?prov/m.ingTotal:0;
-    return{m:m.m,ventas:m.ingTotal,neto:m.neto,res:m.res,margen:margen,dMar:dMar,crec:crec,costPV:costPV,hasData:m.ingTotal>0||m.egrTotal>0};
+    var egr=m.egrTotal+m.cf; // egresos totales incl. costo financiero
+    return{m:m.m,ventas:m.ingTotal,egr:egr,neto:m.neto,res:m.res,margen:margen,dMar:dMar,crec:crec,costPV:costPV,hasData:m.ingTotal>0||m.egrTotal>0};
   });
 }
 
 function ratioTable(rows, suc){
   var label=suc==="todos"?"Consolidado":suc==="Tucuman"?"Tucumán":suc;
   var cls=suc==="Ocampo"?"oc":suc==="Tucuman"?"tu":"co";
-  var tVentas=0,tNeto=0,tRes=0;
-  rows.forEach(function(r){tVentas+=r.ventas;tNeto+=r.neto;tRes+=r.res;});
+  var tVentas=0,tEgr=0,tNeto=0,tRes=0;
+  rows.forEach(function(r){tVentas+=r.ventas;tEgr+=r.egr;tNeto+=r.neto;tRes+=r.res;});
   var tMar=tVentas>0?tRes/tVentas:0;
 
   var html='<div class="suc-hdr '+ cls+'">'+ label+'</div>';
   html+='<div class="rtable-wrap"><table class="rtable"><thead><tr>';
-  html+='<th>Mes</th><th>Ventas</th><th>Caja neto</th><th>Resultado</th><th>Margen</th><th>ΔMargen</th><th>Crecim.</th><th>Prov/Vntas</th>';
+  html+='<th>Mes</th><th>Ventas</th><th>Egresos</th><th>Caja neto</th><th>Resultado</th><th>Margen</th><th>ΔMargen</th><th>Crecim.</th><th>Prov/Vntas</th>';
   html+='</tr></thead><tbody>';
   rows.forEach(function(r){
     if(!r.hasData)return;
@@ -1835,6 +2096,7 @@ function ratioTable(rows, suc){
     html+='<tr>';
     html+='<td>'+MESES[r.m-1]+'</td>';
     html+='<td class="pos">'+fp(r.ventas)+'</td>';
+    html+='<td class="neg">'+fp(r.egr)+'</td>';
     html+='<td class="'+(r.neto>=0?"pos":"neg")+'">'+fp(r.neto)+'</td>';
     html+='<td class="'+(r.res>=0?"pos":"neg")+'">'+fp(r.res)+'</td>';
     html+='<td class="'+(r.margen>=0?"pos":"neg")+'">'+marStr+'</td>';
@@ -1845,7 +2107,7 @@ function ratioTable(rows, suc){
   });
   // Fila totales
   html+='<tr class="tot-r">';
-  html+='<td>TOTAL</td><td class="pos">'+fp(tVentas)+'</td><td class="'+(tNeto>=0?"pos":"neg")+'">'+fp(tNeto)+'</td>';
+  html+='<td>TOTAL</td><td class="pos">'+fp(tVentas)+'</td><td class="neg">'+fp(tEgr)+'</td><td class="'+(tNeto>=0?"pos":"neg")+'">'+fp(tNeto)+'</td>';
   html+='<td class="'+(tRes>=0?"pos":"neg")+'">'+fp(tRes)+'</td><td class="'+(tMar>=0?"pos":"neg")+'">'+( tMar*100).toFixed(1)+'%</td><td>—</td><td>—</td><td>—</td></tr>';
   html+='</tbody></table></div>';
   return html;

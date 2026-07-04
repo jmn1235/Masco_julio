@@ -116,6 +116,13 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .cf-input-wrap{display:flex;align-items:center;gap:4px;background:var(--bg);border:2px solid var(--teal);border-radius:10px;padding:6px 10px}
 .cf-input{width:56px;border:none;background:transparent;font-size:18px;font-weight:800;color:var(--teal);text-align:right;outline:none;font-family:inherit}
 .range-card{background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px}
+.mk-card{background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px}
+.mk-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mk-sel{border:2px solid var(--border);border-radius:10px;padding:7px 8px;font-size:12px;font-family:inherit;color:var(--navy);background:var(--bg);outline:none}
+.mk-hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.cmv-input{width:100%;border:1.5px solid var(--teal);border-radius:8px;padding:5px 8px;font-size:12px;font-family:inherit;color:var(--navy);text-align:right;background:#fff;outline:none}
+.cmv-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(240,192,64,.25)}
+.dtable td .cmv-input{min-width:88px}
 .range-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .range-field{display:flex;flex-direction:column;gap:4px}
 .range-lbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
@@ -131,7 +138,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .chart-card h3{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px}
 canvas{max-width:100%;display:block}
 .dtable-wrap{overflow-x:auto;margin-bottom:14px;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-.dtable{width:100%;border-collapse:collapse;background:var(--card);font-size:11px;min-width:420px}
+.dtable{width:100%;border-collapse:collapse;background:var(--card);font-size:11px;min-width:660px}
 .dtable th{padding:8px 8px;background:var(--navy);color:#fff;font-weight:700;text-align:right;white-space:nowrap;font-size:10px}
 .dtable th:first-child{text-align:left;border-radius:16px 0 0 0}
 .dtable th:last-child{border-radius:0 16px 0 0}
@@ -218,6 +225,27 @@ canvas{max-width:100%;display:block}
 .user-chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border-radius:20px;padding:3px 5px 3px 9px}
 .user-chip span{color:#fff;font-size:10px;font-weight:600;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .user-chip button{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;flex-shrink:0}
+
+/* ═══ VISTA ESCRITORIO (solo pantallas anchas ≥700px, no afecta el celular) ═══ */
+@media (min-width:700px){
+  /* Centrar la app y evitar que se estire de borde a borde */
+  .header>*:first-child{max-width:900px}
+  .header{padding-left:calc((100vw - 900px)/2 + 16px);padding-right:calc((100vw - 900px)/2 + 16px)}
+  .tabs{padding-left:calc((100vw - 900px)/2);padding-right:calc((100vw - 900px)/2);justify-content:center}
+  .screen{max-width:900px;margin-left:auto;margin-right:auto}
+  /* Gráficos: limitar tamaño para que no queden enormes */
+  .chart-card{max-width:560px;margin-left:auto;margin-right:auto}
+  .chart-card canvas{max-height:280px}
+  /* En Categorías: los dos gráficos (torta y barras) lado a lado */
+  .categ-charts{display:flex;gap:14px;align-items:stretch}
+  .categ-charts .chart-card{flex:1;max-width:none;margin:0}
+  .categ-charts canvas{max-height:260px}
+  /* Tablas de categorías más contenidas */
+  .cat-wrap{max-width:640px;margin-left:auto;margin-right:auto}
+}
+@media (min-width:900px){
+  .categ-detail-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+}
 </style>
 </head>
 <body>
@@ -412,27 +440,15 @@ canvas{max-width:100%;display:block}
     <div class="dst active" onclick="setDashView('resumen',this)">Resumen</div>
     <div class="dst" onclick="setDashView('mensual',this)">Mensual</div>
     <div class="dst" onclick="setDashView('rango',this)">Rango</div>
+    <div class="dst" onclick="setDashView('deveng',this)">Devengado</div>
     <div class="dst" onclick="setDashView('categ',this)">Categorías</div>
     <div class="dst" onclick="setDashView('ratios',this)">Ratios</div>
   </div>
-  <!-- Filtro sucursal + CF% (siempre visible) -->
+  <!-- Filtro sucursal (CF% se configura en Exportar › Configuración) -->
   <div class="fbar" id="dash-fbar">
     <div class="fc ablu" onclick="setDash('todos',this)">Consolidado</div>
     <div class="fc"      onclick="setDash('Ocampo',this)">Ocampo</div>
     <div class="fc"      onclick="setDash('Tucuman',this)">Tucumán</div>
-  </div>
-  <div class="cf-card cf-card-multi">
-    <div class="cf-label">Costo Financiero <span>% sobre ventas · por sucursal</span></div>
-    <div class="cf-multi-grid">
-      <div class="cf-multi-item">
-        <span class="cf-multi-lbl">Ocampo</span>
-        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-oc" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
-      </div>
-      <div class="cf-multi-item">
-        <span class="cf-multi-lbl">Tucumán</span>
-        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-tu" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
-      </div>
-    </div>
   </div>
 
   <!-- VIEW: RESUMEN -->
@@ -476,18 +492,41 @@ canvas{max-width:100%;display:block}
     <div id="rango-content"></div>
   </div>
 
-  <!-- VIEW: CATEGORÍAS -->
+  <!-- VIEW: DEVENGADO (Ventas − CMV − Franquicia − Gastos op.) -->
+  <div class="dview" id="dview-deveng">
+    <div class="enote" style="margin-bottom:12px">
+      <strong>Rentabilidad devengada.</strong> Reemplaza los pagos a <em>Proveedores</em> por el <strong>Costo de Mercadería Vendida (CMV)</strong> y el <strong>costo de franquicia</strong> (Royalty + Publicidad + Sistema), que ingresás a mano mes a mes por sucursal. Así comparás las ventas contra el costo real de lo vendido y los cargos fijos de la cadena, sin el ruido de los plazos de pago a proveedores.
+    </div>
+    <div id="deveng-content"></div>
+  </div>
+
+
   <div class="dview" id="dview-categ">
+    <div class="range-card">
+      <div class="range-row">
+        <div class="range-field"><span class="range-lbl">Desde</span><input type="date" id="cat-desde" onchange="renderCateg()"></div>
+        <div class="range-field"><span class="range-lbl">Hasta</span><input type="date" id="cat-hasta" onchange="renderCateg()"></div>
+      </div>
+    </div>
+    <div class="sdiv">Distribución</div>
+    <div class="categ-charts">
+      <div class="chart-card"><h3>Ingresos por categoría</h3><canvas id="chart-pie-ing" height="220"></canvas></div>
+      <div class="chart-card"><h3>Egresos por categoría</h3><canvas id="chart-bar-egr" height="220"></canvas></div>
+    </div>
     <div class="sdiv">Ingresos por categoría</div>
-    <div class="chart-card"><h3>Distribución de ingresos</h3><canvas id="chart-pie-ing" height="220"></canvas></div>
     <div class="cat-wrap" id="categ-ing-table"></div>
     <div class="sdiv">Egresos por categoría</div>
-    <div class="chart-card"><h3>Distribución de egresos</h3><canvas id="chart-bar-egr" height="220"></canvas></div>
     <div class="cat-wrap" id="categ-egr-table"></div>
-    <div class="sdiv">Detalle Personal</div>
-    <div class="card" id="categ-personal" style="padding:12px 16px"></div>
-    <div class="sdiv">Detalle Proveedores</div>
-    <div class="card" id="categ-provs" style="padding:12px 16px"></div>
+    <div class="categ-detail-2col">
+      <div>
+        <div class="sdiv">Detalle Personal</div>
+        <div class="card" id="categ-personal" style="padding:12px 16px"></div>
+      </div>
+      <div>
+        <div class="sdiv">Detalle Proveedores</div>
+        <div class="card" id="categ-provs" style="padding:12px 16px"></div>
+      </div>
+    </div>
   </div>
   <!-- VIEW: RATIOS -->
   <div class="dview" id="dview-ratios">
@@ -497,6 +536,24 @@ canvas{max-width:100%;display:block}
 
 <!-- ══ EXPORTAR ══ -->
 <div class="screen" id="screen-exportar">
+  <div class="sdiv">⚙️ Configuración</div>
+  <div class="cf-card cf-card-multi">
+    <div class="cf-label">Costo Financiero <span>% sobre ventas · por sucursal</span></div>
+    <div class="cf-multi-grid">
+      <div class="cf-multi-item">
+        <span class="cf-multi-lbl">Ocampo</span>
+        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-oc" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
+      </div>
+      <div class="cf-multi-item">
+        <span class="cf-multi-lbl">Tucumán</span>
+        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-tu" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="enote" style="margin-top:-6px">
+    El <strong>Costo Financiero</strong> se usa en todo el Dashboard. Se configura una sola vez acá.
+  </div>
+
   <div class="sdiv">Importar datos</div>
   <div class="enote">
     <strong>Importar desde Excel (.xlsx):</strong><br>
@@ -707,6 +764,8 @@ var records=[],cajaRecs=[],tipoMov="Egreso",tipoCaja="Extraccion";
 var movSuc="",cajaSuc="",filterAct="todos",dashFilter="todos";
 var cajImpact=false;
 var stockRecs=[],stockSuc="";
+var cmvRecs=[]; // Costo de Mercadería Vendida mensual por sucursal
+var fraRecs=[]; // Costo de franquicia (Royalty+Publicidad+Sistema) mensual por sucursal
 var chartBar=null,chartLine=null;
 var editId=null,editTipo="Egreso",editSuc="";
 var editCajaLinkId=null,editCajaWanted=false; // imputación a caja del movimiento en edición
@@ -776,6 +835,9 @@ function startData(){
   var rgd=document.getElementById("rg-desde"),rgh=document.getElementById("rg-hasta");
   if(rgd&&!rgd.value){var d=new Date();rgd.value=d.getFullYear()+"-"+p2(d.getMonth()+1)+"-01";}
   if(rgh&&!rgh.value){rgh.value=hoy();}
+  var cd=document.getElementById("cat-desde"),ch=document.getElementById("cat-hasta");
+  if(cd&&!cd.value) cd.value="2026-03-01";
+  if(ch&&!ch.value) ch.value=hoy();
   updateCats();
 
   db.collection("movimientos").orderBy("ts","asc").onSnapshot(function(snap){
@@ -796,6 +858,16 @@ function startData(){
   db.collection("stock").orderBy("ts","asc").onSnapshot(function(snap){
     stockRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
     renderStockCards(); renderStockList(); renderStockHist();
+    if(isA("dashboard")) renderDashboard();
+  },function(){});
+
+  db.collection("cmv").onSnapshot(function(snap){
+    cmvRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
+    if(isA("dashboard")) renderDashboard();
+  },function(){});
+
+  db.collection("fra").onSnapshot(function(snap){
+    fraRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
     if(isA("dashboard")) renderDashboard();
   },function(){});
 }
@@ -1539,19 +1611,180 @@ function sumCatSet(movs, tipo, cat, suc, pf){
   return d+g*pf;
 }
 
-// ── RENDER CATEGORÍAS (Vista 4) ────────────────────────────────────────────
-function renderCateg(){
-  // Para categorías: sumar todos los meses con prorrateo correcto
-  var months=computeMonthlyFull(dashFilter);
-  var ingCatsTot={},egrCatsTot={};
-  ING_CATS.forEach(function(c){ingCatsTot[c]=0;});
-  EGR_CATS.forEach(function(c){egrCatsTot[c]=0;});
-  months.forEach(function(m){
-    ING_CATS.forEach(function(c){ingCatsTot[c]+=(m.ingCats[c]||0);});
-    EGR_CATS.forEach(function(c){egrCatsTot[c]+=(m.egrCats[c]||0);});
+// ── DEVENGADO / CMV ────────────────────────────────────────────────────────
+// Gastos operativos devengados = todo Egreso MENOS Proveedores (se reemplaza por CMV)
+var OPEX_CATS=["Personal","Local","Impuestos","Publicidad","Otros Gastos"];
+var CMV_YEAR=2026;
+var DEVENG_START_MONTH=3; // el Devengado muestra meses desde marzo hasta el mes actual (aunque estén vacíos)
+function cmvDocId(mes,suc){return CMV_YEAR+"-"+suc+"-"+mes;}
+// Valor cargado de CMV para un mes/sucursal (null si no hay)
+function cmvStored(mes,suc){
+  var d=cmvRecs.find(function(r){return r.mes===mes&&r.suc===suc;});
+  return d?d.monto:null;
+}
+// CMV efectivo: monto cargado a mano (0 si no hay nada cargado)
+function cmvEffective(mes,suc){
+  var st=cmvStored(mes,suc);
+  return st!==null?st:0;
+}
+// Guardar CMV manual (por sucursal). Consolidado no se edita directo.
+function cmvSave(mes,suc,val){
+  var monto=parseMonto(val);
+  var id=cmvDocId(mes,suc);
+  if(isNaN(monto)||monto<0){
+    db.collection("cmv").doc(id).delete().catch(function(){});
+    return;
+  }
+  db.collection("cmv").doc(id).set({mes:mes,suc:suc,anio:CMV_YEAR,monto:monto,ts:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){toast("✓ CMV "+MESES[mes-1]+" guardado","ok");})
+    .catch(function(e){toast("Error: "+e.message,"err");});
+}
+function onCmvInput(el){el.value=fmtMiles(el.value);}
+
+// ── FRANQUICIA (Royalty + Publicidad + Sistema) mensual por sucursal ────────
+function fraDocId(mes,suc){return CMV_YEAR+"-"+suc+"-"+mes;}
+function fraStored(mes,suc){
+  var d=fraRecs.find(function(r){return r.mes===mes&&r.suc===suc;});
+  return d?d.monto:null;
+}
+function fraEffective(mes,suc){var st=fraStored(mes,suc);return st!==null?st:0;}
+function fraSave(mes,suc,val){
+  var monto=parseMonto(val);
+  var id=fraDocId(mes,suc);
+  if(isNaN(monto)||monto<0){
+    db.collection("fra").doc(id).delete().catch(function(){});
+    return;
+  }
+  db.collection("fra").doc(id).set({mes:mes,suc:suc,anio:CMV_YEAR,monto:monto,ts:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){toast("✓ Franquicia "+MESES[mes-1]+" guardada","ok");})
+    .catch(function(e){toast("Error: "+e.message,"err");});
+}
+
+function renderDeveng(){
+  var el=document.getElementById("deveng-content");if(!el)return;
+  var suc=dashFilter;
+  var months=computeMonthlyFull(suc); // ingTotal, egrCats, cf, neto por mes (con prorrateo + Gabriel + CF)
+  var editable=(suc!=="todos"); // sólo se edita por sucursal
+
+  // CMV del mes para la sucursal elegida (consolidado = Ocampo + Tucumán)
+  function cmvForMonth(mIdx){
+    if(suc!=="todos") return cmvEffective(mIdx,suc);
+    return cmvEffective(mIdx,"Ocampo")+cmvEffective(mIdx,"Tucuman");
+  }
+  // Franquicia del mes (consolidado = Ocampo + Tucumán)
+  function fraForMonth(mIdx){
+    if(suc!=="todos") return fraEffective(mIdx,suc);
+    return fraEffective(mIdx,"Ocampo")+fraEffective(mIdx,"Tucuman");
+  }
+  // Mes actual (si estamos en 2026; si el año es otro, mostramos hasta diciembre)
+  var _now=new Date();
+  var curMonth=(_now.getFullYear()===CMV_YEAR)?(_now.getMonth()+1):12;
+  var rows=months.map(function(m){
+    var ventas=m.ingTotal;
+    var opex=OPEX_CATS.reduce(function(s,c){return s+(m.egrCats[c]||0);},0);
+    var cmv=cmvForMonth(m.m);
+    var fra=fraForMonth(m.m);
+    var mb=ventas-cmv;                  // margen bruto (Ventas − CMV)
+    var mbPct=ventas>0?mb/ventas:0;
+    var resDev=mb-fra-opex-m.cf;        // resultado devengado (− franquicia − opex − CF; sin Proveedores)
+    var tieneDatos=ventas>0||opex>0||m.cf>0||m.neto!==0||cmv>0||fra>0;
+    // Se muestra si tiene datos, o si cae en el rango marzo→mes actual (para poder cargar CMV/franquicia por adelantado)
+    var enRango=(m.m>=DEVENG_START_MONTH && m.m<=curMonth);
+    return{m:m.m,ventas:ventas,cmv:cmv,fra:fra,mb:mb,mbPct:mbPct,opex:opex,cf:m.cf,resDev:resDev,neto:m.neto,
+           hasData:tieneDatos||enRango};
   });
-  var ingVals=ING_CATS.map(function(c){return ingCatsTot[c];});
-  var egrVals=EGR_CATS.map(function(c){return egrCatsTot[c];});
+
+  // ── Tabla 1: Rentabilidad devengada + CMV y Franquicia editables ──
+  var html='<div class="sdiv">Rentabilidad devengada (Ventas − CMV − Franquicia − Gastos)</div>';
+  html+='<div class="dtable-wrap"><table class="dtable"><thead><tr>';
+  html+='<th>Mes</th><th>Ventas</th><th>CMV</th><th>Margen bruto</th><th>MB%</th><th>Franquicia</th><th>Gastos op.</th><th>CF</th><th>Result. deveng.</th>';
+  html+='</tr></thead><tbody>';
+  var tV=0,tCMV=0,tFRA=0,tMB=0,tOP=0,tCF=0,tRD=0;
+  rows.forEach(function(r){
+    if(!r.hasData)return;
+    tV+=r.ventas;tCMV+=r.cmv;tFRA+=r.fra;tMB+=r.mb;tOP+=r.opex;tCF+=r.cf;tRD+=r.resDev;
+    var cmvCell,fraCell;
+    if(editable){
+      var cmvStoredV=cmvStored(r.m,suc);
+      var cmvVal=cmvStoredV!==null?fmtMiles(String(Math.round(cmvStoredV))):"";
+      cmvCell='<input class="cmv-input" inputmode="numeric" value="'+cmvVal+'" placeholder="0" '
+        +'oninput="onCmvInput(this)" onchange="cmvSave('+r.m+',\''+suc+'\',this.value)" title="CMV del software de ventas">';
+      var fraStoredV=fraStored(r.m,suc);
+      var fraVal=fraStoredV!==null?fmtMiles(String(Math.round(fraStoredV))):"";
+      fraCell='<input class="cmv-input" inputmode="numeric" value="'+fraVal+'" placeholder="0" '
+        +'oninput="onCmvInput(this)" onchange="fraSave('+r.m+',\''+suc+'\',this.value)" title="Royalty + Publicidad + Sistema de la franquicia">';
+    } else {
+      cmvCell='<span class="neg">'+fp(r.cmv)+'</span>';
+      fraCell='<span class="neg">'+fp(r.fra)+'</span>';
+    }
+    html+='<tr><td>'+MESES[r.m-1]+'</td>';
+    html+='<td class="pos">'+fp(r.ventas)+'</td>';
+    html+='<td>'+cmvCell+'</td>';
+    html+='<td class="'+(r.mb>=0?"pos":"neg")+'">'+fp(r.mb)+'</td>';
+    html+='<td class="neut">'+(r.ventas>0?(r.mbPct*100).toFixed(1)+"%":"-")+'</td>';
+    html+='<td>'+fraCell+'</td>';
+    html+='<td class="neg">'+fp(r.opex)+'</td>';
+    html+='<td class="cf">'+fp(r.cf)+'</td>';
+    html+='<td class="'+(r.resDev>=0?"pos":"neg")+'">'+fp(r.resDev)+'</td></tr>';
+  });
+  var tMBp=tV>0?tMB/tV:0;
+  html+='<tr class="total-row"><td>TOTAL</td><td class="pos">'+fp(tV)+'</td><td class="neg">'+fp(tCMV)+'</td>'
+    +'<td class="'+(tMB>=0?"pos":"neg")+'">'+fp(tMB)+'</td><td class="neut">'+(tV>0?(tMBp*100).toFixed(1)+"%":"-")+'</td>'
+    +'<td class="neg">'+fp(tFRA)+'</td><td class="neg">'+fp(tOP)+'</td><td class="cf">'+fp(tCF)+'</td>'
+    +'<td class="'+(tRD>=0?"pos":"neg")+'">'+fp(tRD)+'</td></tr>';
+  html+='</tbody></table></div>';
+  html+='<div class="enote" style="margin-top:-6px">El <strong>CMV</strong> lo sacás del software de ventas y el <strong>costo de franquicia</strong> (Royalty + Publicidad + Sistema, que en el flujo cargás dentro de Proveedores → "Central La Mascotera") se ingresa acá aparte. Ambos se cargan a mano por mes y se <strong>restan</strong> del resultado.'
+    +(suc==="todos"?' El consolidado suma Ocampo + Tucumán; para <strong>editar</strong> los valores elegí una sucursal arriba.':'')+'</div>';
+
+  // ── Tabla 2: Conciliación Resultado devengado vs Neto de caja ──
+  html+='<div class="sdiv">Conciliación: Devengado vs Caja</div>';
+  html+='<div class="enote" style="margin-bottom:10px">El <strong>resultado devengado</strong> y el <strong>neto de caja</strong> no coinciden mes a mes: la diferencia es normal y viene del rezago de acreditación de tarjetas y de los plazos de pago a proveedores. La <strong>diferencia acumulada</strong> es la señal a vigilar.</div>';
+  html+='<div class="dtable-wrap"><table class="dtable"><thead><tr>';
+  html+='<th>Mes</th><th>Result. deveng.</th><th>Neto caja</th><th>Difer.</th><th>Difer. acum.</th>';
+  html+='</tr></thead><tbody>';
+  var acum=0,tRD2=0,tN2=0;
+  rows.forEach(function(r){
+    if(!r.hasData)return;
+    var dif=r.resDev-r.neto;
+    acum+=dif;tRD2+=r.resDev;tN2+=r.neto;
+    html+='<tr><td>'+MESES[r.m-1]+'</td>';
+    html+='<td class="'+(r.resDev>=0?"pos":"neg")+'">'+fp(r.resDev)+'</td>';
+    html+='<td class="'+(r.neto>=0?"pos":"neg")+'">'+fp(r.neto)+'</td>';
+    html+='<td class="'+(dif>=0?"pos":"neg")+'">'+(dif>=0?"+":"−")+fp(dif)+'</td>';
+    html+='<td class="'+(acum>=0?"pos":"neg")+'">'+(acum>=0?"+":"−")+fp(acum)+'</td></tr>';
+  });
+  html+='<tr class="total-row"><td>TOTAL</td><td class="'+(tRD2>=0?"pos":"neg")+'">'+fp(tRD2)+'</td>'
+    +'<td class="'+(tN2>=0?"pos":"neg")+'">'+fp(tN2)+'</td>'
+    +'<td class="'+((tRD2-tN2)>=0?"pos":"neg")+'">'+((tRD2-tN2)>=0?"+":"−")+fp(tRD2-tN2)+'</td>'
+    +'<td class="'+(acum>=0?"pos":"neg")+'">'+(acum>=0?"+":"−")+fp(acum)+'</td></tr>';
+  html+='</tbody></table></div>';
+
+  el.innerHTML=html;
+}
+
+
+// ── RENDER CATEGORÍAS (Vista 4) — por rango de fechas ──────────────────────
+function renderCateg(){
+  // Rango de fechas (predeterminado 01/03/2026 → hoy)
+  var dd=document.getElementById("cat-desde"), dh=document.getElementById("cat-hasta");
+  if(dd&&!dd.value) dd.value="2026-03-01";
+  if(dh&&!dh.value) dh.value=hoy();
+  var desde=dd?dd.value:"2026-03-01", hasta=dh?dh.value:hoy();
+  if(desde>hasta){
+    document.getElementById("categ-ing-table").innerHTML='<div class="empty" style="padding:16px"><p>La fecha "Desde" es posterior a "Hasta"</p></div>';
+    document.getElementById("categ-egr-table").innerHTML="";
+    document.getElementById("categ-personal").innerHTML="";
+    document.getElementById("categ-provs").innerHTML="";
+    if(chartPieIng){chartPieIng.destroy();chartPieIng=null;}
+    if(chartBarEgr){chartBarEgr.destroy();chartBarEgr=null;}
+    return;
+  }
+  var movsAll=records.filter(function(r){return r.fecha>=desde&&r.fecha<=hasta;});
+  var pfAnual=prorFactorSet(dashFilter,movsAll); // factor sobre el rango elegido
+
+  // Totales por categoría con prorrateo sobre el rango
+  var ingVals=ING_CATS.map(function(c){return sumCatSet(movsAll,"Ingreso",c,dashFilter,pfAnual);});
+  var egrVals=EGR_CATS.map(function(c){return sumCatSet(movsAll,"Egreso",c,dashFilter,pfAnual);});
   var ingTotal=ingVals.reduce(function(s,v){return s+v;},0);
   var egrTotal=egrVals.reduce(function(s,v){return s+v;},0);
 
@@ -1573,9 +1806,7 @@ function renderCateg(){
   egrHtml+='<tr><td>TOTAL</td><td class="neg">'+fp(egrTotal)+'</td><td>100%</td></tr></tbody></table>';
   document.getElementById("categ-egr-table").innerHTML=egrHtml;
 
-  // Para detalles Personal/Proveedores usar prorrateo acumulado anual
-  var movsAll=records;
-  var pfAnual=prorFactor(dashFilter,movsAll); // factor global del año
+  // Detalle Personal/Proveedores con prorrateo sobre el rango
   function sumSubP(cat,sub){
     // Gabriel Yapura: split fijo 85% Ocampo / 15% Tucumán (ignora prorrateo estándar)
     if(cat==="Personal"&&sub===GY_NAME&&dashFilter!=="todos"){
@@ -1630,6 +1861,7 @@ function renderDashboard(){
   if(dashView==="resumen"){renderResumen();renderDashStock();}
   else if(dashView==="mensual")  renderMensualDetalle();
   else if(dashView==="rango")    renderRango();
+  else if(dashView==="deveng")   renderDeveng();
   else if(dashView==="categ")    renderCateg();
   else if(dashView==="ratios")   renderRatios();
 }

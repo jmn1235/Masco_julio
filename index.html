@@ -208,7 +208,7 @@ canvas{max-width:100%;display:block}
 .rtable .up{color:var(--green)}.rtable .dn{color:var(--red)}.rtable .neu{color:var(--muted)}
 .rtable .pos{color:var(--green)}.rtable .neg{color:var(--red)}
 .suc-hdr{padding:8px 16px;font-size:12px;font-weight:800;color:#fff;letter-spacing:.5px;margin-bottom:0}
-.suc-hdr.oc{background:var(--navy)}.suc-hdr.tu{background:var(--green)}.suc-hdr.co{background:var(--teal)}
+.suc-hdr.oc{background:var(--navy)}.suc-hdr.tu{background:var(--green)}.suc-hdr.co{background:var(--teal)}.suc-hdr.ge{background:var(--purple)}
 
 /* Login overlay */
 .login-screen{position:fixed;inset:0;z-index:2000;background:linear-gradient(160deg,var(--navy),#0d1526);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
@@ -384,6 +384,9 @@ canvas{max-width:100%;display:block}
   <button class="btn btn-t" id="bcc" onclick="cargarCaja()">💵 CARGAR CAJA</button>
   <div class="sdiv">Últimas entradas</div>
   <div class="card" id="cajalist"></div>
+
+  <div class="sdiv">Resumen mensual de Caja</div>
+  <div id="caja-mensual"></div>
 </div>
 
 <!-- ══ STOCK ══ -->
@@ -850,7 +853,7 @@ function startData(){
 
   db.collection("caja").orderBy("ts","asc").onSnapshot(function(snap){
     cajaRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
-    updateBadges();renderCajaResumen();renderCajaList();
+    updateBadges();renderCajaResumen();renderCajaList();renderCajaMensual();
     if(isA("exportar"))  renderStats();
     if(isA("dashboard")) renderDashboard();
   },function(){setSync("offline");});
@@ -877,7 +880,7 @@ window.addEventListener("offline",function(){setSync("offline");document.getElem
 window.addEventListener("load",function(){
   document.getElementById("ff").value=hoy();
   document.getElementById("cf").value=hoy();
-  updateCats();renderCajaResumen();renderCajaList();
+  updateCats();renderCajaResumen();renderCajaList();renderCajaMensual();
   renderStockCards();renderStockList();renderStockHist();
   document.getElementById("sf").value=hoy();
 });
@@ -1027,6 +1030,48 @@ function renderCajaList(){
   }).join("");
 }
 function delCaja(id){if(!confirm("¿Eliminar?"))return;db.collection("caja").doc(id).delete().then(function(){toast("Eliminado","warn");});}
+
+// Resumen mensual de Caja por sucursal + consolidado (Extracción / Gasto / Neto)
+function renderCajaMensual(){
+  var el=document.getElementById("caja-mensual");if(!el)return;
+  if(!cajaRecs.length){el.innerHTML='<div class="empty"><div class="eico">💵</div><p>Sin registros de caja.</p></div>';return;}
+  // Una tabla por sucursal presente + Consolidado. Caja se muestra tal como se cargó
+  // (Ocampo / Tucumán / General), sin prorrateo: son movimientos de efectivo reales.
+  function tabla(filtroSuc,label,cls){
+    // meses con algún registro para este filtro
+    var vals=[];
+    for(var m=1;m<=12;m++){
+      var recs=(filtroSuc==="todos")?cajaRecs.filter(function(r){return gm(r.fecha)===m;})
+                                     :cajaRecs.filter(function(r){return gm(r.fecha)===m&&r.suc===filtroSuc;});
+      if(!recs.length)continue;
+      var ext=recs.filter(function(r){return r.tipo==="Extraccion";}).reduce(function(s,r){return s+r.monto;},0);
+      var gst=recs.filter(function(r){return r.tipo==="Gasto";}).reduce(function(s,r){return s+r.monto;},0);
+      vals.push({m:m,ext:ext,gst:gst,neto:ext-gst});
+    }
+    if(!vals.length)return "";
+    var tE=0,tG=0;
+    var html='<div class="suc-hdr '+cls+'">'+label+'</div>';
+    html+='<div class="rtable-wrap"><table class="rtable"><thead><tr><th>Mes</th><th>Extracción</th><th>Gasto</th><th>Neto</th></tr></thead><tbody>';
+    vals.forEach(function(x){
+      tE+=x.ext;tG+=x.gst;
+      html+='<tr><td>'+MESES[x.m-1]+'</td>';
+      html+='<td class="pos">'+fp(x.ext)+'</td>';
+      html+='<td class="neg">'+fp(x.gst)+'</td>';
+      html+='<td class="'+(x.neto>=0?"pos":"neg")+'">'+fp(x.neto)+'</td></tr>';
+    });
+    var tN=tE-tG;
+    html+='<tr class="tot-r"><td>TOTAL</td><td class="pos">'+fp(tE)+'</td><td class="neg">'+fp(tG)+'</td><td class="'+(tN>=0?"pos":"neg")+'">'+fp(tN)+'</td></tr>';
+    html+='</tbody></table></div>';
+    return html;
+  }
+  var out=tabla("Ocampo","Ocampo","oc");
+  out+=(out?'<div style="height:12px"></div>':"")+tabla("Tucuman","Tucumán","tu");
+  // General solo si hay registros cargados con esa sucursal
+  var hayGeneral=cajaRecs.some(function(r){return r.suc==="General";});
+  if(hayGeneral){ out+='<div style="height:12px"></div>'+tabla("General","General","ge"); }
+  out+='<div style="height:12px"></div>'+tabla("todos","Consolidado","co");
+  el.innerHTML=out;
+}
 
 // ── HISTORIAL ──────────────────────────────────────────────────────────────
 function setFilter(f,el){
@@ -2100,7 +2145,7 @@ function showTab(t){
   document.querySelectorAll(".tab")[{cargar:0,caja:1,stock:2,historial:3,dashboard:4,exportar:5}[t]].classList.add("active");
   if(t==="historial") renderHistorial();
   if(t==="exportar")  renderStats();
-  if(t==="caja")      {renderCajaResumen();renderCajaList();}
+  if(t==="caja")      {renderCajaResumen();renderCajaList();renderCajaMensual();}
   if(t==="stock")     {renderStockCards();renderStockList();renderStockHist();}
   if(t==="dashboard") renderDashboard();
 }

@@ -545,11 +545,11 @@ canvas{max-width:100%;display:block}
     <div class="cf-multi-grid">
       <div class="cf-multi-item">
         <span class="cf-multi-lbl">Ocampo</span>
-        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-oc" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
+        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-oc" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()" onchange="cfSave()"><span class="cf-pct">%</span></div>
       </div>
       <div class="cf-multi-item">
         <span class="cf-multi-lbl">Tucumán</span>
-        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-tu" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()"><span class="cf-pct">%</span></div>
+        <div class="cf-input-wrap"><input class="cf-input" type="number" id="cf-pct-tu" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()" onchange="cfSave()"><span class="cf-pct">%</span></div>
       </div>
     </div>
   </div>
@@ -769,6 +769,7 @@ var cajImpact=false;
 var stockRecs=[],stockSuc="";
 var cmvRecs=[]; // Costo de Mercadería Vendida mensual por sucursal
 var fraRecs=[]; // Costo de franquicia (Royalty+Publicidad+Sistema) mensual por sucursal
+var cfLoaded=false; // evita re-escribir el CF durante la carga inicial desde la nube
 var chartBar=null,chartLine=null;
 var editId=null,editTipo="Egreso",editSuc="";
 var editCajaLinkId=null,editCajaWanted=false; // imputación a caja del movimiento en edición
@@ -873,6 +874,18 @@ function startData(){
     fraRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
     if(isA("dashboard")) renderDashboard();
   },function(){});
+
+  // Configuración (Costo Financiero por sucursal) — un único doc "cf"
+  db.collection("config").doc("cf").onSnapshot(function(doc){
+    if(doc&&doc.exists){
+      var d=doc.data();
+      var eo=document.getElementById("cf-pct-oc"), et=document.getElementById("cf-pct-tu");
+      if(eo&&typeof d.ocampo==="number") eo.value=d.ocampo;
+      if(et&&typeof d.tucuman==="number") et.value=d.tucuman;
+    }
+    cfLoaded=true; // ya trajimos (o confirmamos que no hay) valor de la nube
+    if(isA("dashboard")) renderDashboard();
+  },function(){cfLoaded=true;});
 }
 
 window.addEventListener("online", function(){setSync("online");document.getElementById("offbanner").classList.remove("show");});
@@ -1310,6 +1323,16 @@ function getCFpctSuc(suc){
   if(suc==="Ocampo") return oc;
   if(suc==="Tucuman")return tu;
   return {oc:oc,tu:tu}; // consolidado: se resuelve con ventas por sucursal
+}
+// Guardar el Costo Financiero por sucursal en la nube (doc config/cf)
+function cfSave(){
+  if(!cfLoaded)return; // no escribir hasta haber cargado el valor inicial
+  var oc=parseFloat(document.getElementById("cf-pct-oc").value);
+  var tu=parseFloat(document.getElementById("cf-pct-tu").value);
+  if(isNaN(oc))oc=0; if(isNaN(tu))tu=0;
+  db.collection("config").doc("cf").set({ocampo:oc,tucuman:tu,ts:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){toast("✓ Costo financiero guardado","ok");})
+    .catch(function(e){toast("Error: "+e.message,"err");});
 }
 // CF consolidado: cf_ocampo + cf_tucuman calculado con % propio de cada una
 function cfConsolidado(mm){

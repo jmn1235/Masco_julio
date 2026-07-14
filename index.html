@@ -129,6 +129,19 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .range-field input{border:2px solid var(--teal);border-radius:10px;padding:8px 10px;font-size:14px;font-family:inherit;color:var(--navy);background:var(--bg);outline:none}
 .cf-card-multi{flex-direction:column;align-items:stretch;gap:8px}
 .cf-multi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dux-sel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.dux-sel-item{display:flex;flex-direction:column;gap:4px}
+.dux-select{border:2px solid var(--teal);border-radius:10px;padding:9px 10px;font-size:14px;font-family:inherit;color:var(--navy);background:var(--bg);outline:none}
+.dux-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid var(--border)}
+.dux-row:last-child{border-bottom:none}
+.dux-row-lbl{font-size:13px;color:var(--text)}
+.dux-row-val{font-size:13px;font-weight:700}
+.dux-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.dux-svc-input{width:120px;border:1.5px solid var(--teal);border-radius:8px;padding:5px 8px;font-size:13px;font-family:inherit;color:var(--navy);text-align:right;background:#fff;outline:none}
+.dux-warn{background:#fff4e0;border:1px solid #f0c040;border-radius:10px;padding:9px 11px;margin-bottom:12px;font-size:11.5px;color:#8a6d1a;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.dux-tot{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:12px}
+.dux-tot-row{display:flex;justify-content:space-between;align-items:center}
+.dux-tot-row+.dux-tot-row{margin-top:5px}
 .cf-multi-item{display:flex;flex-direction:column;gap:4px}
 .cf-multi-lbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
 .cf-multi-item .cf-input-wrap{justify-content:flex-end}
@@ -557,7 +570,35 @@ canvas{max-width:100%;display:block}
     El <strong>Costo Financiero</strong> se usa en todo el Dashboard. Se configura una sola vez acá.
   </div>
 
-  <div class="sdiv">Importar datos</div>
+  <div class="sdiv">Importar ventas DUX</div>
+  <div class="enote">
+    Importá el archivo <strong>"consulta de ventas detallada"</strong> exportado de DUX. Cargá <strong>un archivo por mes y sucursal</strong>: se cargan las ventas por rubro (con IVA) y el CMV del mes. Antes de guardar vas a poder revisar y separar Peluquería / Veterinaria.
+  </div>
+  <div class="dux-sel">
+    <div class="dux-sel-item">
+      <span class="cf-multi-lbl">Mes</span>
+      <select id="dux-mes" class="dux-select">
+        <option value="1">Enero</option><option value="2">Febrero</option>
+        <option value="3">Marzo</option><option value="4">Abril</option>
+        <option value="5">Mayo</option><option value="6">Junio</option>
+        <option value="7">Julio</option><option value="8">Agosto</option>
+        <option value="9">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+    </div>
+    <div class="dux-sel-item">
+      <span class="cf-multi-lbl">Sucursal</span>
+      <select id="dux-suc" class="dux-select">
+        <option value="">— Elegir —</option>
+        <option value="Ocampo">Ocampo</option>
+        <option value="Tucuman">Tucumán</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn btn-b" onclick="duxPick()">📊 Elegir archivo DUX</button>
+  <input type="file" id="dux-file" accept=".xls,.xlsx,.xlsm" style="display:none" onchange="duxHandleFile(this)">
+
+  <div class="sdiv">Importar datos (formato app)</div>
   <div class="enote">
     <strong>Importar desde Excel (.xlsx):</strong><br>
     El archivo debe tener el mismo formato del export:<br>
@@ -682,6 +723,19 @@ canvas{max-width:100%;display:block}
         </div>
       </div>
       <button class="btn btn-b" id="ebtn" onclick="guardarEdit()">💾 GUARDAR CAMBIOS</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL REVISIÓN IMPORTACIÓN DUX ══ -->
+<div class="modal-backdrop" id="modal-dux">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">📊 Revisar importación DUX</span>
+      <button class="modal-close" onclick="duxClose()">✕</button>
+    </div>
+    <div class="modal-body" id="dux-body">
+      <!-- contenido generado dinámicamente -->
     </div>
   </div>
 </div>
@@ -2159,6 +2213,205 @@ function clearAll(){
     .concat(cajaRecs.map(function(r){return db.collection("caja").doc(r._id).delete();}));
   Promise.all(dels).then(function(){toast("Borrado","warn");});
 }
+
+// ══ IMPORTACIÓN DE VENTAS DUX ═══════════════════════════════════════════════
+// Mapeo de rubros DUX → categorías de la app
+var DUX_RUBRO_MAP={
+  "ALIMENTOS BALANCEADOS":"Ventas Alimentos",
+  "ACCESORIOS - PET SHOP":"Ventas Accesorios",
+  "SALUD, HIGIENE Y ESTETICA":"Salud y medicamentos"
+};
+// Columnas del archivo DUX (0-based): J=9 Producto, K=10 Rubro, L=11 SubRubro,
+// AE=30 Total (con IVA), AK=36 Costo Total Producto
+var DUX_COL={rubro:10,subrubro:11,producto:9,total:30,costo:36};
+var duxData=null; // resultado del parseo, a la espera de confirmación
+
+function duxPick(){
+  var suc=document.getElementById("dux-suc").value;
+  if(!suc){toast("Elegí primero la sucursal","err");return;}
+  document.getElementById("dux-file").click();
+}
+
+function duxHandleFile(input){
+  var file=input.files[0]; if(!file)return;
+  var mes=parseInt(document.getElementById("dux-mes").value);
+  var suc=document.getElementById("dux-suc").value;
+  input.value=""; // permitir re-seleccionar el mismo archivo
+  if(!suc){toast("Elegí la sucursal","err");return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(new Uint8Array(e.target.result),{type:"array",cellDates:true});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:""});
+      // Buscar la fila de encabezado (la que tiene "Rubro" y "Total")
+      var hdrIdx=-1;
+      for(var i=0;i<Math.min(rows.length,10);i++){
+        var joined=rows[i].join("|").toUpperCase();
+        if(joined.indexOf("RUBRO")>=0&&joined.indexOf("PRODUCTO")>=0){hdrIdx=i;break;}
+      }
+      if(hdrIdx<0){toast("No parece un archivo de ventas DUX (no encontré encabezados)","err");return;}
+      var data=rows.slice(hdrIdx+1).filter(function(r){return r&&(String(r[DUX_COL.rubro]||"").trim()!==""); });
+      if(!data.length){toast("El archivo no tiene filas de ventas","err");return;}
+
+      // Agregar por rubro mapeado
+      var ingCats={}; // categoria app -> monto (con IVA)
+      var cmvTotal=0;
+      var svcProductos={}; // producto de Servicios -> monto (para separar vet/pelu)
+      var rubrosNoMapeados={};
+      data.forEach(function(r){
+        var rubro=String(r[DUX_COL.rubro]||"").trim().toUpperCase();
+        var total=toNum(r[DUX_COL.total]);
+        var costo=toNum(r[DUX_COL.costo]);
+        cmvTotal+=costo;
+        if(rubro==="SERVICIOS"){
+          var prod=String(r[DUX_COL.producto]||"(sin producto)").trim();
+          svcProductos[prod]=(svcProductos[prod]||0)+total;
+        } else if(DUX_RUBRO_MAP[rubro]){
+          var cat=DUX_RUBRO_MAP[rubro];
+          ingCats[cat]=(ingCats[cat]||0)+total;
+        } else {
+          rubrosNoMapeados[rubro]=(rubrosNoMapeados[rubro]||0)+total;
+        }
+      });
+      var svcTotal=Object.keys(svcProductos).reduce(function(s,k){return s+svcProductos[k];},0);
+      // Pre-asignar servicios: si el nombre del producto sugiere peluquería → Peluquería; si no → Veterinaria
+      var pelu=0,vet=0;
+      Object.keys(svcProductos).forEach(function(prod){
+        if(/PELUQ/i.test(prod)) pelu+=svcProductos[prod]; else vet+=svcProductos[prod];
+      });
+
+      // ¿Ya hay importación DUX previa de este mes/sucursal?
+      var yaHay=records.some(function(x){return x.tipo==="Ingreso"&&x.suc===suc&&gm(x.fecha)===mes&&/DUX/.test(x.notas||"");});
+      var yaCMV=cmvRecs.some(function(x){return x.suc===suc&&x.mes===mes;});
+
+      duxData={mes:mes,suc:suc,ingCats:ingCats,cmvTotal:cmvTotal,svcTotal:svcTotal,svcProductos:svcProductos,
+               pelu:Math.round(pelu),vet:Math.round(vet),rubrosNoMapeados:rubrosNoMapeados,
+               yaHay:yaHay,yaCMV:yaCMV,nLineas:data.length};
+      duxRenderReview();
+      document.getElementById("modal-dux").classList.add("open");
+    }catch(err){toast("Error al leer el archivo: "+err.message,"err");console.error(err);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function duxRenderReview(){
+  var d=duxData; if(!d)return;
+  var sucLbl=d.suc==="Tucuman"?"Tucumán":d.suc;
+  var ventasNoSvc=Object.keys(d.ingCats).reduce(function(s,k){return s+d.ingCats[k];},0);
+  var ventasTot=ventasNoSvc+d.svcTotal;
+  var html="";
+  html+='<div style="font-size:12px;color:var(--muted);margin:10px 0 12px">'+MESES[d.mes-1]+' '+CMV_YEAR+' · '+sucLbl+' · '+d.nLineas+' líneas</div>';
+
+  if(d.yaHay||d.yaCMV){
+    html+='<div class="dux-warn"><span>⚠️</span><span>Ya hay datos de '+MESES[d.mes-1]+'/'+sucLbl+((d.yaHay&&d.yaCMV)?" (ventas DUX y CMV)":d.yaHay?" (ventas DUX)":" (CMV)")+'. Si confirmás, esto se <strong>suma</strong> a lo existente.</span></div>';
+  }
+
+  // Ingresos por rubro
+  html+='<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Ingresos por rubro (con IVA)</div>';
+  html+='<div class="dux-card">';
+  var orden=["Ventas Alimentos","Ventas Accesorios","Salud y medicamentos"];
+  orden.forEach(function(cat){
+    if(d.ingCats[cat]!==undefined)
+      html+='<div class="dux-row"><span class="dux-row-lbl">'+cat+'</span><span class="dux-row-val" style="color:var(--green)">'+fp(d.ingCats[cat])+'</span></div>';
+  });
+  html+='</div>';
+
+  // Servicios: separar
+  html+='<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Servicios — separá el total <span style="color:#aaa">('+fp(d.svcTotal)+')</span></div>';
+  html+='<div class="dux-card" style="padding:10px 12px">';
+  html+='<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Veterinaria</span>'
+     +'<input class="dux-svc-input" inputmode="numeric" id="dux-vet" value="'+fmtMiles(String(d.vet))+'" oninput="duxSvcInput()"></div>';
+  html+='<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Peluquería</span>'
+     +'<input class="dux-svc-input" inputmode="numeric" id="dux-pelu" value="'+fmtMiles(String(d.pelu))+'" oninput="duxSvcInput()"></div>';
+  html+='<div id="dux-svc-msg" style="font-size:11px;margin-top:8px;line-height:1.5"></div>';
+  html+='</div>';
+
+  // Rubros no mapeados (aviso)
+  var noMap=Object.keys(d.rubrosNoMapeados);
+  if(noMap.length){
+    html+='<div class="dux-warn"><span>ℹ️</span><span>Rubros no reconocidos (no se cargan): '+noMap.map(function(k){return k+" ("+fp(d.rubrosNoMapeados[k])+")";}).join(", ")+'</span></div>';
+  }
+
+  // Totales
+  html+='<div class="dux-tot">';
+  html+='<div class="dux-tot-row"><span style="font-size:13px;color:var(--muted)">Total ventas</span><span style="font-size:15px;font-weight:800" id="dux-tot-ventas">'+fp(ventasTot)+'</span></div>';
+  html+='<div class="dux-tot-row"><span style="font-size:13px;color:var(--muted)">CMV del mes</span><span style="font-size:15px;font-weight:800;color:#c0392b">'+fp(d.cmvTotal)+'</span></div>';
+  html+='</div>';
+
+  html+='<div style="display:flex;gap:8px;margin-top:4px">';
+  html+='<button class="btn btn-r" style="flex:1;margin:0" onclick="duxClose()">Cancelar</button>';
+  html+='<button class="btn btn-b" style="flex:2;margin:0" id="dux-confirm" onclick="duxConfirm()">✓ Confirmar y cargar</button>';
+  html+='</div>';
+
+  document.getElementById("dux-body").innerHTML=html;
+  duxSvcInput();
+}
+
+// Recalcula el mensaje de control del reparto de servicios
+function duxSvcInput(){
+  var d=duxData; if(!d)return;
+  var vet=parseMonto(document.getElementById("dux-vet").value)||0;
+  var pelu=parseMonto(document.getElementById("dux-pelu").value)||0;
+  var suma=vet+pelu, msg=document.getElementById("dux-svc-msg");
+  var dif=Math.round(d.svcTotal-suma);
+  if(Math.abs(dif)<1){ msg.innerHTML='<span style="color:var(--green)">✓ El reparto coincide con el total de servicios.</span>'; }
+  else if(dif>0){ msg.innerHTML='<span style="color:#c0392b">Faltan asignar '+fp(dif)+' de servicios.</span>'; }
+  else { msg.innerHTML='<span style="color:#c0392b">Te pasaste por '+fp(-dif)+' del total de servicios.</span>'; }
+  // Actualizar total ventas en vivo
+  var ventasNoSvc=Object.keys(d.ingCats).reduce(function(s,k){return s+d.ingCats[k];},0);
+  document.getElementById("dux-tot-ventas").textContent=fp(ventasNoSvc+vet+pelu);
+}
+
+function duxClose(){document.getElementById("modal-dux").classList.remove("open");duxData=null;}
+
+function duxConfirm(){
+  var d=duxData; if(!d)return;
+  var vet=parseMonto(document.getElementById("dux-vet").value)||0;
+  var pelu=parseMonto(document.getElementById("dux-pelu").value)||0;
+  // Fecha: último día del mes elegido (los ingresos son agregados mensuales)
+  var lastDay=new Date(CMV_YEAR,d.mes,0).getDate();
+  var fecha=CMV_YEAR+"-"+p2(d.mes)+"-"+p2(lastDay);
+  var dObj=new Date(fecha+"T12:00:00");
+  var sem=Math.ceil(((dObj-new Date(dObj.getFullYear(),0,1))/86400000+new Date(dObj.getFullYear(),0,1).getDay()+1)/7);
+  var notaBase="DUX "+MESES[d.mes-1];
+
+  // Armar movimientos de ingreso por categoría
+  var movs=[];
+  function pushMov(cat,monto){
+    if(monto<=0)return;
+    movs.push({fecha:fecha,tipo:"Ingreso",suc:d.suc,cat:cat,sub:"",monto:Math.round(monto),
+               semana:sem,mes:d.mes,notas:notaBase,ts:firebase.firestore.FieldValue.serverTimestamp()});
+  }
+  Object.keys(d.ingCats).forEach(function(cat){pushMov(cat,d.ingCats[cat]);});
+  pushMov("Servicios Veterinaria",vet);
+  pushMov("Servicios Peluqueria",pelu);
+
+  if(!movs.length){toast("No hay montos para cargar","err");return;}
+
+  setLoading("dux-confirm",true);
+  // Cargar movimientos en secuencia, luego sumar el CMV
+  var idx=0;
+  function next(){
+    if(idx>=movs.length){ guardarCMVdux(); return; }
+    db.collection("movimientos").add(movs[idx]).then(function(){idx++;next();})
+      .catch(function(e){toast("Error: "+e.message,"err");setLoading("dux-confirm",false);});
+  }
+  function guardarCMVdux(){
+    // CMV: sumar al valor existente del mes/sucursal (no reemplaza)
+    var id=cmvDocId(d.mes,d.suc);
+    var prev=cmvStored(d.mes,d.suc)||0;
+    var nuevo=Math.round(prev+d.cmvTotal);
+    db.collection("cmv").doc(id).set({mes:d.mes,suc:d.suc,anio:CMV_YEAR,monto:nuevo,ts:firebase.firestore.FieldValue.serverTimestamp()})
+      .then(function(){
+        toast("✓ Importado: "+movs.length+" ingresos + CMV","ok");
+        setLoading("dux-confirm",false);
+        duxClose();
+      }).catch(function(e){toast("CMV: "+e.message,"err");setLoading("dux-confirm",false);duxClose();});
+  }
+  next();
+}
+
 
 // ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
 function showTab(t){

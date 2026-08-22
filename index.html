@@ -898,9 +898,16 @@ function startData(){
   if(ch&&!ch.value) ch.value=hoy();
   updateCats();
 
+// Cualquier snapshot exitoso confirma que hay conexión real con Firestore:
+// esto evita que el cartel "Sin conexión" quede pegado tras una falla puntual.
+function markOnline(){
+  setSync("online");
+  var ob=document.getElementById("offbanner"); if(ob)ob.classList.remove("show");
+}
+
   db.collection("movimientos").orderBy("ts","asc").onSnapshot(function(snap){
     records=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
-    setSync("online");updateBadges();
+    markOnline();updateBadges();
     if(isA("historial"))  renderHistorial();
     if(isA("exportar"))   renderStats();
     if(isA("dashboard"))  renderDashboard();
@@ -908,26 +915,29 @@ function startData(){
 
   db.collection("caja").orderBy("ts","asc").onSnapshot(function(snap){
     cajaRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
-    updateBadges();renderCajaResumen();renderCajaList();renderCajaMensual();
+    markOnline();updateBadges();renderCajaResumen();renderCajaList();renderCajaMensual();
     if(isA("exportar"))  renderStats();
     if(isA("dashboard")) renderDashboard();
   },function(){setSync("offline");});
 
   db.collection("stock").orderBy("ts","asc").onSnapshot(function(snap){
     stockRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
+    markOnline();
     renderStockCards(); renderStockList(); renderStockHist();
     if(isA("dashboard")) renderDashboard();
-  },function(){});
+  },function(){setSync("offline");});
 
   db.collection("cmv").onSnapshot(function(snap){
     cmvRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
+    markOnline();
     if(isA("dashboard")) renderDashboard();
-  },function(){});
+  },function(){setSync("offline");});
 
   db.collection("fra").onSnapshot(function(snap){
     fraRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
+    markOnline();
     if(isA("dashboard")) renderDashboard();
-  },function(){});
+  },function(){setSync("offline");});
 
   // Configuración (Costo Financiero por sucursal) — un único doc "cf"
   db.collection("config").doc("cf").onSnapshot(function(doc){
@@ -938,8 +948,9 @@ function startData(){
       if(et&&typeof d.tucuman==="number") et.value=d.tucuman;
     }
     cfLoaded=true; // ya trajimos (o confirmamos que no hay) valor de la nube
+    markOnline();
     if(isA("dashboard")) renderDashboard();
-  },function(){cfLoaded=true;});
+  },function(){cfLoaded=true;setSync("offline");});
 }
 
 window.addEventListener("online", function(){setSync("online");document.getElementById("offbanner").classList.remove("show");});
@@ -2007,8 +2018,32 @@ function renderStats(){
 }
 
 // ── EXPORT XLSX (fechas reales) ────────────────────────────────────────────
+// Rentabilidad devengada por mes para una sucursal ("Ocampo","Tucuman","todos"),
+// con la MISMA fórmula que usa el Dashboard → Devengado: Ventas−CMV−Franquicia−Opex−CF
+function computeDevengMonths(suc){
+  var months=computeMonthlyFull(suc);
+  function cmvForMonth(mIdx){
+    if(suc!=="todos") return cmvEffective(mIdx,suc);
+    return cmvEffective(mIdx,"Ocampo")+cmvEffective(mIdx,"Tucuman");
+  }
+  function fraForMonth(mIdx){
+    if(suc!=="todos") return fraEffective(mIdx,suc);
+    return fraEffective(mIdx,"Ocampo")+fraEffective(mIdx,"Tucuman");
+  }
+  return months.map(function(m){
+    var ventas=m.ingTotal;
+    var opex=OPEX_CATS.reduce(function(s,c){return s+(m.egrCats[c]||0);},0);
+    var cmv=cmvForMonth(m.m);
+    var fra=fraForMonth(m.m);
+    var mb=ventas-cmv;
+    var resDev=mb-fra-opex-m.cf;
+    return{m:m.m,ventas:ventas,cmv:cmv,mb:mb,fra:fra,opex:opex,cf:m.cf,resDev:resDev,
+           hasData:ventas>0||opex>0||m.cf>0||cmv>0||fra>0};
+  });
+}
+
 function exportXLSX(){
-  if(!records.length&&!cajaRecs.length)return toast("No hay datos","err");
+  if(!records.length&&!cajaRecs.length&&!cmvRecs.length&&!fraRecs.length&&!stockRecs.length)return toast("No hay datos","err");
   var xl=window.XLSX;if(!xl)return toast("Recargá la página","err");
   var wb=xl.utils.book_new();
 
@@ -2051,6 +2086,58 @@ function exportXLSX(){
   }
   ws2["!cols"]=[{wch:13},{wch:12},{wch:16},{wch:18},{wch:30}];
   xl.utils.book_append_sheet(wb,ws2,"Caja Diaria");
+
+  // Hoja 3: CMV y Franquicia — valores crudos cargados a mano, por mes/sucursal
+  var h3=["Mes","Año","Sucursal","CMV cargado","Franquicia cargada (Royalty+Pub+Sistema)"];
+  var r3=[];
+  ["Ocampo","Tucuman"].forEach(function(suc){
+    for(var m=1;m<=12;m++){
+      var cmvV=cmvStored(m,suc), fraV=fraStored(m,suc);
+      if(cmvV===null&&fraV===null)continue; // solo meses con algo cargado
+      r3.push([MESES[m-1],CMV_YEAR,suc==="Tucuman"?"Tucumán":suc,cmvV!==null?cmvV:"",fraV!==null?fraV:""]);
+    }
+  });
+  var ws3=xl.utils.aoa_to_sheet([h3].concat(r3));
+  ws3["!cols"]=[{wch:8},{wch:7},{wch:12},{wch:14},{wch:36}];
+  xl.utils.book_append_sheet(wb,ws3,"CMV y Franquicia");
+
+  // Hoja 4: Rentabilidad Devengada — totales calculados (igual fórmula que Dashboard→Devengado)
+  var h4=["Mes","Sucursal","Ventas","CMV","Margen Bruto","Franquicia","Gastos Operativos","Costo Financiero ($)","Resultado Devengado"];
+  var r4=[];
+  [["Ocampo","Ocampo"],["Tucuman","Tucumán"],["todos","Consolidado"]].forEach(function(pair){
+    var rows=computeDevengMonths(pair[0]);
+    rows.forEach(function(row){
+      if(!row.hasData)return;
+      r4.push([MESES[row.m-1],pair[1],row.ventas,row.cmv,row.mb,row.fra,row.opex,row.cf,row.resDev]);
+    });
+  });
+  var ws4=xl.utils.aoa_to_sheet([h4].concat(r4));
+  var range4=xl.utils.decode_range(ws4["!ref"]||"A1");
+  for(var r4i=1;r4i<=range4.e.r;r4i++){
+    for(var c4i=2;c4i<=8;c4i++){
+      var cell4=xl.utils.encode_cell({r:r4i,c:c4i});
+      if(ws4[cell4]&&ws4[cell4].v!==""){ws4[cell4].t="n";}
+    }
+  }
+  ws4["!cols"]=[{wch:8},{wch:12},{wch:13},{wch:13},{wch:13},{wch:12},{wch:16},{wch:16},{wch:16}];
+  xl.utils.book_append_sheet(wb,ws4,"Rentabilidad Devengada");
+
+  // Hoja 5: Stock Mensual — valuaciones cargadas por sucursal/fecha
+  var h5=["Fecha","Sucursal","Monto Stock","Notas"];
+  var r5=stockRecs.slice().sort(function(a,b){return (a.fecha||"").localeCompare(b.fecha||"");}).map(function(r){
+    var d=new Date((r.fecha||"2026-01-01")+"T12:00:00");
+    return[d,r.suc==="Tucuman"?"Tucumán":r.suc,r.monto,r.notas||""];
+  });
+  var ws5=xl.utils.aoa_to_sheet([h5].concat(r5));
+  var range5=xl.utils.decode_range(ws5["!ref"]||"A1");
+  for(var r5i=1;r5i<=range5.e.r;r5i++){
+    var a5=xl.utils.encode_cell({r:r5i,c:0});
+    if(ws5[a5]){ws5[a5].t="d";ws5[a5].z="DD/MM/YYYY";}
+    var m5=xl.utils.encode_cell({r:r5i,c:2});
+    if(ws5[m5]){ws5[m5].t="n";}
+  }
+  ws5["!cols"]=[{wch:13},{wch:12},{wch:14},{wch:30}];
+  xl.utils.book_append_sheet(wb,ws5,"Stock Mensual");
 
   xl.writeFile(wb,"Mascotera_"+new Date().toISOString().slice(0,10)+".xlsx");
   toast("✓ Descargado con fechas reales","ok");

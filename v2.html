@@ -103,8 +103,9 @@ button,input,select,textarea{font-family:inherit}
 .panel-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .panel-t{font-family:var(--f-disp);font-weight:700;font-size:15px;line-height:1.3}
 .panel-s{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
-.grid2{display:grid;grid-template-columns:1fr;gap:14px}
-@media (min-width:900px){.grid2{grid-template-columns:1fr 1fr}.grid2>.panel{margin-bottom:0}.grid2{margin-bottom:14px}}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.grid2>*{min-width:0} /* las columnas se achican al ancho del celular */
+@media (min-width:900px){.grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid2>.panel{margin-bottom:0}.grid2{margin-bottom:14px}}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
 
 /* ── Formularios ── */
@@ -363,6 +364,18 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
 .user-chip{display:flex;align-items:center;gap:6px}
 .user-chip button{background:var(--bg);border:1px solid var(--border);color:#555;border-radius:50%;width:30px;height:30px;font-size:12px;cursor:pointer;flex-shrink:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ── Respaldo ── */
+.aviso-bk{display:flex;align-items:center;gap:8px;border:1px solid #BFE3D8;background:var(--tq-l);border-radius:var(--r-lg);padding:7px 8px 7px 12px;margin-bottom:10px;font-size:13px;color:var(--tq-d)}
+.aviso-bk .t{flex:1;min-width:0;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aviso-bk .t b{color:var(--ink)}
+.aviso-bk .btn-sm{min-height:34px;padding:6px 12px}
+.aviso-bk .btn{margin:0}
+.aviso-bk .x{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;width:32px;height:32px;flex-shrink:0}
+.bk-pasos{padding-left:20px;font-size:13px;line-height:1.6;margin:8px 0}
+.rs-tab{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 12px}
+.rs-tab th,.rs-tab td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right}
+.rs-tab th:first-child,.rs-tab td:first-child{text-align:left}
+.rs-tab th{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
 </style>
 </head>
 <body>
@@ -417,6 +430,7 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
 <!-- ══════════ CARGAR ══════════ -->
 <section class="screen active" id="screen-cargar">
   <div class="page-h"><h1>Cargar</h1><p>Movimientos, caja, stock y comisiones</p></div>
+  <div id="aviso-respaldo"></div>
   <div id="alertas-gastos"></div>
   <div class="segtabs" id="cargar-tabs">
     <button class="stab active" data-c="mov" onclick="showCargar('mov')">Movimiento</button>
@@ -739,6 +753,27 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
     </div>
   </div>
 
+  <div class="panel" id="bk-panel">
+    <div class="panel-h" style="margin-bottom:6px"><div class="panel-t">🛟 Respaldo en Google Drive</div><div id="bk-estado"></div></div>
+    <div class="panel-s">Guarda una copia completa de todos los datos (.json) en la carpeta <b>“Mascotera respaldos”</b> de tu Google Drive. Cuando toca respaldar, la app te avisa al abrirla y lo hacés con un toque.</div>
+    <div class="fgrid c2" style="margin-top:12px">
+      <div class="field"><label for="bk-frec">Avisarme</label><select id="bk-frec" class="inp" onchange="bkSetCfg('frecuencia',this.value)">
+        <option value="1">Todos los días</option><option value="3">Cada 3 días</option><option value="7">Una vez por semana</option><option value="15">Cada 15 días</option><option value="30">Una vez por mes</option><option value="0">Nunca (solo manual)</option></select></div>
+      <div class="field"><label for="bk-cons">Copias a conservar en Drive</label><select id="bk-cons" class="inp" onchange="bkSetCfg('conservar',this.value)">
+        <option value="5">Las últimas 5</option><option value="10">Las últimas 10</option><option value="20">Las últimas 20</option><option value="50">Las últimas 50</option></select></div>
+      <div class="btn-row span2"><button class="btn btn-sm" id="bk-btn" onclick="bkRespaldar()">Respaldar ahora en Drive</button><a class="btn btn-sm btn-sec" id="bk-link" target="_blank" rel="noopener" style="display:none;text-decoration:none">Abrir carpeta</a></div>
+      <div class="span2" id="bk-msg"></div>
+    </div>
+    <details class="more"><summary>Primera vez: activar Google Drive (un solo paso)</summary>
+      <ol class="bk-pasos">
+        <li>Desde la compu, entrá a <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com?project=mascoapp-701c6" target="_blank" rel="noopener">este enlace</a> con tu cuenta juliomonti91@gmail.com.</li>
+        <li>Tocá <b>Habilitar</b> (Enable). Listo, no hay que hacer nada más ahí.</li>
+        <li>Volvé a la app y tocá <b>Respaldar ahora en Drive</b>. Google te va a pedir permiso para que la app guarde archivos en tu Drive: aceptá.</li>
+      </ol>
+      <div class="panel-s">La app solo puede ver los archivos que ella misma crea, no el resto de tu Drive.</div>
+    </details>
+  </div>
+
   <div class="panel">
     <div class="panel-t">Datos</div>
     <div class="panel-s" style="margin-bottom:12px">Importar, exportar y respaldar</div>
@@ -754,6 +789,9 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
         <div class="enote"><strong>Importar Excel (.xlsx / .xlsm):</strong> lee las hojas <em>Registro Diario</em> y <em>Caja Diaria</em> (formato planilla o formato app). Los datos se <strong>agregan</strong> sin borrar los existentes.</div>
         <button class="btn btn-sec" onclick="document.getElementById('file-import').click()">Importar archivo .xlsx</button>
         <input type="file" id="file-import" accept=".xlsx,.xls,.xlsm" style="display:none" onchange="importXLSX(this)">
+        <div class="enote" style="margin-top:4px"><strong>Restaurar desde un respaldo (.json):</strong> recupera los registros que falten (por ejemplo, si se borró algo). No borra ni cambia nada de lo que ya está cargado.</div>
+        <button class="btn btn-sec" onclick="document.getElementById('file-restaurar').click()">Restaurar desde respaldo .json</button>
+        <input type="file" id="file-restaurar" accept=".json,application/json" style="display:none" onchange="rsArchivo(this)">
         <div class="iprog" id="iprog"><div class="ititl" id="ititle">Importando...</div><div class="ibar-wrap"><div class="ibar" id="ibar"></div></div><div class="itxt" id="itxt">Preparando...</div></div>
       </div>
     </div>
@@ -764,7 +802,7 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
 
   <div class="panel">
     <div class="panel-t">Cuenta</div>
-    <div class="user-chip js-user" style="display:none;margin-top:8px"><span class="js-uemail" style="flex:1"></span><button class="btn btn-sm btn-ghost" style="width:auto;border-radius:10px" onclick="logout()">Cerrar sesión</button></div>
+    <div class="user-chip js-user" style="display:none;margin-top:8px;flex-wrap:wrap"><span class="js-uemail" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"></span><button class="btn btn-sm btn-ghost" style="width:auto;border-radius:10px" onclick="logout()">Cerrar sesión</button></div>
   </div>
 </section>
 
@@ -826,6 +864,14 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
   <div class="modal">
     <div class="modal-hdr"><span class="modal-title">Revisar importación DUX</span><button class="modal-close" onclick="duxClose()">✕</button></div>
     <div class="modal-body" id="dux-body"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL RESTAURAR RESPALDO ══ -->
+<div class="modal-backdrop" id="modal-restaurar">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Restaurar respaldo</span><button class="modal-close" onclick="rsCerrar()">✕</button></div>
+    <div class="modal-body" id="rs-body"></div>
   </div>
 </div>
 
@@ -1006,6 +1052,8 @@ function startData(){
   if(cd&&!cd.value) cd.value="2026-03-01";
   if(ch&&!ch.value) ch.value=hoy();
   updateCats();
+  bkEscuchar(); // configuración del respaldo en Drive (nuevo.js)
+  if(typeof tgEscuchar==="function") tgEscuchar(); // estado del bot de Telegram (v3)
 
 // Cualquier snapshot exitoso confirma que hay conexión real con Firestore:
 // esto evita que el cartel "Sin conexión" quede pegado tras una falla puntual.
@@ -1649,6 +1697,7 @@ function setDashView(v,el){
   el.classList.add("active");
   document.querySelectorAll(".dview").forEach(function(d){d.classList.remove("active");});
   document.getElementById("dview-"+v).classList.add("active");
+  var fb=document.getElementById("dash-fbar"); if(fb) fb.style.display=(v==="preguntar")?"none":"";
   renderDashboard();
 }
 // Costo financiero % por sucursal (diferenciado). "todos" = ponderado por ventas.
@@ -2289,6 +2338,7 @@ function renderDashboard(){
   else if(dashView==="deveng")   renderDeveng();
   else if(dashView==="categ")    renderCateg();
   else if(dashView==="ratios")   renderRatios();
+  else if(dashView==="preguntar"&&typeof iaRenderPreguntar==="function") iaRenderPreguntar();
 }
 
 // ── STATS ──────────────────────────────────────────────────────────────────
@@ -2334,6 +2384,17 @@ function computeDevengMonths(suc){
   });
 }
 
+// Fecha "AAAA-MM-DD" → número de serie de Excel (días desde 1900), sin depender de zonas horarias
+function xlSerial(f){
+  var p=String(f||"2026-01-01").split("-");
+  return Math.round(Date.UTC(parseInt(p[0],10),parseInt(p[1],10)-1,parseInt(p[2],10))/86400000)+25569;
+}
+function xlFechaCol(ws,col,filaIni,filaFin){
+  for(var i=filaIni;i<=filaFin;i++){
+    var a=window.XLSX.utils.encode_cell({r:i,c:col});
+    if(ws[a]){ws[a].t="n";ws[a].z="dd/mm/yyyy";}
+  }
+}
 function exportXLSX(){
   if(!records.length&&!cajaRecs.length&&!cmvRecs.length&&!fraRecs.length&&!stockRecs.length)return toast("No hay datos","err");
   var xl=window.XLSX;if(!xl)return toast("Recargá la página","err");
@@ -2343,7 +2404,7 @@ function exportXLSX(){
   // Columna 0 = fecha (Date object → tipo 'd'), columna 5 = monto (número)
   var h1=["Fecha","Sucursal","Tipo","Categoria","Subcategoria","Monto","Semana","Mes","Notas"];
   var r1=records.map(function(r){
-    var d=new Date((r.fecha||"2026-01-01")+"T12:00:00");
+    var d=xlSerial(r.fecha);
     return[d,r.suc,r.tipo,r.cat,r.sub||"",r.monto,r.semana,r.mes,r.notas||""];
   });
   var ws1=xl.utils.aoa_to_sheet([h1].concat(r1));
@@ -2351,7 +2412,7 @@ function exportXLSX(){
   var range1=xl.utils.decode_range(ws1["!ref"]||"A1");
   for(var ri=1;ri<=range1.e.r;ri++){
     var addr=xl.utils.encode_cell({r:ri,c:0});
-    if(ws1[addr]){ws1[addr].t="d";ws1[addr].z="DD/MM/YYYY";}
+    if(ws1[addr]){ws1[addr].t="n";ws1[addr].z="dd/mm/yyyy";}
     var amnt=xl.utils.encode_cell({r:ri,c:5});
     if(ws1[amnt]){ws1[amnt].t="n";}
   }
@@ -2361,7 +2422,7 @@ function exportXLSX(){
   // Hoja 2: Caja Diaria — agrupar por fecha+suc: una fila por evento
   var h2=["Fecha","Sucursal","Extraccion","Gasto bolsillo","Notas"];
   var r2=cajaRecs.map(function(r){
-    var d=new Date((r.fecha||"2026-01-01")+"T12:00:00");
+    var d=xlSerial(r.fecha);
     var ext=r.tipo==="Extraccion"?r.monto:0;
     var gst=r.tipo==="Gasto"?r.monto:0;
     return[d,r.suc||"",ext||"",gst||"",r.notas||""];
@@ -2370,7 +2431,7 @@ function exportXLSX(){
   var range2=xl.utils.decode_range(ws2["!ref"]||"A1");
   for(var rj=1;rj<=range2.e.r;rj++){
     var a2=xl.utils.encode_cell({r:rj,c:0});
-    if(ws2[a2]){ws2[a2].t="d";ws2[a2].z="DD/MM/YYYY";}
+    if(ws2[a2]){ws2[a2].t="n";ws2[a2].z="dd/mm/yyyy";}
     for(var cj=2;cj<=3;cj++){
       var nc=xl.utils.encode_cell({r:rj,c:cj});
       if(ws2[nc]&&ws2[nc].v!==""){ws2[nc].t="n";}
@@ -2422,14 +2483,14 @@ function exportXLSX(){
   // Hoja 5: Stock Mensual — valuaciones cargadas por sucursal/fecha
   var h5=["Fecha","Sucursal","Monto Stock","Notas"];
   var r5=stockRecs.slice().sort(function(a,b){return (a.fecha||"").localeCompare(b.fecha||"");}).map(function(r){
-    var d=new Date((r.fecha||"2026-01-01")+"T12:00:00");
+    var d=xlSerial(r.fecha);
     return[d,r.suc==="Tucuman"?"Tucumán":r.suc,r.monto,r.notas||""];
   });
   var ws5=xl.utils.aoa_to_sheet([h5].concat(r5));
   var range5=xl.utils.decode_range(ws5["!ref"]||"A1");
   for(var r5i=1;r5i<=range5.e.r;r5i++){
     var a5=xl.utils.encode_cell({r:r5i,c:0});
-    if(ws5[a5]){ws5[a5].t="d";ws5[a5].z="DD/MM/YYYY";}
+    if(ws5[a5]){ws5[a5].t="n";ws5[a5].z="dd/mm/yyyy";}
     var m5=xl.utils.encode_cell({r:r5i,c:2});
     if(ws5[m5]){ws5[m5].t="n";}
   }
@@ -2825,6 +2886,8 @@ function showCargar(v){
   if(v==="caja")  {renderCajaResumen();renderCajaList();renderCajaMensual();}
   if(v==="stock") {renderStockCards();renderStockList();renderStockHist();}
   if(v==="comis") renderComis();
+  if(v==="ia"&&typeof iaRenderCargar==="function") iaRenderCargar();
+  if(typeof tgRender==="function") tgRender();
 }
 
 // ── STOCK ──────────────────────────────────────────────────────────────────
@@ -3305,6 +3368,8 @@ function renderAjustes(){
     }).join("");
   }
   renderRecurrentes();
+  renderRespaldoPanel();
+  if(typeof iaRenderAjustes==="function") iaRenderAjustes();
 }
 
 // ══ GASTOS RECURRENTES + DETECCIÓN AUTOMÁTICA ═════════════════════════════
@@ -3466,6 +3531,7 @@ function renderAlertas(){
       +'<div class="aviso-s">'+partes.join(" · ")+(alertaAbierta.all?'':' — tocá para ver')+'</div>'
       +'<div class="aviso-body">'+cuerpo+'</div></div>':"";
   document.querySelectorAll(".js-alertn").forEach(function(b){b.textContent=total;b.classList.toggle("show",total>0);});
+  renderAvisoRespaldo();
   var pendCierre=!(dPrev&&dPrev.cerrado);
   document.querySelectorAll(".js-cierren").forEach(function(b){b.textContent="1";b.classList.toggle("show",pendCierre);});
 }
@@ -3548,6 +3614,7 @@ function renderCierre(){
       +desc.map(function(k){var p=k.split("|");return '<span class="chip">'+esc(p[0]+(p[1]?" · "+p[1]:""))+'<button title="Deshacer" onclick="restaurarDescartado(\''+s+'\',\''+esc(k).replace(/'/g,"\\'")+'\')">↺</button></span>';}).join("")+'</div>';
   }
   document.getElementById("cierre-falt").innerHTML=html;
+  if(typeof iaRenderCierre==="function") iaRenderCierre(s);
 }
 function cierreToggle(){
   var s=document.getElementById("cierre-mes").value; if(!s)return;
@@ -3654,6 +3721,11 @@ function renderComis(){
 // ══ INFORME PARA CLAUDE ═══════════════════════════════════════════════════
 function informeGenerar(){
   var s=document.getElementById("cierre-mes").value; if(!s)return;
+  var ta=document.getElementById("informe-txt"); ta.value=informeTexto(s,true);
+  toast("✓ Informe generado","ok");
+}
+// Texto del informe del mes "s" + 2 anteriores. conPedido=false omite el bloque "QUÉ NECESITO" (lo usa la IA)
+function informeTexto(s,conPedido){
   var y=parseInt(s.slice(0,4),10), m=parseInt(s.slice(5,7),10);
   // Meses a comparar como "YYYY-MM" (pueden cruzar de año: Nov 26, Dic 26, Ene 27)
   var meses=[ymAdd(s,-2),ymAdd(s,-1),s].filter(function(x){return x>=CMV_YEAR_INICIO+"-"+p2(DEVENG_START_MONTH);});
@@ -3683,6 +3755,7 @@ function informeGenerar(){
   L.push("- Costo financiero (tarjetas): "+cfOc+"% de las ventas en Ocampo y "+cfTu+"% en Tucumán.");
   L.push("- Resultado de caja = Ventas − Egresos pagados (incluye pagos a Proveedores) − Costo financiero.");
   L.push("- Resultado devengado = Ventas − CMV − Franquicia − Gastos operativos (todo menos Proveedores) − Costo financiero.");
+  if(conPedido){
   L.push("");
   L.push("QUÉ NECESITO");
   L.push("Armame un reporte mensual de "+MESES_L[m-1]+" comparándolo con los meses anteriores:");
@@ -3692,6 +3765,7 @@ function informeGenerar(){
   L.push("4) Margen bruto, resultado devengado y resultado de caja, y cómo evolucionaron.");
   L.push("5) Alertas y 3 o 4 acciones concretas para el mes que viene.");
   L.push("Si algún dato parece incompleto (ver PENDIENTES al final), avisalo antes de sacar conclusiones.");
+  }
   [["todos","CONSOLIDADO"],["Ocampo","OCAMPO"],["Tucuman","TUCUMÁN"]].forEach(function(par){
     var suc=par[0];
     function mo(x){return MF(suc,yr(x))[mn(x)-1];} function de(x){return DV(suc,yr(x))[mn(x)-1];}
@@ -3745,8 +3819,7 @@ function informeGenerar(){
   if(!pend.length) L.push("- Ninguno: el mes está completo.");
   pend.forEach(function(c){L.push("- "+c.t+": "+c.d.replace(/<[^>]+>/g,""));});
   gastosFaltantes(s).forEach(function(it){L.push("  · Sin cargar: "+it.cat+(it.sub?" / "+it.sub:"")+" ("+(it.suc==="*"?"cualquier sucursal":sucLbl(it.suc))+(it.monto?", aprox. "+fp(it.monto):"")+")");});
-  var ta=document.getElementById("informe-txt"); ta.value=L.join("\n");
-  toast("✓ Informe generado","ok");
+  return L.join("\n");
 }
 function informeCopiar(){
   var ta=document.getElementById("informe-txt");
@@ -3764,20 +3837,294 @@ function informeDescargar(){
 }
 
 // ══ RESPALDO JSON ═════════════════════════════════════════════════════════
-function exportJSON(){
+var pendientesTg=[], destinatariosTg={}, telegramEstado=null; // los completa la v3 (bot de Telegram)
+function respaldoData(){
   function limpio(arr){return arr.map(function(r){var o={};Object.keys(r).forEach(function(k){
     var v=r[k]; if(v&&typeof v.toDate==="function")v=v.toDate().toISOString(); o[k]=v;});return o;});}
-  var data={
-    app:"La Mascotera",version:2,exportado:new Date().toISOString(),
+  return {
+    app:"La Mascotera",version:3,exportado:new Date().toISOString(),
     movimientos:limpio(records),caja:limpio(cajaRecs),stock:limpio(stockRecs),cmv:limpio(cmvRecs),fra:limpio(fraRecs),
-    cierres:limpio(cierresRecs),papelera:limpio(papeleraRecs),
-    config:{maestros:MAESTROS,recurrentes:recurrentes,
+    cierres:limpio(cierresRecs),papelera:limpio(papeleraRecs),pendientes_tg:limpio(pendientesTg),
+    config:{maestros:MAESTROS,recurrentes:recurrentes,destinatarios:destinatariosTg,
       cf:{ocampo:parseFloat(document.getElementById("cf-pct-oc").value)||0,tucuman:parseFloat(document.getElementById("cf-pct-tu").value)||0}}
   };
+}
+function respaldoNombre(){
+  var d=new Date();
+  return "Mascotera_respaldo_"+hoy()+"_"+p2(d.getHours())+p2(d.getMinutes())+".json";
+}
+function exportJSON(){
   var a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:"application/json"}));
-  a.download="Mascotera_respaldo_"+new Date().toISOString().slice(0,10)+".json"; a.click();
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(respaldoData(),null,1)],{type:"application/json"}));
+  a.download=respaldoNombre(); a.click();
   toast("✓ Respaldo descargado","ok");
+}
+
+// ══ RESPALDO AUTOMÁTICO EN GOOGLE DRIVE ═══════════════════════════════════
+// La app avisa al abrirse cuando pasó la frecuencia elegida y sube el .json con un toque.
+// Permiso: drive.file (la app solo ve los archivos que ella misma crea).
+var DRIVE_API="https://www.googleapis.com/drive/v3", DRIVE_UP="https://www.googleapis.com/upload/drive/v3";
+var DRIVE_SCOPE="https://www.googleapis.com/auth/drive.file", BK_CARPETA="Mascotera respaldos";
+var bkCfg={}, bkCargado=false, bkToken=null, bkTokenVence=0, bkBusy=false, bkPospuesto=false, bkTrasRedirect=false;
+function bkEscuchar(){
+  db.collection("config").doc("backup").onSnapshot(function(doc){
+    bkCfg=(doc&&doc.exists&&doc.data())||{}; bkCargado=true;
+    renderAvisoRespaldo(); renderRespaldoPanel(); bkSeguirTrasRedirect();
+  },function(){bkCargado=true;});
+  bkRevisarRedirect();
+  // Datos del bot de Telegram (se guardan también en el respaldo)
+  db.collection("pendientes_tg").onSnapshot(function(snap){
+    pendientesTg=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;});
+    if(typeof tgRender==="function")tgRender();
+  },function(){});
+  db.collection("config").doc("destinatarios").onSnapshot(function(doc){
+    destinatariosTg=(doc&&doc.exists&&doc.data()&&doc.data().items)||{};
+    if(typeof tgRender==="function")tgRender();
+  },function(){});
+}
+function bkFrecuencia(){var f=parseInt(bkCfg.frecuencia,10);return isNaN(f)?7:f;}
+function bkConservar(){var c=parseInt(bkCfg.conservar,10);return isNaN(c)||c<1?10:c;}
+function bkDias(){if(!bkCfg.ultimo)return null;return Math.floor((Date.now()-new Date(bkCfg.ultimo).getTime())/86400000);}
+function bkVencido(){var f=bkFrecuencia();if(!f)return false;var d=bkDias();return d===null||d>=f;}
+function bkHace(){
+  var d=bkDias(); if(d===null)return "nunca";
+  return d===0?"hoy":d===1?"ayer":"hace "+d+" días";
+}
+function renderAvisoRespaldo(){
+  var el=document.getElementById("aviso-respaldo"); if(!el)return;
+  if(!recordsLoaded||!bkCargado||bkPospuesto||!records.length||!bkVencido()){el.innerHTML="";return;}
+  var d=bkDias();
+  el.innerHTML='<div class="aviso-bk"><div class="t">🛟 <b>'+(d===null?'Sin respaldo en Drive':'Respaldo '+bkHace())+'</b></div>'
+    +'<button class="btn btn-sm btn-g" id="bk-btn-aviso" onclick="bkRespaldar()"'+(bkBusy?' disabled':'')+'>'+(bkBusy?'Subiendo…':'Respaldar')+'</button>'
+    +'<button class="x" onclick="bkPosponer()" aria-label="Más tarde" title="Más tarde">✕</button></div>';
+}
+function bkPosponer(){bkPospuesto=true;renderAvisoRespaldo();}
+function renderRespaldoPanel(){
+  var est=document.getElementById("bk-estado"); if(!est)return;
+  var d=bkDias(), ok=d!==null&&!bkVencido();
+  est.innerHTML=d===null?'<span class="tag warn">Sin respaldos</span>':'<span class="tag '+(ok?'ok':'warn')+'">Último: '+bkHace()+'</span>';
+  var f=document.getElementById("bk-frec"), c=document.getElementById("bk-cons");
+  if(f&&document.activeElement!==f)f.value=String(bkFrecuencia());
+  if(c&&document.activeElement!==c)c.value=String(bkConservar());
+  var l=document.getElementById("bk-link");
+  if(l){if(bkCfg.carpetaId){l.href="https://drive.google.com/drive/folders/"+bkCfg.carpetaId;l.style.display="";}else l.style.display="none";}
+  var m=document.getElementById("bk-msg");
+  if(m&&!m.getAttribute("data-fijo")){
+    m.innerHTML=bkCfg.ultimo?'<div class="panel-s">Último archivo: <b>'+esc(bkCfg.archivo||"")+'</b> · '
+      +new Date(bkCfg.ultimo).toLocaleString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})
+      +(bkCfg.tam?' · '+Math.round(bkCfg.tam/1024)+' KB':'')+'</div>':'';
+  }
+}
+function bkSetCfg(campo,v){
+  var o={}; o[campo]=parseInt(v,10);
+  db.collection("config").doc("backup").set(o,{merge:true}).then(function(){toast("✓ Guardado","ok");})
+    .catch(function(e){toast("Error: "+e.message,"err");});
+}
+function bkMsg(tipo,txt){
+  var m=document.getElementById("bk-msg"); if(!m)return;
+  if(!txt){m.removeAttribute("data-fijo");renderRespaldoPanel();return;}
+  m.setAttribute("data-fijo","1");
+  m.innerHTML='<div class="'+(tipo==="err"?"dux-warn":"enote")+'" style="margin:0">'+txt+'</div>';
+}
+function bkError(st,j){
+  var m=(j&&j.error&&j.error.message)||"", e;
+  if(/has not been used|is disabled|accessNotConfigured|SERVICE_DISABLED/i.test(m))
+    e=new Error('Falta activar Google Drive en tu proyecto (paso único). <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com?project=mascoapp-701c6" target="_blank" rel="noopener" style="color:inherit;font-weight:700">Activarlo acá</a> desde la compu y volvé a intentar.');
+  else if(st===401)e=new Error("El permiso de Google venció. Volvé a tocar Respaldar.");
+  else if(st===403&&/insufficient|scope/i.test(m))e=new Error("No se dio permiso para guardar en Drive. Volvé a intentarlo y aceptá el permiso.");
+  else if(/storageQuota|quota/i.test(m))e=new Error("Tu Google Drive no tiene espacio libre.");
+  else e=new Error("Error de Google Drive ("+st+")"+(m?": "+esc(m):""));
+  e.status=st; return e;
+}
+function bkFetch(url,opt){
+  opt=opt||{}; opt.headers=opt.headers||{}; opt.headers.Authorization="Bearer "+bkToken;
+  return fetch(url,opt).then(function(r){
+    return r.text().then(function(t){
+      var j={}; try{j=t?JSON.parse(t):{};}catch(e){}
+      if(!r.ok){if(r.status===401){bkToken=null;}throw bkError(r.status,j);}
+      return j;
+    });
+  },function(){throw new Error("Sin conexión con Google Drive.");});
+}
+function bkProveedor(){
+  var p=new firebase.auth.GoogleAuthProvider(); p.addScope(DRIVE_SCOPE);
+  var u=auth.currentUser; if(u&&u.email)p.setCustomParameters({login_hint:u.email});
+  return p;
+}
+function bkGuardarToken(r){
+  var t=r&&r.credential&&r.credential.accessToken;
+  if(!t)throw new Error("Google no devolvió el permiso para Drive. Probá de nuevo.");
+  bkToken=t; bkTokenVence=Date.now()+50*60000; return t;
+}
+// Pide a Google el permiso de Drive (popup; en celulares que lo bloquean, redirección)
+function bkObtenerToken(){
+  if(bkToken&&Date.now()<bkTokenVence)return Promise.resolve(bkToken);
+  var u=auth.currentUser; if(!u)return Promise.reject(new Error("La sesión no está iniciada."));
+  var prov=bkProveedor();
+  return u.reauthenticateWithPopup(prov).then(bkGuardarToken,function(e){
+    var c=e&&e.code;
+    if(c==="auth/popup-blocked"||c==="auth/operation-not-supported-in-this-environment"||c==="auth/cancelled-popup-request"){
+      try{sessionStorage.setItem("masco_bk_redirect","1");}catch(x){}
+      u.reauthenticateWithRedirect(prov);
+      return new Promise(function(){}); // la página se va a Google y vuelve
+    }
+    if(c==="auth/popup-closed-by-user")throw new Error("Se cerró la ventana de Google antes de dar el permiso.");
+    if(c==="auth/user-mismatch")throw new Error("Elegí la cuenta juliomonti91@gmail.com en la ventana de Google.");
+    throw new Error((e&&e.message)||String(e));
+  });
+}
+function bkRevisarRedirect(){
+  var f=null; try{f=sessionStorage.getItem("masco_bk_redirect");}catch(e){}
+  if(!f)return;
+  try{sessionStorage.removeItem("masco_bk_redirect");}catch(e){}
+  auth.getRedirectResult().then(function(r){
+    if(r&&r.credential&&r.credential.accessToken){bkGuardarToken(r);bkTrasRedirect=true;bkSeguirTrasRedirect();}
+  }).catch(function(e){toast("No se pudo obtener el permiso de Drive: "+(e&&e.message||e),"err");});
+}
+function bkSeguirTrasRedirect(){
+  if(!bkTrasRedirect||!bkCargado||!recordsLoaded)return;
+  bkTrasRedirect=false;
+  setTimeout(function(){bkRespaldar();},1200); // dejar que terminen de llegar todas las colecciones
+}
+function bkCarpeta(){
+  function crear(){
+    var q=encodeURIComponent("name='"+BK_CARPETA+"' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+    return bkFetch(DRIVE_API+"/files?q="+q+"&fields=files(id)&spaces=drive").then(function(r){
+      if(r.files&&r.files.length)return r.files[0].id;
+      return bkFetch(DRIVE_API+"/files?fields=id",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name:BK_CARPETA,mimeType:"application/vnd.google-apps.folder"})}).then(function(f){return f.id;});
+    });
+  }
+  if(!bkCfg.carpetaId)return crear();
+  return bkFetch(DRIVE_API+"/files/"+bkCfg.carpetaId+"?fields=id,trashed").then(function(f){
+    return f.trashed?crear():f.id;
+  },function(e){if(e.status===404)return crear();throw e;});
+}
+function bkSubir(carpetaId,nombre,contenido){
+  var b="mascotera_"+Date.now();
+  var cuerpo="--"+b+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"
+    +JSON.stringify({name:nombre,parents:[carpetaId],mimeType:"application/json"})
+    +"\r\n--"+b+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+contenido+"\r\n--"+b+"--";
+  return bkFetch(DRIVE_UP+"/files?uploadType=multipart&fields=id,name,size",{method:"POST",
+    headers:{"Content-Type":"multipart/related; boundary="+b},body:cuerpo});
+}
+// Deja solo las últimas N copias (las viejas van a la papelera de Drive, no se borran del todo)
+function bkPodar(carpetaId){
+  var q=encodeURIComponent("'"+carpetaId+"' in parents and trashed=false and mimeType='application/json'");
+  return bkFetch(DRIVE_API+"/files?q="+q+"&orderBy=createdTime%20desc&pageSize=200&fields=files(id,name,createdTime)").then(function(r){
+    var viejos=(r.files||[]).slice(bkConservar()), p=Promise.resolve();
+    viejos.forEach(function(f){
+      p=p.then(function(){return bkFetch(DRIVE_API+"/files/"+f.id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({trashed:true})});});
+    });
+    return p.then(function(){return viejos.length;});
+  }).catch(function(){return 0;}); // si falla la limpieza, el respaldo igual quedó hecho
+}
+function bkRespaldar(){
+  if(bkBusy)return;
+  if(!records.length&&!cajaRecs.length)return toast("Todavía no hay datos para respaldar","err");
+  bkBusy=true; setLoading("bk-btn",true); setLoading("bk-btn-aviso",true); renderAvisoRespaldo();
+  bkMsg("info","Pidiendo permiso a Google y subiendo el respaldo…");
+  var nombre=respaldoNombre(), contenido=JSON.stringify(respaldoData()), carpeta=null, archivo=null;
+  bkObtenerToken().then(function(){return bkCarpeta();})
+  .then(function(id){carpeta=id;return bkSubir(id,nombre,contenido);})
+  .then(function(f){archivo=f;return bkPodar(carpeta);})
+  .then(function(){
+    return db.collection("config").doc("backup").set({ultimo:new Date().toISOString(),archivo:nombre,
+      tam:contenido.length,carpetaId:carpeta,ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  })
+  .then(function(){
+    bkBusy=false; setLoading("bk-btn",false); setLoading("bk-btn-aviso",false);
+    bkMsg(); renderAvisoRespaldo();
+    toast("✓ Respaldo guardado en Google Drive","ok");
+  })
+  .catch(function(e){
+    bkBusy=false; setLoading("bk-btn",false); setLoading("bk-btn-aviso",false); renderAvisoRespaldo();
+    bkMsg("err",(e&&e.message)||String(e));
+    if(!isA("ajustes"))toast("No se pudo respaldar: revisalo en Ajustes","err");
+  });
+}
+
+// ══ RESTAURAR DESDE RESPALDO ══════════════════════════════════════════════
+var RS_COLS=[["movimientos","Movimientos"],["caja","Caja"],["stock","Stock"],["cmv","CMV"],["fra","Franquicia"],["cierres","Cierres de mes"],["papelera","Papelera"]];
+var rsDatos=null;
+function rsActuales(col){return {movimientos:records,caja:cajaRecs,stock:stockRecs,cmv:cmvRecs,fra:fraRecs,cierres:cierresRecs,papelera:papeleraRecs}[col]||[];}
+function rsFaltan(col){
+  var ids={}; rsActuales(col).forEach(function(r){ids[r._id]=1;});
+  return ((rsDatos&&rsDatos[col])||[]).filter(function(r){return r&&r._id&&!ids[r._id];});
+}
+function rsArchivo(input){
+  var f=input.files&&input.files[0]; input.value=""; if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    var d=null; try{d=JSON.parse(rd.result);}catch(e){}
+    if(!d||d.app!=="La Mascotera"||!Array.isArray(d.movimientos))return toast("Ese archivo no es un respaldo de la app","err");
+    rsDatos=d; rsMostrar();
+  };
+  rd.onerror=function(){toast("No se pudo leer el archivo","err");};
+  rd.readAsText(f);
+}
+function rsMostrar(){
+  var d=rsDatos, total=0;
+  var filas=RS_COLS.map(function(c){
+    var n=(d[c[0]]||[]).length, k=rsFaltan(c[0]).length; total+=k;
+    return '<tr><td>'+c[1]+'</td><td>'+n+'</td><td>'+rsActuales(c[0]).length+'</td><td><b'+(k?' style="color:var(--or-d)"':'')+'>'+k+'</b></td></tr>';
+  }).join("");
+  var h='<div class="panel-s" style="margin-bottom:6px">Respaldo del <b>'+new Date(d.exportado).toLocaleString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+'</b></div>'
+    +'<table class="rs-tab"><thead><tr><th></th><th>En el respaldo</th><th>Hoy en la app</th><th>Faltan</th></tr></thead><tbody>'+filas+'</tbody></table>'
+    +(total?'<div class="enote">Se van a <b>agregar '+total+' registros</b> que están en el respaldo y hoy no están en la app. Lo que ya está cargado no se toca.</div>'
+           :'<div class="enote">No falta nada: todo lo del respaldo ya está en la app.</div>')
+    +(d.config&&d.config.maestros?'<label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:14px"><input type="checkbox" id="rs-config" style="width:18px;height:18px;margin-top:1px;accent-color:var(--or-d)"> <span>También volver las <b>listas</b> (empleados, proveedores, categorías), gastos recurrentes, costo financiero y destinatarios del bot a como estaban en el respaldo. <span class="panel-s">Reemplaza las actuales.</span></span></label>':'')
+    +'<button class="btn" id="rs-btn" onclick="rsConfirmar()">'+(total?'Recuperar '+total+' registros':'Aplicar')+'</button>'
+    +'<button class="btn btn-ghost" onclick="rsCerrar()">Cancelar</button>';
+  document.getElementById("rs-body").innerHTML=h;
+  document.getElementById("modal-restaurar").classList.add("open");
+}
+function rsCerrar(){document.getElementById("modal-restaurar").classList.remove("open");rsDatos=null;}
+// Vuelve a convertir en fecha de Firestore lo que en el .json quedó como texto
+function rsRevivir(v,k){
+  if(v&&typeof v==="object"&&!Array.isArray(v)){
+    var ks=Object.keys(v);
+    if(ks.length===2&&typeof v.seconds==="number"&&typeof v.nanoseconds==="number")return new firebase.firestore.Timestamp(v.seconds,v.nanoseconds);
+    var o={}; ks.forEach(function(kk){o[kk]=rsRevivir(v[kk],kk);}); return o;
+  }
+  if(Array.isArray(v))return v.map(function(x){return rsRevivir(x);});
+  if(k==="ts"&&typeof v==="string"&&!isNaN(Date.parse(v)))return firebase.firestore.Timestamp.fromDate(new Date(v));
+  return v;
+}
+function rsConfirmar(){
+  if(!rsDatos)return;
+  var ops=[], conCfg=document.getElementById("rs-config")&&document.getElementById("rs-config").checked;
+  RS_COLS.forEach(function(c){
+    rsFaltan(c[0]).forEach(function(r){
+      var o={}; Object.keys(r).forEach(function(k){if(k!=="_id")o[k]=rsRevivir(r[k],k);});
+      if(!o.ts&&(c[0]==="movimientos"||c[0]==="caja"||c[0]==="stock"))
+        o.ts=firebase.firestore.Timestamp.fromDate(new Date((o.fecha||"2026-01-01")+"T12:00:00"));
+      ops.push([c[0],r._id,o]);
+    });
+  });
+  var cfg=rsDatos.config||{};
+  if(conCfg){
+    if(cfg.maestros&&Array.isArray(cfg.maestros.egresos))ops.push(["config","maestros",{egresos:cfg.maestros.egresos,ts:firebase.firestore.FieldValue.serverTimestamp()}]);
+    if(Array.isArray(cfg.recurrentes))ops.push(["config","recurrentes",{items:cfg.recurrentes,ts:firebase.firestore.FieldValue.serverTimestamp()}]);
+    if(cfg.cf&&typeof cfg.cf.ocampo==="number")ops.push(["config","cf",{ocampo:cfg.cf.ocampo,tucuman:cfg.cf.tucuman}]);
+    if(cfg.destinatarios&&typeof cfg.destinatarios==="object"&&Object.keys(cfg.destinatarios).length)ops.push(["config","destinatarios",{items:cfg.destinatarios}]);
+  }
+  if(!ops.length){rsCerrar();return toast("No había nada para recuperar","ok");}
+  setLoading("rs-btn",true);
+  var p=Promise.resolve(), hechos=0;
+  for(var i=0;i<ops.length;i+=400){
+    (function(lote){
+      p=p.then(function(){
+        var b=db.batch();
+        lote.forEach(function(op){b.set(db.collection(op[0]).doc(op[1]),op[2]);});
+        return b.commit().then(function(){hechos+=lote.length;});
+      });
+    })(ops.slice(i,i+400));
+  }
+  p.then(function(){
+    setLoading("rs-btn",false); rsCerrar();
+    toast("✓ Restaurado: "+hechos+" registro"+(hechos===1?"":"s"),"ok");
+  }).catch(function(e){setLoading("rs-btn",false);toast("Error: "+e.message+" ("+hechos+" ya restaurados)","err");});
 }
 
 // ══ AÑO DE TRABAJO ════════════════════════════════════════════════════════

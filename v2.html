@@ -376,6 +376,26 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
 .rs-tab th,.rs-tab td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right}
 .rs-tab th:first-child,.rs-tab td:first-child{text-align:left}
 .rs-tab th{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+
+/* ── v4: Ajustes en pestañas, menú agrupado, buscador, márgenes ── */
+.aview{display:none}.aview.active{display:block}
+#aj-tabs .bdg{display:inline-block;margin-left:6px;min-width:20px;padding:1px 6px;border-radius:999px;background:var(--bg);border:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-align:center}
+.nav-grp{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:16px 12px 6px}
+nav>.nav-grp:first-child{padding-top:2px}
+.hsearch{position:relative;margin-bottom:10px}
+.hsearch svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted);pointer-events:none}
+.hsearch .inp{padding-left:39px;min-height:44px;font-size:16px}
+.h-sum{font-size:12.5px;color:var(--muted);margin:-4px 2px 10px;min-height:0}
+.h-sum:empty{display:none}
+.mg-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.mg-row:last-child{border-bottom:none}
+.mg-n{flex:1;min-width:0}
+.mg-n b{display:block;font-size:14px}
+.mg-n span{font-size:11.5px;color:var(--muted);line-height:1.4;display:block}
+.mg-in{display:flex;align-items:center;gap:5px;flex-shrink:0;font-weight:700;color:var(--muted)}
+.mg-in .inp{width:88px;text-align:right;min-height:40px;padding:8px 10px;font-size:16px;color:var(--ink)}
+.dux-suc-h{font-family:var(--f-disp);font-weight:800;font-size:15px;margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+.dux-suc-h:first-of-type{border-top:none;padding-top:0;margin-top:4px}
 </style>
 </head>
 <body>
@@ -404,10 +424,13 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
     <div class="brand-logo" role="img" aria-label="La Mascotera"></div>
     <div class="sb-sub">Gestión financiera</div>
     <nav>
+      <div class="nav-grp">Carga de datos</div>
       <button class="nav-btn active" data-tab="cargar" onclick="showTab('cargar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Cargar<span class="dotn js-alertn"></span></button>
       <button class="nav-btn" data-tab="historial" onclick="showTab('historial')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></svg>Historial</button>
+      <div class="nav-grp">Análisis</div>
       <button class="nav-btn" data-tab="analisis" onclick="showTab('analisis')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="16.5" y="3.5" width="4" height="16.5" rx="1"/></svg>Análisis</button>
       <button class="nav-btn" data-tab="cierre" onclick="showTab('cierre')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15.5 2 2 4-4"/></svg>Cierre de mes<span class="dotn js-cierren"></span></button>
+      <div class="nav-grp">Configuración</div>
       <button class="nav-btn" data-tab="ajustes" onclick="showTab('ajustes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Ajustes</button>
     </nav>
     <div class="sb-foot">
@@ -557,7 +580,9 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
 
 <!-- ══════════ HISTORIAL ══════════ -->
 <section class="screen" id="screen-historial">
-  <div class="page-h"><h1>Historial</h1><p>Movimientos, caja y papelera</p></div>
+  <div class="page-h"><h1>Historial</h1><p>Movimientos y caja</p></div>
+  <div class="hsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="inp" type="search" id="h-q" placeholder="Buscar: nota, categoría, proveedor, monto, mes…" autocomplete="off" oninput="hSearch(this.value)"></div>
+  <div class="h-sum" id="h-sum"></div>
   <div class="fbar">
     <div class="fc active" onclick="setFilter('todos',this)">Todos</div>
     <div class="fc" onclick="setFilter('Ingreso',this)">↑ Ingresos</div>
@@ -566,7 +591,6 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
     <div class="fc" onclick="setFilter('Tucuman',this)">Tucumán</div>
     <div class="fc" onclick="setFilter('General',this)">General</div>
     <div class="fc" onclick="setFilter('caja',this)">Caja</div>
-    <div class="fc" onclick="setFilter('papelera',this)">🗑 Papelera</div>
   </div>
   <div class="card" id="reclist"></div>
 </section>
@@ -676,15 +700,15 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
   </div>
   <div class="grid2">
     <div class="panel" id="dux-panel">
-      <div class="panel-t">Importar ventas DUX</div>
-      <div class="panel-s" style="margin-bottom:12px">Archivo "consulta de ventas detallada", uno por mes y sucursal. Carga ventas por rubro (con IVA) y suma el CMV del mes. Antes de guardar separás Peluquería y Veterinaria.</div>
+      <div class="panel-t">Importar ventas</div>
+      <div class="panel-s" style="margin-bottom:12px">Planilla de ventas del sistema: una sola con las dos sucursales, o una por sucursal. Detecta el mes y la sucursal sola, carga las ventas por rubro (con IVA) y suma el CMV. Si faltan costos, los estima con los márgenes de Ajustes → Márgenes. Antes de guardar revisás todo.</div>
       <div class="dux-sel">
-        <div class="field"><label for="dux-mes">Mes</label>
+        <div class="field"><label for="dux-mes">Mes (si la planilla no trae fechas)</label>
           <select id="dux-mes" class="inp"></select></div>
         <div class="field"><label for="dux-suc">Sucursal</label>
-          <select id="dux-suc" class="inp"><option value="">— Elegir —</option><option value="Ocampo">Ocampo</option><option value="Tucuman">Tucumán</option></select></div>
+          <select id="dux-suc" class="inp"><option value="">Según la planilla</option><option value="Ocampo">Solo Ocampo</option><option value="Tucuman">Solo Tucumán</option></select></div>
       </div>
-      <button class="btn btn-sec" onclick="duxPick()" style="margin:0">Elegir archivo DUX</button>
+      <button class="btn btn-sec" onclick="duxPick()" style="margin:0">Elegir planilla de ventas</button>
       <input type="file" id="dux-file" accept=".xls,.xlsx,.xlsm" style="display:none" onchange="duxHandleFile(this)">
     </div>
     <div class="panel">
@@ -703,8 +727,17 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
 
 <!-- ══════════ AJUSTES ══════════ -->
 <section class="screen" id="screen-ajustes">
-  <div class="page-h"><h1>Ajustes</h1><p>Configuración, listas y datos</p></div>
+  <div class="page-h"><h1>Ajustes</h1><p>Configuración, márgenes, respaldo, importación y papelera</p></div>
 
+  <div class="dst-bar" id="aj-tabs">
+    <div class="dst active" data-v="config" onclick="setAjView('config')">Configuración</div>
+    <div class="dst" data-v="margenes" onclick="setAjView('margenes')">Márgenes</div>
+    <div class="dst" data-v="respaldo" onclick="setAjView('respaldo')">Respaldo</div>
+    <div class="dst" data-v="importar" onclick="setAjView('importar')">Importar</div>
+    <div class="dst" data-v="papelera" onclick="setAjView('papelera')">Papelera<span class="bdg" id="aj-pap-n">0</span></div>
+  </div>
+
+  <div class="aview active" id="ajview-config">
   <div class="grid2">
     <div class="panel">
       <div class="panel-t">Costo financiero</div>
@@ -753,6 +786,23 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
     </div>
   </div>
 
+  <div class="panel">
+    <div class="panel-t">Cuenta</div>
+    <div class="user-chip js-user" style="display:none;margin-top:8px;flex-wrap:wrap"><span class="js-uemail" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"></span><button class="btn btn-sm btn-ghost" style="width:auto;border-radius:10px" onclick="logout()">Cerrar sesión</button></div>
+  </div>
+  </div>
+
+  <div class="aview" id="ajview-margenes">
+    <div class="panel">
+      <div class="panel-t">Márgenes por línea</div>
+      <div class="panel-s" style="margin-bottom:8px">Margen promedio sobre el precio de venta (con IVA). Se usa al importar las ventas para estimar el CMV de los productos que la planilla trae sin costo: <b>CMV = venta × (1 − margen)</b>. Si el costo viene en la planilla, se usa el costo real.</div>
+      <div id="mg-list"></div>
+      <div class="btn-row" style="margin-top:12px"><button class="btn btn-sm btn-sec" onclick="mgReset()">Volver a los valores de la planilla</button></div>
+      <div class="panel-s" style="margin-top:8px">Valores iniciales: planilla de márgenes (controles de agosto y septiembre de 2026).</div>
+    </div>
+  </div>
+
+  <div class="aview" id="ajview-respaldo">
   <div class="panel" id="bk-panel">
     <div class="panel-h" style="margin-bottom:6px"><div class="panel-t">🛟 Respaldo en Google Drive</div><div id="bk-estado"></div></div>
     <div class="panel-s">Guarda una copia completa de todos los datos (.json) en la carpeta <b>“Mascotera respaldos”</b> de tu Google Drive. Cuando toca respaldar, la app te avisa al abrirla y lo hacés con un toque.</div>
@@ -775,8 +825,8 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
   </div>
 
   <div class="panel">
-    <div class="panel-t">Datos</div>
-    <div class="panel-s" style="margin-bottom:12px">Importar, exportar y respaldar</div>
+    <div class="panel-t">Copia en este dispositivo</div>
+    <div class="panel-s" style="margin-bottom:12px">Exportar y restaurar</div>
     <div class="sg2" id="smov"></div>
     <div class="sg2" id="scaj"></div>
     <div class="grid2" style="margin-bottom:0">
@@ -786,23 +836,41 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
         <div class="btn-row"><button class="btn btn-sm btn-sec" onclick="exportCSV()">Descargar .csv</button><button class="btn btn-sm btn-sec" onclick="exportJSON()">Respaldo completo (.json)</button></div>
       </div>
       <div>
-        <div class="enote"><strong>Importar Excel (.xlsx / .xlsm):</strong> lee las hojas <em>Registro Diario</em> y <em>Caja Diaria</em> (formato planilla o formato app). Los datos se <strong>agregan</strong> sin borrar los existentes.</div>
-        <button class="btn btn-sec" onclick="document.getElementById('file-import').click()">Importar archivo .xlsx</button>
-        <input type="file" id="file-import" accept=".xlsx,.xls,.xlsm" style="display:none" onchange="importXLSX(this)">
         <div class="enote" style="margin-top:4px"><strong>Restaurar desde un respaldo (.json):</strong> recupera los registros que falten (por ejemplo, si se borró algo). No borra ni cambia nada de lo que ya está cargado.</div>
         <button class="btn btn-sec" onclick="document.getElementById('file-restaurar').click()">Restaurar desde respaldo .json</button>
         <input type="file" id="file-restaurar" accept=".json,application/json" style="display:none" onchange="rsArchivo(this)">
-        <div class="iprog" id="iprog"><div class="ititl" id="ititle">Importando...</div><div class="ibar-wrap"><div class="ibar" id="ibar"></div></div><div class="itxt" id="itxt">Preparando...</div></div>
       </div>
     </div>
     <div style="border-top:1px solid var(--line);margin-top:6px;padding-top:14px">
       <button class="btn btn-r btn-sm" onclick="clearAll()">Borrar todos los movimientos y la caja</button>
     </div>
   </div>
+  </div>
 
-  <div class="panel">
-    <div class="panel-t">Cuenta</div>
-    <div class="user-chip js-user" style="display:none;margin-top:8px;flex-wrap:wrap"><span class="js-uemail" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"></span><button class="btn btn-sm btn-ghost" style="width:auto;border-radius:10px" onclick="logout()">Cerrar sesión</button></div>
+  <div class="aview" id="ajview-importar">
+    <div class="panel">
+      <div class="panel-t">Importar Excel</div>
+      <div class="panel-s" style="margin-bottom:12px">Para cargar movimientos y caja desde una planilla</div>
+      <div>
+        <div class="enote"><strong>Importar Excel (.xlsx / .xlsm):</strong> lee las hojas <em>Registro Diario</em> y <em>Caja Diaria</em> (formato planilla o formato app). Los datos se <strong>agregan</strong> sin borrar los existentes.</div>
+        <button class="btn btn-sec" onclick="document.getElementById('file-import').click()">Importar archivo .xlsx</button>
+        <input type="file" id="file-import" accept=".xlsx,.xls,.xlsm" style="display:none" onchange="importXLSX(this)">
+      </div>
+        <div class="iprog" id="iprog"><div class="ititl" id="ititle">Importando...</div><div class="ibar-wrap"><div class="ibar" id="ibar"></div></div><div class="itxt" id="itxt">Preparando...</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-t">Importar ventas del mes</div>
+      <div class="panel-s" style="margin-bottom:12px">La planilla de ventas del sistema se importa desde <b>Cierre de mes</b>, así queda ligada al mes que estás cerrando.</div>
+      <button class="btn btn-sec" onclick="showTab('cierre')">Ir a Cierre de mes</button>
+    </div>
+  </div>
+
+  <div class="aview" id="ajview-papelera">
+    <div class="panel">
+      <div class="panel-t">Papelera</div>
+      <div class="panel-s" style="margin-bottom:10px">Lo que borrás queda acá y se puede restaurar.</div>
+      <div id="aj-pap-list"></div>
+    </div>
   </div>
 </section>
 
@@ -862,7 +930,7 @@ textarea.inp{min-height:220px;font-size:12.5px;line-height:1.5;font-family:ui-mo
 <!-- ══ MODAL REVISIÓN IMPORTACIÓN DUX ══ -->
 <div class="modal-backdrop" id="modal-dux">
   <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">Revisar importación DUX</span><button class="modal-close" onclick="duxClose()">✕</button></div>
+    <div class="modal-hdr"><span class="modal-title">Revisar importación de ventas</span><button class="modal-close" onclick="duxClose()">✕</button></div>
     <div class="modal-body" id="dux-body"></div>
   </div>
 </div>
@@ -1052,7 +1120,7 @@ function startData(){
   if(cd&&!cd.value) cd.value="2026-03-01";
   if(ch&&!ch.value) ch.value=hoy();
   updateCats();
-  bkEscuchar(); // configuración del respaldo en Drive (nuevo.js)
+  mgEscuchar(); bkEscuchar(); // configuración del respaldo en Drive (nuevo.js)
   if(typeof tgEscuchar==="function") tgEscuchar(); // estado del bot de Telegram (v3)
 
 // Cualquier snapshot exitoso confirma que hay conexión real con Firestore:
@@ -1132,7 +1200,7 @@ function markOnline(){
   db.collection("papelera").onSnapshot(function(snap){
     papeleraRecs=snap.docs.map(function(d){var r=d.data();r._id=d.id;return r;})
       .sort(function(a,b){return String(b.borradoEl||"").localeCompare(String(a.borradoEl||""));});
-    if(isA("historial")&&filterAct==="papelera") renderHistorial();
+    updatePapBadge(); if(isA("ajustes")&&ajView==="papelera") renderPapelera("aj-pap-list");
   },function(){});
 
   // Configuración (Costo Financiero por sucursal) — un único doc "cf"
@@ -1434,28 +1502,11 @@ function setFilter(f,el){
 }
 function renderHistorial(){
   var list=document.getElementById("reclist"),html="",lm=null;
-  if(filterAct==="papelera"){
-    if(!papeleraRecs.length){list.innerHTML='<div class="empty"><div class="eico">🗑</div><p><strong>La papelera está vacía.</strong><br>Lo que borres queda acá y se puede restaurar.</p></div>';return;}
-    var COLN={movimientos:"Movimiento",caja:"Caja",stock:"Stock"};
-    papeleraRecs.forEach(function(p){
-      var d=p.datos||{};
-      var titulo=COLN[p.col]||p.col;
-      if(p.col==="movimientos") titulo+=" · "+sucLbl(d.suc)+" · "+(d.cat||"")+(d.sub?" · "+d.sub:"");
-      else if(p.col==="caja")   titulo+=" · "+(d.tipo==="Extraccion"?"Extracción":"Gasto")+" · "+sucLbl(d.suc);
-      else if(p.col==="stock")  titulo+=" · "+sucLbl(d.suc);
-      var cuando=p.borradoEl?new Date(p.borradoEl).toLocaleString("es-AR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
-      html+='<div class="ri"><div class="rdot" style="background:#B5AFA6"></div>'
-        +'<div class="rb"><div class="rt">'+esc(titulo)+'</div>'
-        +'<div class="rs">'+(d.fecha||"").split("-").reverse().join("/")+(d.notas?' · '+esc(d.notas):'')+' · borrado '+cuando+'</div></div>'
-        +'<span class="rm" style="color:var(--muted)">'+fp(d.monto||0)+'</span>'
-        +'<div class="rbtns"><button class="rbtn rbtn-e" onclick="restaurarPapelera(\''+p._id+'\')">Restaurar</button>'
-        +'<button class="rbtn rbtn-d" onclick="borrarDefinitivo(\''+p._id+'\',this)">✕</button></div></div>';
-    });
-    list.innerHTML=html;return;
-  }
   if(filterAct==="caja"){
-    if(!cajaRecs.length){list.innerHTML='<div class="empty"><div class="eico">💵</div><p>Sin registros.</p></div>';return;}
-    cajaRecs.slice().reverse().forEach(function(r){
+    var cd=cajaRecs.slice().reverse().filter(hCoincideCaja);
+    hResumen(cd,"caja");
+    if(!cd.length){list.innerHTML=hVacio("💵","Sin registros.");return;}
+    cd.forEach(function(r){
       var ml=MESES_L[new Date(r.fecha+"T12:00:00").getMonth()]+" "+r.fecha.slice(0,4);
       if(ml!==lm){html+='<div class="mhdr">'+ml+'</div>';lm=ml;}
       var col=r.tipo==="Extraccion"?"var(--teal)":"var(--purple)";
@@ -1473,7 +1524,9 @@ function renderHistorial(){
   var data=records.slice().reverse();
   if(filterAct==="Ingreso"||filterAct==="Egreso") data=data.filter(function(r){return r.tipo===filterAct;});
   else if(filterAct!=="todos") data=data.filter(function(r){return r.suc===filterAct;});
-  if(!data.length){list.innerHTML='<div class="empty"><div class="eico">📭</div><p>No hay registros.</p></div>';return;}
+  data=data.filter(hCoincideMov);
+  hResumen(data,"mov");
+  if(!data.length){list.innerHTML=hVacio("📭","No hay registros.");return;}
   data.forEach(function(r){
     var ml=MESES_L[(r.mes||1)-1]+" "+(r.fecha||"").slice(0,4);
     if(ml!==lm){html+='<div class="mhdr">'+ml+'</div>';lm=ml;}
@@ -2659,81 +2712,209 @@ function clearAll(){
   Promise.all(dels).then(function(){toast("Borrado","warn");});
 }
 
-// ══ IMPORTACIÓN DE VENTAS DUX ═══════════════════════════════════════════════
-// Mapeo de rubros DUX → categorías de la app
+// ══ MÁRGENES POR LÍNEA ═════════════════════════════════════════════════════
+// Sirven para estimar el CMV de lo que la planilla de ventas trae sin costo:
+// CMV = venta (con IVA) × (1 − margen). El margen es sobre el precio de venta.
+// Valores iniciales: planilla de márgenes (controles de ago–sep 2026). Se editan en Ajustes → Márgenes.
+var MG_DEF=[
+  {id:"sieger",n:"Sieger",m:38.7,marcas:["SIEGER"]},
+  {id:"agility",n:"Agility",m:38.3,marcas:["AGILITY"]},
+  {id:"fawna",n:"Fawna",m:34.1,marcas:["FAWNA"]},
+  {id:"balanced",n:"Balanced",m:36.0,marcas:["BALANCED"]},
+  {id:"oldprince",n:"Old Prince",m:36.6,marcas:["OLD PRINCE"]},
+  {id:"central",n:"Central",m:44.6,marcas:["SENDA","JASPE"]},
+  {id:"cabana",n:"La Cabaña",m:44.7,marcas:["ROYAL CANIN"]},
+  {id:"origen",n:"Origen",m:41.3,marcas:["ORIGEN"]},
+  {id:"otros_al",n:"Otros alimentos",m:38,marcas:[],nota:"Alimentos de marcas que no están en las líneas de arriba"},
+  {id:"otros",n:"Otros (accesorios, salud, etc.)",m:40,marcas:[],nota:"Accesorios, salud, higiene y demás rubros sin costo"}
+];
+var mgPct={};          // id → % editado por vos (config/margenes)
+var mgListo=false;     // ya se leyó la nube (no guardar antes)
+function mgDef(id){for(var i=0;i<MG_DEF.length;i++){if(MG_DEF[i].id===id)return MG_DEF[i];}return null;}
+function mgPctDe(id){
+  if(typeof mgPct[id]==="number"&&isFinite(mgPct[id]))return mgPct[id];
+  var d=mgDef(id); return d?d.m:0;
+}
+function mgNorm(t){
+  t=String(t==null?"":t).toUpperCase();
+  if(t.normalize)t=t.normalize("NFD").replace(/[̀-ͯ]/g,"");
+  return t.replace(/\s+/g," ").trim();
+}
+// Línea que corresponde a una marca; si no tiene, "otros_al" para alimentos y "otros" para el resto
+function mgIdPara(marca,rubroN){
+  var m=mgNorm(marca);
+  for(var i=0;i<MG_DEF.length;i++){if(MG_DEF[i].marcas.indexOf(m)>=0)return MG_DEF[i].id;}
+  return rubroN==="ALIMENTOS BALANCEADOS"?"otros_al":"otros";
+}
+function mgEscuchar(){
+  db.collection("config").doc("margenes").onSnapshot(function(doc){
+    var d=doc&&doc.exists?doc.data():null, l=(d&&d.lineas)||{}, o={};
+    Object.keys(l).forEach(function(k){if(typeof l[k]==="number"&&isFinite(l[k]))o[k]=l[k];});
+    mgPct=o; mgListo=true;
+    if(isA("ajustes")&&ajView==="margenes")mgRender();
+  },function(){mgListo=true;});
+}
+function mgRender(){
+  var el=document.getElementById("mg-list"); if(!el)return;
+  var h="", sec="";
+  MG_DEF.forEach(function(d){
+    var s=d.marcas.length?"alim":"resto";
+    if(d.marcas.length&&sec!=="alim"){h+='<div class="sdiv" style="margin:4px 0 0">Alimentos por línea</div>';sec="alim";}
+    if(!d.marcas.length&&sec!=="resto"){h+='<div class="sdiv" style="margin:14px 0 0">Lo que no tiene línea propia</div>';sec="resto";}
+    var v=mgPctDe(d.id), tocado=typeof mgPct[d.id]==="number"&&mgPct[d.id]!==d.m;
+    h+='<div class="mg-row"><div class="mg-n"><b>'+esc(d.n)+'</b><span>'+(d.marcas.length?'Marcas: '+esc(d.marcas.join(", ")):esc(d.nota||""))+(tocado?' · valor inicial '+d.m.toString().replace(".",",")+'%':'')+'</span></div>'
+      +'<div class="mg-in"><input class="inp" type="number" inputmode="decimal" id="mg-'+d.id+'" min="0" max="95" step="0.1" value="'+v+'" onchange="mgSet(\''+d.id+'\',this.value)"><span>%</span></div></div>';
+  });
+  el.innerHTML=h;
+}
+function mgSet(id,val){
+  var v=parseFloat(String(val).replace(",","."));
+  if(isNaN(v)||v<0||v>95){toast("El margen tiene que estar entre 0 y 95 %","err");mgRender();return;}
+  if(!mgListo){toast("Esperá un segundo: todavía está cargando","warn");mgRender();return;}
+  v=Math.round(v*10)/10;
+  mgPct[id]=v;
+  db.collection("config").doc("margenes").set({lineas:mgPct,ts:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){toast("✓ Margen guardado","ok");})
+    .catch(function(e){toast("Error: "+e.message,"err");});
+  mgRender();
+}
+function mgReset(){
+  if(!mgListo)return;
+  if(!confirm("¿Volver todos los márgenes a los valores de la planilla?"))return;
+  mgPct={};
+  db.collection("config").doc("margenes").set({lineas:{},ts:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){toast("✓ Márgenes restablecidos","ok");})
+    .catch(function(e){toast("Error: "+e.message,"err");});
+  mgRender();
+}
+
+// ══ IMPORTACIÓN DE VENTAS (planilla del sistema de ventas) ═════════════════
+// Una planilla con las dos sucursales, o una por sucursal. Se agrupa por sucursal y rubro.
+// Ocampo = "JULIO MONTI - CATAMARCA"; Tucumán = la que lleva "(TUCUMAN …)" en el nombre.
 var DUX_RUBRO_MAP={
   "ALIMENTOS BALANCEADOS":"Ventas Alimentos",
   "ACCESORIOS - PET SHOP":"Ventas Accesorios",
-  "SALUD, HIGIENE Y ESTETICA":"Salud y medicamentos"
+  "SALUD, HIGIENE Y ESTETICA":"Salud y medicamentos",
+  "ARTICULOS NO CATALOGADOS Y OTROS INGRESOS":"Otros Ingresos"
 };
-// Columnas del archivo DUX (0-based): J=9 Producto, K=10 Rubro, L=11 SubRubro,
-// AE=30 Total (con IVA), AK=36 Costo Total Producto
-var DUX_COL={rubro:10,subrubro:11,producto:9,total:30,costo:36};
+var DUX_CAT_ORDEN=["Ventas Alimentos","Ventas Accesorios","Salud y medicamentos","Otros Ingresos"];
+var DUX_SUC_ORDEN=["Ocampo","Tucuman"];
 var duxData=null; // resultado del parseo, a la espera de confirmación
 
-function duxPick(){
-  var suc=document.getElementById("dux-suc").value;
-  if(!suc){toast("Elegí primero la sucursal","err");return;}
-  document.getElementById("dux-file").click();
+function duxNum(v){
+  if(typeof v==="number")return isFinite(v)?v:0;
+  var s=String(v==null?"":v).replace(/[$\s]/g,"");
+  if(!s)return 0;
+  if(s.indexOf(",")>=0&&s.indexOf(".")>=0)s=s.replace(/\./g,"").replace(",",".");
+  else if(s.indexOf(",")>=0)s=s.replace(",",".");
+  var n=parseFloat(s); return isNaN(n)?0:n;
 }
+// Fecha de la planilla → "YYYY-MM" (serial de Excel, texto ISO o dd/mm/aaaa)
+function duxYM(v){
+  if(v instanceof Date&&!isNaN(v))return v.getFullYear()+"-"+p2(v.getMonth()+1);
+  if(typeof v==="number"&&v>20000&&v<80000){
+    var d=new Date(Date.UTC(1899,11,30)+Math.floor(v+1e-6)*86400000);
+    return d.getUTCFullYear()+"-"+p2(d.getUTCMonth()+1);
+  }
+  var s=String(v==null?"":v).trim(), m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return m[1]+"-"+m[2];
+  m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/);
+  if(m){var y=parseInt(m[3],10); if(y<100)y+=2000; return y+"-"+p2(parseInt(m[2],10));}
+  return "";
+}
+function duxSucDe(nombre){
+  var n=mgNorm(nombre); if(!n)return "";
+  if(n.indexOf("TUCUMAN")>=0)return "Tucuman";
+  if(n.indexOf("JULIO MONTI")>=0||n.indexOf("CATAMARCA")>=0)return "Ocampo";
+  return "";
+}
+function duxBus(h,lista){for(var k=0;k<lista.length;k++){var j=h.indexOf(lista[k]);if(j>=0)return j;}return -1;}
+function duxBusRe(h,re){for(var j=0;j<h.length;j++){if(re.test(h[j]))return j;}return -1;}
+// Busca la fila de encabezados y ubica las columnas por nombre (no por posición)
+function duxColumnas(rows){
+  for(var i=0;i<Math.min(rows.length,15);i++){
+    if(!rows[i])continue;
+    var h=rows[i].map(mgNorm), c={};
+    c.rubro=duxBus(h,["RUBRO"]); c.prod=duxBus(h,["PRODUCTO"]); c.suc=duxBus(h,["SUCURSAL"]);
+    c.total=duxBus(h,["IMPORTE TOTAL (CON IVA)","IMPORTE TOTAL"]); if(c.total<0)c.total=duxBusRe(h,/^IMPORTE TOTAL/);
+    c.costo=duxBus(h,["COSTO C/IVA (UNIT.)","COSTO C/IVA (UNIT)","COSTO CON IVA (UNIT.)"]); if(c.costo<0)c.costo=duxBusRe(h,/^COSTO C\/IVA/);
+    c.marca=duxBus(h,["MARCA"]); c.cant=duxBus(h,["CANTIDAD"]); c.fecha=duxBus(h,["FECHA"]);
+    if(c.rubro>=0&&c.prod>=0&&c.suc>=0&&c.total>=0)return {hdr:i,col:c};
+  }
+  return null;
+}
+function duxNuevaSuc(){return {ingCats:{},svc:{},cmvReal:0,cmvEst:0,vBase:0,vReal:0,est:{},rubrosNo:{},nFilas:0};}
+// Lee las filas de la planilla (ya como matriz) y arma el resumen por sucursal. No toca la pantalla.
+function duxParse(rows){
+  var cc=duxColumnas(rows);
+  if(!cc)return {error:"No parece la planilla de ventas: no encontré las columnas Sucursal, Rubro, Producto e Importe total."};
+  var c=cc.col, meses={}, i, r;
+  // 1ª pasada: mes dominante (si la planilla trae más de un mes, se carga solo el principal)
+  if(c.fecha>=0){
+    for(i=cc.hdr+1;i<rows.length;i++){
+      r=rows[i]; if(!r||!mgNorm(r[c.rubro]))continue;
+      var k=duxYM(r[c.fecha]); if(k)meses[k]=(meses[k]||0)+1;
+    }
+  }
+  var dom="", mx=0; Object.keys(meses).forEach(function(k){if(meses[k]>mx){mx=meses[k];dom=k;}});
+  var sucs={}, sucsNo={}, ignoradas=0;
+  for(i=cc.hdr+1;i<rows.length;i++){
+    r=rows[i]; if(!r)continue;
+    var rubro=mgNorm(r[c.rubro]); if(!rubro)continue; // filas vacías o de totales
+    if(dom&&c.fecha>=0){var ymF=duxYM(r[c.fecha]); if(ymF&&ymF!==dom){ignoradas++;continue;}}
+    var nomSuc=String(r[c.suc]==null?"":r[c.suc]).trim(), suc=duxSucDe(nomSuc);
+    var tot=duxNum(r[c.total]);
+    if(!suc){sucsNo[nomSuc||"(sin sucursal)"]=(sucsNo[nomSuc||"(sin sucursal)"]||0)+tot;continue;}
+    var S=sucs[suc]||(sucs[suc]=duxNuevaSuc()); S.nFilas++;
+    if(rubro==="SERVICIOS"){
+      var prod=String(r[c.prod]==null?"":r[c.prod]).trim()||"(sin producto)";
+      S.svc[prod]=(S.svc[prod]||0)+tot;
+      continue;
+    }
+    var cat=DUX_RUBRO_MAP[rubro];
+    if(!cat){S.rubrosNo[rubro]=(S.rubrosNo[rubro]||0)+tot;continue;}
+    S.ingCats[cat]=(S.ingCats[cat]||0)+tot;
+    if(cat==="Otros Ingresos")continue; // no tiene costo
+    S.vBase+=tot;
+    var qty=c.cant>=0?duxNum(r[c.cant]):1, cu=c.costo>=0?duxNum(r[c.costo]):0;
+    if(!qty)qty=1;
+    if(cu>0){ S.cmvReal+=cu*qty; S.vReal+=tot; }
+    else{
+      var id=mgIdPara(c.marca>=0?r[c.marca]:"",rubro), est=tot*(1-mgPctDe(id)/100);
+      var E=S.est[id]||(S.est[id]={venta:0,cmv:0}); E.venta+=tot; E.cmv+=est; S.cmvEst+=est;
+    }
+  }
+  return {ym:dom,meses:meses,sucs:sucs,sucsNo:sucsNo,ignoradas:ignoradas};
+}
+
+function duxPick(){document.getElementById("dux-file").click();}
 
 function duxHandleFile(input){
   var file=input.files[0]; if(!file)return;
-  var duxYm=document.getElementById("dux-mes").value; // "YYYY-MM"
-  var anio=parseInt(duxYm.slice(0,4),10), mes=parseInt(duxYm.slice(5,7),10);
-  var suc=document.getElementById("dux-suc").value;
+  var sel=document.getElementById("dux-suc").value; // "" = según la planilla
   input.value=""; // permitir re-seleccionar el mismo archivo
-  if(!suc){toast("Elegí la sucursal","err");return;}
   var reader=new FileReader();
   reader.onload=function(e){
     try{
-      var wb=XLSX.read(new Uint8Array(e.target.result),{type:"array",cellDates:true});
+      var wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
       var ws=wb.Sheets[wb.SheetNames[0]];
       var rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:""});
-      // Buscar la fila de encabezado (la que tiene "Rubro" y "Total")
-      var hdrIdx=-1;
-      for(var i=0;i<Math.min(rows.length,10);i++){
-        var joined=rows[i].join("|").toUpperCase();
-        if(joined.indexOf("RUBRO")>=0&&joined.indexOf("PRODUCTO")>=0){hdrIdx=i;break;}
+      var p=duxParse(rows);
+      if(p.error){toast(p.error,"err");return;}
+      var avisos=[], orden=DUX_SUC_ORDEN.filter(function(s){return !!p.sucs[s];});
+      if(sel){
+        DUX_SUC_ORDEN.forEach(function(s){if(s!==sel&&p.sucs[s])avisos.push("La planilla también trae "+sucLbl(s)+": no se carga porque elegiste solo "+sucLbl(sel)+".");});
+        orden=orden.filter(function(s){return s===sel;});
+        if(!orden.length){toast("La planilla no tiene ventas de "+sucLbl(sel),"err");return;}
       }
-      if(hdrIdx<0){toast("No parece un archivo de ventas DUX (no encontré encabezados)","err");return;}
-      var data=rows.slice(hdrIdx+1).filter(function(r){return r&&(String(r[DUX_COL.rubro]||"").trim()!==""); });
-      if(!data.length){toast("El archivo no tiene filas de ventas","err");return;}
-
-      // Agregar por rubro mapeado
-      var ingCats={}; // categoria app -> monto (con IVA)
-      var cmvTotal=0;
-      var svcProductos={}; // producto de Servicios -> monto (para separar vet/pelu)
-      var rubrosNoMapeados={};
-      data.forEach(function(r){
-        var rubro=String(r[DUX_COL.rubro]||"").trim().toUpperCase();
-        var total=toNum(r[DUX_COL.total]);
-        var costo=toNum(r[DUX_COL.costo]);
-        cmvTotal+=costo;
-        if(rubro==="SERVICIOS"){
-          var prod=String(r[DUX_COL.producto]||"(sin producto)").trim();
-          svcProductos[prod]=(svcProductos[prod]||0)+total;
-        } else if(DUX_RUBRO_MAP[rubro]){
-          var cat=DUX_RUBRO_MAP[rubro];
-          ingCats[cat]=(ingCats[cat]||0)+total;
-        } else {
-          rubrosNoMapeados[rubro]=(rubrosNoMapeados[rubro]||0)+total;
-        }
-      });
-      var svcTotal=Object.keys(svcProductos).reduce(function(s,k){return s+svcProductos[k];},0);
-      // Pre-asignar servicios: si el nombre del producto sugiere peluquería → Peluquería; si no → Veterinaria
-      var pelu=0,vet=0;
-      Object.keys(svcProductos).forEach(function(prod){
-        if(/PELUQ/i.test(prod)) pelu+=svcProductos[prod]; else vet+=svcProductos[prod];
-      });
-
-      // ¿Ya hay importación DUX previa de este mes/sucursal?
-      var yaHay=records.some(function(x){return x.tipo==="Ingreso"&&x.suc===suc&&ym(x.fecha)===duxYm&&/DUX/.test(x.notas||"");});
-      var yaCMV=cmvStored(mes,suc,anio)!==null;
-
-      duxData={mes:mes,anio:anio,suc:suc,ingCats:ingCats,cmvTotal:cmvTotal,svcTotal:svcTotal,svcProductos:svcProductos,
-               pelu:Math.round(pelu),vet:Math.round(vet),rubrosNoMapeados:rubrosNoMapeados,
-               yaHay:yaHay,yaCMV:yaCMV,nLineas:data.length};
+      if(!orden.length){toast("No encontré ventas de Ocampo ni de Tucumán en la planilla","err");return;}
+      var ymSel=p.ym||document.getElementById("dux-mes").value;
+      if(!p.ym)avisos.push("La planilla no trae fechas: se usa el mes elegido en Cierre de mes.");
+      var otros=Object.keys(p.meses).filter(function(k){return k!==p.ym;});
+      if(otros.length)avisos.push("La planilla tiene fechas de más de un mes. Se carga solo "+ymLabel(p.ym)+"; se ignoran "+p.ignoradas+" fila"+(p.ignoradas===1?"":"s")+" de "+otros.map(ymLabel).join(", ")+".");
+      Object.keys(p.sucsNo).forEach(function(k){avisos.push("Sucursal no reconocida, no se carga: "+k+" ("+fp(p.sucsNo[k])+").");});
+      duxData={ym:ymSel,anio:parseInt(ymSel.slice(0,4),10),mes:parseInt(ymSel.slice(5,7),10),sucs:p.sucs,orden:orden,avisos:avisos,busy:false};
+      duxChequearPrevios();
       duxRenderReview();
       document.getElementById("modal-dux").classList.add("open");
     }catch(err){toast("Error al leer el archivo: "+err.message,"err");console.error(err);}
@@ -2741,121 +2922,219 @@ function duxHandleFile(input){
   reader.readAsArrayBuffer(file);
 }
 
+// ¿Ya hay ventas importadas o CMV cargado para ese mes y sucursal?
+function duxChequearPrevios(){
+  var d=duxData; if(!d)return;
+  d.prev={};
+  d.orden.forEach(function(s){
+    d.prev[s]={
+      ventas:records.some(function(x){return x.tipo==="Ingreso"&&x.suc===s&&ym(x.fecha)===d.ym&&/^(DUX|Ventas) /.test(x.notas||"");}),
+      cmv:cmvStored(d.mes,s,d.anio)!=null
+    };
+  });
+}
+function duxMesCambio(v){
+  var d=duxData; if(!d||!v)return;
+  d.ym=v; d.anio=parseInt(v.slice(0,4),10); d.mes=parseInt(v.slice(5,7),10);
+  duxChequearPrevios(); duxRenderReview();
+}
+
 function duxRenderReview(){
   var d=duxData; if(!d)return;
-  var sucLbl=d.suc==="Tucuman"?"Tucumán":d.suc;
-  var ventasNoSvc=Object.keys(d.ingCats).reduce(function(s,k){return s+d.ingCats[k];},0);
-  var ventasTot=ventasNoSvc+d.svcTotal;
-  var html="";
-  html+='<div style="font-size:12px;color:var(--muted);margin:10px 0 12px">'+MESES[d.mes-1]+' '+d.anio+' · '+sucLbl+' · '+d.nLineas+' líneas</div>';
-
-  if(d.yaHay||d.yaCMV){
-    html+='<div class="dux-warn"><span>⚠️</span><span>Ya hay datos de '+MESES[d.mes-1]+'/'+sucLbl+((d.yaHay&&d.yaCMV)?" (ventas DUX y CMV)":d.yaHay?" (ventas DUX)":" (CMV)")+'. Si confirmás, esto se <strong>suma</strong> a lo existente.</span></div>';
-  }
-
-  // Ingresos por rubro
-  html+='<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Ingresos por rubro (con IVA)</div>';
-  html+='<div class="dux-card">';
-  var orden=["Ventas Alimentos","Ventas Accesorios","Salud y medicamentos"];
-  orden.forEach(function(cat){
-    if(d.ingCats[cat]!==undefined)
-      html+='<div class="dux-row"><span class="dux-row-lbl">'+cat+'</span><span class="dux-row-val" style="color:var(--green)">'+fp(d.ingCats[cat])+'</span></div>';
+  var lista=[].slice.call(document.getElementById("dux-mes").options).map(function(o){return o.value;});
+  if(lista.indexOf(d.ym)<0)lista.unshift(d.ym);
+  var h='<div class="field" style="margin-bottom:12px"><label for="dux-mes2">Mes de la planilla</label><select class="inp" id="dux-mes2" onchange="duxMesCambio(this.value)">'
+    +lista.map(function(v){return '<option value="'+v+'"'+(v===d.ym?' selected':'')+'>'+esc(ymLabel(v))+'</option>';}).join("")+'</select></div>';
+  d.avisos.forEach(function(a){h+='<div class="dux-warn"><span>ℹ️</span><span>'+esc(a)+'</span></div>';});
+  d.orden.forEach(function(s){
+    var S=d.sucs[s], pv=d.prev[s], lbl=sucLbl(s);
+    h+='<div class="dux-suc-h">'+esc(lbl)+'</div>';
+    if(pv.ventas||pv.cmv){
+      h+='<div class="dux-warn"><span>⚠️</span><span>Ya hay datos de '+esc(ymLabel(d.ym))+' en '+esc(lbl)+((pv.ventas&&pv.cmv)?" (ventas y CMV)":pv.ventas?" (ventas importadas)":" (CMV)")+'. Si confirmás, esto se <strong>suma</strong> a lo existente.</span></div>';
+    }
+    h+='<div class="dux-card">';
+    DUX_CAT_ORDEN.forEach(function(cat){
+      if(S.ingCats[cat])h+='<div class="dux-row"><span class="dux-row-lbl">'+cat+'</span><span class="dux-row-val" style="color:var(--green)">'+fp(S.ingCats[cat])+'</span></div>';
+    });
+    h+='</div>';
+    var svcTot=Object.keys(S.svc).reduce(function(a,k){return a+S.svc[k];},0), pelu=0, vet=0;
+    Object.keys(S.svc).forEach(function(k){if(/PELUQ/i.test(k))pelu+=S.svc[k];else vet+=S.svc[k];});
+    S.svcTot=svcTot;
+    if(svcTot){
+      h+='<div class="dux-card" style="padding:10px 12px">'
+        +'<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Veterinaria</span><input class="dux-svc-input" inputmode="numeric" id="dux-vet-'+s+'" value="'+fmtMiles(String(Math.round(vet)))+'" oninput="duxSvcInput()"></div>'
+        +'<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Peluquería</span><input class="dux-svc-input" inputmode="numeric" id="dux-pelu-'+s+'" value="'+fmtMiles(String(Math.round(pelu)))+'" oninput="duxSvcInput()"></div>'
+        +'<div id="dux-svc-msg-'+s+'" style="font-size:11px;margin-top:8px;line-height:1.5"></div></div>';
+    }
+    var noMap=Object.keys(S.rubrosNo);
+    if(noMap.length)h+='<div class="dux-warn"><span>ℹ️</span><span>Rubros no reconocidos (no se cargan): '+noMap.map(function(k){return esc(k)+" ("+fp(S.rubrosNo[k])+")";}).join(", ")+'</span></div>';
+    var cmvTot=Math.round(S.cmvReal+S.cmvEst), cob=S.vBase>0?Math.round(S.vReal/S.vBase*100):0;
+    h+='<div class="dux-card" style="padding:10px 12px">'
+      +'<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl"><b>CMV del mes</b></span><input class="dux-svc-input" inputmode="numeric" id="dux-cmv-'+s+'" value="'+fmtMiles(String(cmvTot))+'"></div>'
+      +'<div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:4px">Costo real de la planilla: <b>'+fp(S.cmvReal)+'</b> (en el '+cob+'% de las ventas de productos)'
+      +(S.cmvEst>0?' · estimado con márgenes: <b>'+fp(S.cmvEst)+'</b>':'')+'. Podés corregir el total.</div>';
+    var ids=Object.keys(S.est);
+    if(ids.length){
+      h+='<details class="more"><summary>Ver qué se estimó ('+ids.length+' línea'+(ids.length===1?'':'s')+')</summary><div style="margin-top:6px">'
+        +MG_DEF.filter(function(m){return S.est[m.id];}).map(function(m){
+          var E=S.est[m.id];
+          return '<div class="dux-row" style="padding:6px 0"><span class="dux-row-lbl">'+esc(m.n)+' <span style="color:var(--muted)">· margen '+String(mgPctDe(m.id)).replace(".",",")+'%</span></span><span class="dux-row-val">'+fp(E.venta)+' → '+fp(E.cmv)+'</span></div>';
+        }).join("")
+        +'<div style="font-size:11px;color:var(--muted);margin-top:4px">Venta → costo estimado. Los márgenes se editan en Ajustes → Márgenes.</div></div></details>';
+    }
+    h+='</div>';
+    h+='<div class="dux-tot"><div class="dux-tot-row"><span style="font-size:13px;color:var(--muted)">Total ventas '+esc(lbl)+'</span><span style="font-size:15px;font-weight:800" id="dux-tot-'+s+'">'+fp(0)+'</span></div></div>';
   });
-  html+='</div>';
-
-  // Servicios: separar
-  html+='<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Servicios — separá el total <span style="color:#aaa">('+fp(d.svcTotal)+')</span></div>';
-  html+='<div class="dux-card" style="padding:10px 12px">';
-  html+='<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Veterinaria</span>'
-     +'<input class="dux-svc-input" inputmode="numeric" id="dux-vet" value="'+fmtMiles(String(d.vet))+'" oninput="duxSvcInput()"></div>';
-  html+='<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Peluquería</span>'
-     +'<input class="dux-svc-input" inputmode="numeric" id="dux-pelu" value="'+fmtMiles(String(d.pelu))+'" oninput="duxSvcInput()"></div>';
-  html+='<div id="dux-svc-msg" style="font-size:11px;margin-top:8px;line-height:1.5"></div>';
-  html+='</div>';
-
-  // Rubros no mapeados (aviso)
-  var noMap=Object.keys(d.rubrosNoMapeados);
-  if(noMap.length){
-    html+='<div class="dux-warn"><span>ℹ️</span><span>Rubros no reconocidos (no se cargan): '+noMap.map(function(k){return k+" ("+fp(d.rubrosNoMapeados[k])+")";}).join(", ")+'</span></div>';
-  }
-
-  // Totales
-  html+='<div class="dux-tot">';
-  html+='<div class="dux-tot-row"><span style="font-size:13px;color:var(--muted)">Total ventas</span><span style="font-size:15px;font-weight:800" id="dux-tot-ventas">'+fp(ventasTot)+'</span></div>';
-  html+='<div class="dux-tot-row"><span style="font-size:13px;color:var(--muted)">CMV del mes</span><span style="font-size:15px;font-weight:800;color:#c0392b">'+fp(d.cmvTotal)+'</span></div>';
-  html+='</div>';
-
-  html+='<div style="display:flex;gap:8px;margin-top:4px">';
-  html+='<button class="btn btn-r" style="flex:1;margin:0" onclick="duxClose()">Cancelar</button>';
-  html+='<button class="btn btn-b" style="flex:2;margin:0" id="dux-confirm" onclick="duxConfirm()">✓ Confirmar y cargar</button>';
-  html+='</div>';
-
-  document.getElementById("dux-body").innerHTML=html;
+  h+='<div style="display:flex;gap:8px;margin-top:6px">'
+    +'<button class="btn btn-r" style="flex:1;margin:0" onclick="duxClose()">Cancelar</button>'
+    +'<button class="btn btn-b" style="flex:2;margin:0" id="dux-confirm" onclick="duxConfirm()">✓ Confirmar y cargar</button></div>';
+  document.getElementById("dux-body").innerHTML=h;
   duxSvcInput();
 }
 
-// Recalcula el mensaje de control del reparto de servicios
+// Control del reparto de servicios y total de ventas, por sucursal
 function duxSvcInput(){
   var d=duxData; if(!d)return;
-  var vet=parseMonto(document.getElementById("dux-vet").value)||0;
-  var pelu=parseMonto(document.getElementById("dux-pelu").value)||0;
-  var suma=vet+pelu, msg=document.getElementById("dux-svc-msg");
-  var dif=Math.round(d.svcTotal-suma);
-  if(Math.abs(dif)<1){ msg.innerHTML='<span style="color:var(--green)">✓ El reparto coincide con el total de servicios.</span>'; }
-  else if(dif>0){ msg.innerHTML='<span style="color:#c0392b">Faltan asignar '+fp(dif)+' de servicios.</span>'; }
-  else { msg.innerHTML='<span style="color:#c0392b">Te pasaste por '+fp(-dif)+' del total de servicios.</span>'; }
-  // Actualizar total ventas en vivo
-  var ventasNoSvc=Object.keys(d.ingCats).reduce(function(s,k){return s+d.ingCats[k];},0);
-  document.getElementById("dux-tot-ventas").textContent=fp(ventasNoSvc+vet+pelu);
+  d.orden.forEach(function(s){
+    var S=d.sucs[s], vet=0, pelu=0, ve=document.getElementById("dux-vet-"+s), pe=document.getElementById("dux-pelu-"+s);
+    if(ve)vet=parseMonto(ve.value)||0; if(pe)pelu=parseMonto(pe.value)||0;
+    var msg=document.getElementById("dux-svc-msg-"+s);
+    if(msg){
+      var dif=Math.round((S.svcTot||0)-(vet+pelu));
+      if(Math.abs(dif)<1)msg.innerHTML='<span style="color:var(--green)">✓ El reparto coincide con el total de servicios.</span>';
+      else if(dif>0)msg.innerHTML='<span style="color:#c0392b">Faltan asignar '+fp(dif)+' de servicios.</span>';
+      else msg.innerHTML='<span style="color:#c0392b">Te pasaste por '+fp(-dif)+' del total de servicios.</span>';
+    }
+    var noSvc=Object.keys(S.ingCats).reduce(function(a,k){return a+S.ingCats[k];},0);
+    var t=document.getElementById("dux-tot-"+s); if(t)t.textContent=fp(noSvc+vet+pelu);
+  });
 }
 
 function duxClose(){document.getElementById("modal-dux").classList.remove("open");duxData=null;}
 
 function duxConfirm(){
-  var d=duxData; if(!d)return;
-  var vet=parseMonto(document.getElementById("dux-vet").value)||0;
-  var pelu=parseMonto(document.getElementById("dux-pelu").value)||0;
-  // Fecha: último día del mes elegido (los ingresos son agregados mensuales)
+  var d=duxData; if(!d||d.busy)return;
+  // Fecha: último día del mes (los ingresos son agregados mensuales)
   var lastDay=new Date(d.anio,d.mes,0).getDate();
   var fecha=d.anio+"-"+p2(d.mes)+"-"+p2(lastDay);
   var dObj=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((dObj-new Date(dObj.getFullYear(),0,1))/86400000+new Date(dObj.getFullYear(),0,1).getDay()+1)/7);
-  var notaBase="DUX "+MESES[d.mes-1];
-
-  // Armar movimientos de ingreso por categoría
-  var movs=[];
-  function pushMov(cat,monto){
-    if(monto<=0)return;
-    movs.push({fecha:fecha,tipo:"Ingreso",suc:d.suc,cat:cat,sub:"",monto:Math.round(monto),
-               semana:sem,mes:d.mes,notas:notaBase,ts:firebase.firestore.FieldValue.serverTimestamp()});
-  }
-  Object.keys(d.ingCats).forEach(function(cat){pushMov(cat,d.ingCats[cat]);});
-  pushMov("Servicios Veterinaria",vet);
-  pushMov("Servicios Peluqueria",pelu);
-
-  if(!movs.length){toast("No hay montos para cargar","err");return;}
-
-  setLoading("dux-confirm",true);
-  // Cargar movimientos en secuencia, luego sumar el CMV
-  var idx=0;
+  var notaBase="Ventas "+MESES[d.mes-1];
+  var ops=[], nMov=0;
+  d.orden.forEach(function(s){
+    var S=d.sucs[s], ve=document.getElementById("dux-vet-"+s), pe=document.getElementById("dux-pelu-"+s);
+    var vet=ve?(parseMonto(ve.value)||0):0, pelu=pe?(parseMonto(pe.value)||0):0;
+    function pushMov(cat,monto){
+      if(!(monto>0))return;
+      ops.push({t:"mov",datos:{fecha:fecha,tipo:"Ingreso",suc:s,cat:cat,sub:"",monto:Math.round(monto),semana:sem,mes:d.mes,notas:notaBase,ts:firebase.firestore.FieldValue.serverTimestamp()}});
+      nMov++;
+    }
+    DUX_CAT_ORDEN.forEach(function(cat){if(S.ingCats[cat])pushMov(cat,S.ingCats[cat]);});
+    pushMov("Servicios Veterinaria",vet);
+    pushMov("Servicios Peluqueria",pelu);
+    var ce=document.getElementById("dux-cmv-"+s), cmv=ce?(parseMonto(ce.value)||0):0;
+    if(cmv>0)ops.push({t:"cmv",suc:s,monto:cmv});
+  });
+  if(!nMov){toast("No hay montos para cargar","err");return;}
+  d.busy=true; setLoading("dux-confirm",true);
+  var idx=0, nCmv=0;
+  function fin(msg,tipo){setLoading("dux-confirm",false);duxClose();toast(msg,tipo);}
   function next(){
-    if(idx>=movs.length){ guardarCMVdux(); return; }
-    db.collection("movimientos").add(movs[idx]).then(function(){idx++;next();})
-      .catch(function(e){toast("Error: "+e.message,"err");setLoading("dux-confirm",false);});
-  }
-  function guardarCMVdux(){
-    // CMV: sumar al valor existente del mes/sucursal (no reemplaza)
-    var id=cmvDocId(d.mes,d.suc,d.anio);
-    var prev=cmvStored(d.mes,d.suc,d.anio)||0;
-    var nuevo=Math.round(prev+d.cmvTotal);
-    db.collection("cmv").doc(id).set({mes:d.mes,suc:d.suc,anio:d.anio,monto:nuevo,ts:firebase.firestore.FieldValue.serverTimestamp()})
-      .then(function(){
-        toast("✓ Importado: "+movs.length+" ingresos + CMV","ok");
-        setLoading("dux-confirm",false);
-        duxClose();
-      }).catch(function(e){toast("CMV: "+e.message,"err");setLoading("dux-confirm",false);duxClose();});
+    if(idx>=ops.length){fin("✓ Importado: "+nMov+" ingresos"+(nCmv?" + CMV de "+nCmv+" sucursal"+(nCmv===1?"":"es"):""),"ok");return;}
+    var op=ops[idx], pr;
+    if(op.t==="mov")pr=db.collection("movimientos").add(op.datos);
+    else{
+      // CMV: se suma a lo que ya haya en el mes y la sucursal (no reemplaza)
+      var prev=cmvStored(d.mes,op.suc,d.anio)||0;
+      pr=db.collection("cmv").doc(cmvDocId(d.mes,op.suc,d.anio)).set({mes:d.mes,suc:op.suc,anio:d.anio,monto:Math.round(prev+op.monto),ts:firebase.firestore.FieldValue.serverTimestamp()});
+      nCmv++;
+    }
+    pr.then(function(){idx++;next();}).catch(function(e){d.busy=false;setLoading("dux-confirm",false);toast("Error: "+e.message+" (se alcanzaron a cargar "+idx+" de "+ops.length+" pasos)","err");});
   }
   next();
+}
+
+// ══ AJUSTES EN PESTAÑAS ═════════════════════════════════════════════════════
+var ajView="config";
+function setAjView(v){
+  ajView=v;
+  document.querySelectorAll("#aj-tabs .dst").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-v")===v);});
+  document.querySelectorAll("#screen-ajustes .aview").forEach(function(x){x.classList.toggle("active",x.id==="ajview-"+v);});
+  if(v==="margenes")mgRender();
+  if(v==="papelera")renderPapelera("aj-pap-list");
+  if(v==="respaldo"||v==="importar")renderStats();
+}
+function updatePapBadge(){var b=document.getElementById("aj-pap-n");if(b)b.textContent=papeleraRecs.length;}
+// Lo borrado queda en la papelera y se puede restaurar
+function renderPapelera(id){
+  var list=document.getElementById(id); if(!list)return;
+  var html="";
+  if(!papeleraRecs.length){list.innerHTML='<div class="empty"><div class="eico">🗑</div><p><strong>La papelera está vacía.</strong><br>Lo que borres queda acá y se puede restaurar.</p></div>';return;}
+  var COLN={movimientos:"Movimiento",caja:"Caja",stock:"Stock"};
+  papeleraRecs.forEach(function(p){
+    var d=p.datos||{};
+    var titulo=COLN[p.col]||p.col;
+    if(p.col==="movimientos") titulo+=" · "+sucLbl(d.suc)+" · "+(d.cat||"")+(d.sub?" · "+d.sub:"");
+    else if(p.col==="caja")   titulo+=" · "+(d.tipo==="Extraccion"?"Extracción":"Gasto")+" · "+sucLbl(d.suc);
+    else if(p.col==="stock")  titulo+=" · "+sucLbl(d.suc);
+    var cuando=p.borradoEl?new Date(p.borradoEl).toLocaleString("es-AR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
+    html+='<div class="ri"><div class="rdot" style="background:#B5AFA6"></div>'
+      +'<div class="rb"><div class="rt">'+esc(titulo)+'</div>'
+      +'<div class="rs">'+(d.fecha||"").split("-").reverse().join("/")+(d.notas?' · '+esc(d.notas):'')+' · borrado '+cuando+'</div></div>'
+      +'<span class="rm" style="color:var(--muted)">'+fp(d.monto||0)+'</span>'
+      +'<div class="rbtns"><button class="rbtn rbtn-e" onclick="restaurarPapelera(\''+p._id+'\')">Restaurar</button>'
+      +'<button class="rbtn rbtn-d" onclick="borrarDefinitivo(\''+p._id+'\',this)">✕</button></div></div>';
+  });
+  list.innerHTML=html;
+}
+
+// ══ BUSCADOR DEL HISTORIAL ═════════════════════════════════════════════════
+var histQ="";
+function hNorm(t){
+  t=String(t==null?"":t).toLowerCase();
+  if(t.normalize)t=t.normalize("NFD").replace(/[̀-ͯ]/g,"");
+  return t;
+}
+function hSearch(v){histQ=String(v||"");renderHistorial();}
+// Todos los términos tienen que aparecer (en cualquier campo). Los números también se comparan con el monto.
+function hCoincide(texto,monto){
+  var q=hNorm(histQ).trim(); if(!q)return true;
+  var toks=q.split(/\s+/), numTxt=String(Math.round(Math.abs(monto||0)));
+  for(var i=0;i<toks.length;i++){
+    var t=toks[i];
+    if(texto.indexOf(t)>=0)continue;
+    if(/^[\d.,$]+$/.test(t)){var dg=t.replace(/[^\d]/g,""); if(dg.length>=2&&numTxt.indexOf(dg)>=0)continue;}
+    return false;
+  }
+  return true;
+}
+function hFecha(f){return String(f||"").split("-").reverse().join("/");}
+function hCoincideMov(r){
+  if(!histQ.trim())return true;
+  var tx=hNorm([sucLbl(r.suc),r.tipo,r.tipo==="Ingreso"?"ingreso venta":"egreso gasto",r.cat,r.sub,r.notas,hFecha(r.fecha),r.fecha,MESES_L[(r.mes||1)-1]].join(" | "));
+  return hCoincide(tx,r.monto);
+}
+function hCoincideCaja(r){
+  if(!histQ.trim())return true;
+  var tx=hNorm(["caja",r.tipo==="Extraccion"?"extraccion":"gasto bolsillo",sucLbl(r.suc),r.notas,hFecha(r.fecha),r.fecha].join(" | "));
+  return hCoincide(tx,r.monto);
+}
+function hResumen(arr,tipo){
+  var el=document.getElementById("h-sum"); if(!el)return;
+  if(!histQ.trim()){el.textContent="";return;}
+  var n=arr.length, t=n+" resultado"+(n===1?"":"s");
+  if(n){
+    if(tipo==="caja")t+=" · total "+fp(arr.reduce(function(a,r){return a+r.monto;},0));
+    else{
+      var ing=0,egr=0; arr.forEach(function(r){if(r.tipo==="Ingreso")ing+=r.monto;else egr+=r.monto;});
+      if(ing)t+=" · ingresos "+fp(ing); if(egr)t+=" · egresos "+fp(egr);
+    }
+  }
+  el.textContent=t;
+}
+function hVacio(ico,msg){
+  if(histQ.trim())return '<div class="empty"><div class="eico">🔎</div><p><strong>Sin resultados</strong><br>No encontré nada para “'+esc(histQ.trim())+'”.</p></div>';
+  return '<div class="empty"><div class="eico">'+ico+'</div><p>'+msg+'</p></div>';
 }
 
 
@@ -2874,7 +3153,7 @@ function showTab(t){
   window.scrollTo(0,0);
   if(t==="cargar")    {renderAlertas();if(cargarView==="comis")renderComis();}
   if(t==="historial") renderHistorial();
-  if(t==="ajustes")   {renderStats();renderAjustes();}
+  if(t==="ajustes")   {renderStats();renderAjustes();setAjView(ajView);}
   if(t==="analisis")  renderDashboard();
   if(t==="cierre")    renderCierre();
 }
@@ -3845,7 +4124,7 @@ function respaldoData(){
     app:"La Mascotera",version:3,exportado:new Date().toISOString(),
     movimientos:limpio(records),caja:limpio(cajaRecs),stock:limpio(stockRecs),cmv:limpio(cmvRecs),fra:limpio(fraRecs),
     cierres:limpio(cierresRecs),papelera:limpio(papeleraRecs),pendientes_tg:limpio(pendientesTg),
-    config:{maestros:MAESTROS,recurrentes:recurrentes,destinatarios:destinatariosTg,
+    config:{maestros:MAESTROS,recurrentes:recurrentes,destinatarios:destinatariosTg,margenes:mgPct,
       cf:{ocampo:parseFloat(document.getElementById("cf-pct-oc").value)||0,tucuman:parseFloat(document.getElementById("cf-pct-tu").value)||0}}
   };
 }
@@ -4108,6 +4387,7 @@ function rsConfirmar(){
     if(Array.isArray(cfg.recurrentes))ops.push(["config","recurrentes",{items:cfg.recurrentes,ts:firebase.firestore.FieldValue.serverTimestamp()}]);
     if(cfg.cf&&typeof cfg.cf.ocampo==="number")ops.push(["config","cf",{ocampo:cfg.cf.ocampo,tucuman:cfg.cf.tucuman}]);
     if(cfg.destinatarios&&typeof cfg.destinatarios==="object"&&Object.keys(cfg.destinatarios).length)ops.push(["config","destinatarios",{items:cfg.destinatarios}]);
+    if(cfg.margenes&&typeof cfg.margenes==="object"&&Object.keys(cfg.margenes).length)ops.push(["config","margenes",{lineas:cfg.margenes}]);
   }
   if(!ops.length){rsCerrar();return toast("No había nada para recuperar","ok");}
   setLoading("rs-btn",true);

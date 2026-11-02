@@ -472,6 +472,14 @@ nav>.nav-grp:first-child{padding-top:2px}
 .mg-in .inp{width:88px;text-align:right;min-height:40px;padding:8px 10px;font-size:16px;color:var(--ink)}
 .dux-suc-h{font-family:var(--f-disp);font-weight:800;font-size:15px;margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
 .dux-suc-h:first-of-type{border-top:none;padding-top:0;margin-top:4px}
+.mg-imp{border:1px solid var(--or);background:var(--or-l);border-radius:var(--r);padding:12px;margin-top:14px}
+.mg-imp .mg-row{border-bottom-color:rgba(0,0,0,.06)}
+.pel-card{border:1px solid var(--or);background:var(--or-l);border-radius:var(--r-lg);padding:14px;margin-top:12px}
+.pel-t{font-family:var(--f-disp);font-weight:800;font-size:15px;margin-bottom:4px}
+.pel-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:14px}
+.pel-chk{display:flex;gap:9px;align-items:flex-start;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5;cursor:pointer}
+.pel-chk input{width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:var(--or-d)}
+.pel-nota{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.5}
 </style>
 </head>
 <body>
@@ -567,6 +575,7 @@ nav>.nav-grp:first-child{padding-top:2px}
         </div>
       </div>
     </div>
+    <div id="pel-oferta"></div>
   </div>
 
   <!-- CARGA CON IA -->
@@ -948,7 +957,9 @@ nav>.nav-grp:first-child{padding-top:2px}
       <div class="panel-t">Márgenes por línea</div>
       <div class="panel-s" style="margin-bottom:8px">Margen promedio sobre el precio de venta (con IVA). Se usa al importar las ventas para estimar el CMV de los productos que la planilla trae sin costo: <b>CMV = venta × (1 − margen)</b>. Si el costo viene en la planilla, se usa el costo real.</div>
       <div id="mg-list"></div>
-      <div class="btn-row" style="margin-top:12px"><button class="btn btn-sm btn-sec" onclick="mgReset()">Volver a los valores de la planilla</button></div>
+      <div class="btn-row" style="margin-top:12px"><button class="btn btn-sm" onclick="document.getElementById('mg-file').click()">Importar planilla de márgenes</button><button class="btn btn-sm btn-sec" onclick="mgReset()">Volver a los valores iniciales</button></div>
+      <input type="file" id="mg-file" accept=".xlsx,.xls,.xlsm" style="display:none" onchange="mgImportar(this)">
+      <div id="mg-imp"></div>
       <div class="panel-s" style="margin-top:8px">Valores iniciales: planilla de márgenes (controles de agosto y septiembre de 2026).</div>
     </div>
   </div>
@@ -1486,6 +1497,8 @@ function cargarMov(){
   var d=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
   setLoading("bcm",true);
+  var pelO=(tipoMov==="Ingreso"&&cat==="Servicios Peluqueria"&&(suc==="Ocampo"||suc==="Tucuman"))?{fecha:fecha,suc:suc,monto:monto}:null;
+  if(!pelO)pelCerrar();
   db.collection("movimientos").add({
     fecha:fecha,tipo:tipoMov,suc:suc,cat:cat,sub:sub||"",monto:monto,
     semana:sem,mes:d.getMonth()+1,notas:notas,
@@ -1506,6 +1519,7 @@ function cargarMov(){
     document.getElementById("ff").value=hoy();
     document.getElementById("caj-toggle").checked=false;cajImpact=false;
     updateCats();setLoading("bcm",false);
+    if(pelO)pelOfrecer(pelO);
   }).catch(function(e){toast("Error: "+e.message,"err");setLoading("bcm",false);});
 }
 
@@ -2866,22 +2880,30 @@ function clearAll(){
 // ══ MÁRGENES POR LÍNEA ═════════════════════════════════════════════════════
 // Sirven para estimar el CMV de lo que la planilla de ventas trae sin costo:
 // CMV = venta (con IVA) × (1 − margen). El margen es sobre el precio de venta.
-// Valores iniciales: planilla de márgenes (controles de ago–sep 2026). Se editan en Ajustes → Márgenes.
+// Valores iniciales: planilla de márgenes (controles de ago–sep 2026). Se editan o se importan en Ajustes → Márgenes.
 var MG_DEF=[
   {id:"sieger",n:"Sieger",m:38.7,marcas:["SIEGER"]},
   {id:"agility",n:"Agility",m:38.3,marcas:["AGILITY"]},
   {id:"fawna",n:"Fawna",m:34.1,marcas:["FAWNA"]},
-  {id:"balanced",n:"Balanced",m:36.0,marcas:["BALANCED"]},
+  {id:"balanced",n:"Balanced",m:36.0,marcas:["BALANCED"],al:["BLANCED"]},
   {id:"oldprince",n:"Old Prince",m:36.6,marcas:["OLD PRINCE"]},
   {id:"central",n:"Central",m:44.6,marcas:["SENDA","JASPE"]},
-  {id:"cabana",n:"La Cabaña",m:44.7,marcas:["ROYAL CANIN"]},
+  {id:"cabana",n:"La Cabaña",m:44.7,marcas:["ROYAL CANIN"],al:["CABANA","ROYAL"]},
   {id:"origen",n:"Origen",m:41.3,marcas:["ORIGEN"]},
   {id:"otros_al",n:"Otros alimentos",m:38,marcas:[],nota:"Alimentos de marcas que no están en las líneas de arriba"},
   {id:"otros",n:"Otros (accesorios, salud, etc.)",m:40,marcas:[],nota:"Accesorios, salud, higiene y demás rubros sin costo"}
 ];
-var mgPct={};          // id → % editado por vos (config/margenes)
+var mgPct={};          // id → % editado (config/margenes.lineas)
+var mgExtra=[];        // líneas agregadas desde la planilla: {id,n,marcas,m}
+var mgFechas={};       // id → fecha del último control ("YYYY-MM-DD")
 var mgListo=false;     // ya se leyó la nube (no guardar antes)
-function mgDef(id){for(var i=0;i<MG_DEF.length;i++){if(MG_DEF[i].id===id)return MG_DEF[i];}return null;}
+var mgImp=null;        // vista previa de la planilla importada
+// Todas las líneas: las de la planilla original, las agregadas y al final las dos genéricas
+function mgLineas(){
+  var base=MG_DEF.filter(function(d){return d.marcas.length;}), gen=MG_DEF.filter(function(d){return !d.marcas.length;});
+  return base.concat(mgExtra).concat(gen);
+}
+function mgDef(id){var L=mgLineas();for(var i=0;i<L.length;i++){if(L[i].id===id)return L[i];}return null;}
 function mgPctDe(id){
   if(typeof mgPct[id]==="number"&&isFinite(mgPct[id]))return mgPct[id];
   var d=mgDef(id); return d?d.m:0;
@@ -2893,50 +2915,211 @@ function mgNorm(t){
 }
 // Línea que corresponde a una marca; si no tiene, "otros_al" para alimentos y "otros" para el resto
 function mgIdPara(marca,rubroN){
-  var m=mgNorm(marca);
-  for(var i=0;i<MG_DEF.length;i++){if(MG_DEF[i].marcas.indexOf(m)>=0)return MG_DEF[i].id;}
+  var m=mgNorm(marca), L=mgLineas();
+  for(var i=0;i<L.length;i++){if(L[i].marcas.indexOf(m)>=0)return L[i].id;}
   return rubroN==="ALIMENTOS BALANCEADOS"?"otros_al":"otros";
+}
+function mgDoc(){return {lineas:mgPct,extra:mgExtra,fechas:mgFechas};}
+function mgGuardar(msg){
+  var d=mgDoc(); d.ts=firebase.firestore.FieldValue.serverTimestamp();
+  return db.collection("config").doc("margenes").set(d)
+    .then(function(){if(msg)toast(msg,"ok");})
+    .catch(function(e){toast("Error: "+e.message,"err");});
 }
 function mgEscuchar(){
   db.collection("config").doc("margenes").onSnapshot(function(doc){
     var d=doc&&doc.exists?doc.data():null, l=(d&&d.lineas)||{}, o={};
     Object.keys(l).forEach(function(k){if(typeof l[k]==="number"&&isFinite(l[k]))o[k]=l[k];});
-    mgPct=o; mgListo=true;
+    mgPct=o;
+    mgExtra=(d&&Array.isArray(d.extra))?d.extra.filter(function(x){return x&&x.id&&x.n&&Array.isArray(x.marcas);}):[];
+    mgFechas=(d&&d.fechas&&typeof d.fechas==="object")?d.fechas:{};
+    mgListo=true;
     if(isA("ajustes")&&ajView==="margenes")mgRender();
   },function(){mgListo=true;});
 }
+function mgFechaTxt(f){return f?String(f).split("-").reverse().join("/"):"";}
 function mgRender(){
   var el=document.getElementById("mg-list"); if(!el)return;
   var h="", sec="";
-  MG_DEF.forEach(function(d){
-    var s=d.marcas.length?"alim":"resto";
-    if(d.marcas.length&&sec!=="alim"){h+='<div class="sdiv" style="margin:4px 0 0">Alimentos por línea</div>';sec="alim";}
-    if(!d.marcas.length&&sec!=="resto"){h+='<div class="sdiv" style="margin:14px 0 0">Lo que no tiene línea propia</div>';sec="resto";}
-    var v=mgPctDe(d.id), tocado=typeof mgPct[d.id]==="number"&&mgPct[d.id]!==d.m;
-    h+='<div class="mg-row"><div class="mg-n"><b>'+esc(d.n)+'</b><span>'+(d.marcas.length?'Marcas: '+esc(d.marcas.join(", ")):esc(d.nota||""))+(tocado?' · valor inicial '+d.m.toString().replace(".",",")+'%':'')+'</span></div>'
-      +'<div class="mg-in"><input class="inp" type="number" inputmode="decimal" id="mg-'+d.id+'" min="0" max="95" step="0.1" value="'+v+'" onchange="mgSet(\''+d.id+'\',this.value)"><span>%</span></div></div>';
+  mgLineas().forEach(function(d){
+    var gen=!d.marcas.length, ext=/^x_/.test(d.id);
+    if(!gen&&sec!=="alim"){h+='<div class="sdiv" style="margin:4px 0 0">Alimentos por línea</div>';sec="alim";}
+    if(gen&&sec!=="resto"){h+='<div class="sdiv" style="margin:14px 0 0">Lo que no tiene línea propia</div>';sec="resto";}
+    var v=mgPctDe(d.id), tocado=!ext&&typeof mgPct[d.id]==="number"&&mgPct[d.id]!==d.m;
+    var sub=gen?esc(d.nota||""):'Marcas: '+esc(d.marcas.join(", "));
+    if(mgFechas[d.id])sub+=' · control '+mgFechaTxt(mgFechas[d.id]);
+    if(tocado)sub+=' · valor inicial '+d.m.toString().replace(".",",")+'%';
+    h+='<div class="mg-row"><div class="mg-n"><b>'+esc(d.n)+(ext?' <span class="tag">nueva</span>':'')+'</b><span>'+sub+'</span></div>'
+      +'<div class="mg-in"><input class="inp" type="number" inputmode="decimal" id="mg-'+d.id+'" min="0" max="95" step="0.1" value="'+v+'" onchange="mgSet(\''+d.id+'\',this.value)"><span>%</span>'
+      +(ext?'<button class="rbtn rbtn-d" title="Quitar línea" onclick="mgQuitar(\''+d.id+'\')">✕</button>':'')+'</div></div>';
   });
   el.innerHTML=h;
+  mgRenderImp();
 }
 function mgSet(id,val){
   var v=parseFloat(String(val).replace(",","."));
   if(isNaN(v)||v<0||v>95){toast("El margen tiene que estar entre 0 y 95 %","err");mgRender();return;}
   if(!mgListo){toast("Esperá un segundo: todavía está cargando","warn");mgRender();return;}
-  v=Math.round(v*10)/10;
-  mgPct[id]=v;
-  db.collection("config").doc("margenes").set({lineas:mgPct,ts:firebase.firestore.FieldValue.serverTimestamp()})
-    .then(function(){toast("✓ Margen guardado","ok");})
-    .catch(function(e){toast("Error: "+e.message,"err");});
-  mgRender();
+  mgPct[id]=Math.round(v*10)/10;
+  mgGuardar("✓ Margen guardado"); mgRender();
 }
 function mgReset(){
   if(!mgListo)return;
-  if(!confirm("¿Volver todos los márgenes a los valores de la planilla?"))return;
-  mgPct={};
-  db.collection("config").doc("margenes").set({lineas:{},ts:firebase.firestore.FieldValue.serverTimestamp()})
-    .then(function(){toast("✓ Márgenes restablecidos","ok");})
-    .catch(function(e){toast("Error: "+e.message,"err");});
-  mgRender();
+  if(!confirm("¿Volver todos los márgenes a los valores iniciales? Las líneas nuevas que agregaste se mantienen."))return;
+  var o={}; mgExtra.forEach(function(x){o[x.id]=x.m;});
+  mgPct=o; mgFechas={};
+  mgGuardar("✓ Márgenes restablecidos"); mgRender();
+}
+function mgQuitar(id){
+  var d=mgDef(id); if(!d||!/^x_/.test(id))return;
+  if(!confirm("¿Quitar la línea "+d.n+"? Sus ventas sin costo pasan a estimarse con «Otros alimentos».")) return;
+  mgExtra=mgExtra.filter(function(x){return x.id!==id;}); delete mgPct[id]; delete mgFechas[id];
+  mgGuardar("Línea quitada"); mgRender();
+}
+
+// ── Importar la planilla de márgenes ──
+// Formato: bloques por línea, cada uno con su fila de títulos (Fecha control, Alimento, …, Margen, Margen Promedio).
+// El nombre de la línea va en la primera columna. Se toma el "Margen Promedio"; si falta, el promedio de los márgenes.
+function mgFechaISO(v){
+  if(typeof v==="number"&&v>20000&&v<80000){var d=new Date(Date.UTC(1899,11,30)+Math.floor(v+1e-6)*86400000);return d.getUTCFullYear()+"-"+p2(d.getUTCMonth()+1)+"-"+p2(d.getUTCDate());}
+  if(v instanceof Date&&!isNaN(v))return v.getFullYear()+"-"+p2(v.getMonth()+1)+"-"+p2(v.getDate());
+  var s=String(v==null?"":v).trim(), m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m)return m[0];
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if(m){var y=parseInt(m[3],10);if(y<100)y+=2000;return y+"-"+p2(parseInt(m[2],10))+"-"+p2(parseInt(m[1],10));}
+  return "";
+}
+function mgPctCelda(v){
+  var n=typeof v==="number"?v:duxNum(String(v==null?"":v).replace("%",""));
+  if(!(n>0))return null;
+  return n<=1.5?n*100:n; // 0,387 → 38,7 %
+}
+function mgParse(rows){
+  var bloques=[], cols=null, cur=null;
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i]; if(!r)continue;
+    var h=r.map(mgNorm);
+    if(h.indexOf("MARGEN")>=0&&(h.indexOf("MARGEN PROMEDIO")>=0||h.indexOf("ALIMENTO")>=0)){
+      cols={m:h.indexOf("MARGEN"),p:h.indexOf("MARGEN PROMEDIO"),f:h.indexOf("FECHA CONTROL")}; cur=null; continue;
+    }
+    if(!cols)continue;
+    var nom=String(r[0]==null?"":r[0]).trim();
+    if(nom&&isNaN(Number(nom))){cur={n:nom,ms:[],p:null,f:""};bloques.push(cur);}
+    if(!cur)continue;
+    var m=mgPctCelda(r[cols.m]); if(m!==null)cur.ms.push(m);
+    if(cols.p>=0){var p=mgPctCelda(r[cols.p]); if(p!==null)cur.p=p;}
+    if(cols.f>=0){var f=mgFechaISO(r[cols.f]); if(f&&f>cur.f)cur.f=f;}
+  }
+  return bloques.filter(function(b){return b.p!==null||b.ms.length;}).map(function(b){
+    var v=b.p!==null?b.p:b.ms.reduce(function(a,x){return a+x;},0)/b.ms.length;
+    return {nombre:b.n.replace(/\s+/g," "),pct:Math.round(v*10)/10,fecha:b.f,promedio:b.p!==null,n:b.ms.length};
+  });
+}
+// Busca a qué línea corresponde un nombre de la planilla (nombre, alias o marca)
+function mgIdDeNombre(nombre){
+  var n=mgNorm(nombre), L=mgLineas();
+  for(var i=0;i<L.length;i++){
+    var d=L[i]; if(!d.marcas.length)continue;
+    if(mgNorm(d.n)===n||d.marcas.indexOf(n)>=0||(d.al||[]).indexOf(n)>=0)return d.id;
+  }
+  return null;
+}
+function mgImportar(input){
+  var file=input.files[0]; if(!file)return; input.value="";
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"}), res=[];
+      for(var k=0;k<wb.SheetNames.length&&!res.length;k++){
+        res=mgParse(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[k]],{header:1,raw:true,defval:""}));
+      }
+      if(!res.length){toast("No encontré márgenes en la planilla (busco las columnas «Margen» y «Margen Promedio»)","err");return;}
+      res.forEach(function(r){r.id=mgIdDeNombre(r.nombre);r.ok=true;});
+      mgImp=res; mgRenderImp();
+      var el=document.getElementById("mg-imp"); if(el&&el.scrollIntoView)el.scrollIntoView({behavior:"smooth",block:"start"});
+    }catch(err){toast("Error al leer la planilla: "+err.message,"err");console.error(err);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+function mgRenderImp(){
+  var el=document.getElementById("mg-imp"); if(!el)return;
+  if(!mgImp){el.innerHTML="";return;}
+  var h='<div class="mg-imp"><div class="panel-t" style="font-size:14px">Planilla leída: '+mgImp.length+' línea'+(mgImp.length===1?'':'s')+'</div>'
+    +'<div class="panel-s" style="margin-bottom:6px">Revisá y tocá <b>Aplicar</b>. Destildá lo que no quieras cambiar.</div>';
+  mgImp.forEach(function(r,i){
+    var d=r.id?mgDef(r.id):null, act=d?mgPctDe(r.id):null;
+    var det=d?(d.n+' · ahora '+String(act).replace(".",",")+'%'):'Línea nueva · se aplica a la marca '+mgNorm(r.nombre);
+    if(r.fecha)det+=' · control '+mgFechaTxt(r.fecha);
+    if(!r.promedio)det+=' · promedio de '+r.n+' producto'+(r.n===1?'':'s');
+    h+='<label class="mg-row" style="cursor:pointer"><input type="checkbox" '+(r.ok?'checked ':'')+'onchange="mgImp['+i+'].ok=this.checked" style="width:18px;height:18px;accent-color:var(--or-d);flex-shrink:0">'
+      +'<div class="mg-n"><b>'+esc(r.nombre)+'</b><span>'+esc(det)+'</span></div>'
+      +'<div class="mg-in" style="color:var(--ink)">'+String(r.pct).replace(".",",")+'%</div></label>';
+  });
+  h+='<div class="btn-row" style="margin-top:10px"><button class="btn btn-sm" id="mg-aplicar" onclick="mgAplicar()">Aplicar</button><button class="btn btn-sm btn-ghost" onclick="mgImp=null;mgRenderImp()">Cancelar</button></div></div>';
+  el.innerHTML=h;
+}
+function mgAplicar(){
+  if(!mgImp)return;
+  if(!mgListo){toast("Esperá un segundo: todavía está cargando","warn");return;}
+  var n=0;
+  mgImp.forEach(function(r){
+    if(!r.ok)return;
+    var id=r.id;
+    if(!id){
+      var marca=mgNorm(r.nombre); id="x_"+marca.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"");
+      if(!mgDef(id))mgExtra.push({id:id,n:r.nombre,marcas:[marca],m:r.pct});
+    }
+    mgPct[id]=r.pct; if(r.fecha)mgFechas[id]=r.fecha; n++;
+  });
+  mgImp=null;
+  if(!n){mgRender();return;}
+  mgGuardar("✓ "+n+" margen"+(n===1?"":"es")+" actualizado"+(n===1?"":"s")); mgRender();
+}
+
+// ══ PELUQUERÍA: pago al peluquero ═══════════════════════════════════════════
+// En Ajustes → Empleados se indica quién es el peluquero de cada sucursal y qué % le toca (50 por defecto).
+// Al cargar ventas de peluquería (a mano o importadas) la app ofrece cargar ese % como egreso de Personal.
+function pelPeluqueros(suc){
+  var c=maeCat("Personal"); if(!c||!suc)return [];
+  return c.subs.filter(function(s){return !s.off&&s.pelSuc===suc;}).map(function(s){
+    var p=parseFloat(s.pelPct); return {n:s.n,pct:isNaN(p)?50:p};
+  });
+}
+function pelYaCargado(emp,ymS){
+  return records.filter(function(r){return r.tipo==="Egreso"&&r.cat==="Personal"&&r.sub===emp&&ym(r.fecha)===ymS&&/peluquer/i.test(r.notas||"");})
+    .reduce(function(a,r){return a+r.monto;},0);
+}
+function pelNota(pct,base,mesTxt){return "Comisión peluquería"+(mesTxt?" "+mesTxt:"")+" · "+String(pct).replace(".",",")+"% s/ "+fp(base);}
+var pelOf=null;
+function pelOfrecer(o){
+  pelOf=o; pelOf.lista=pelPeluqueros(o.suc);
+  var el=document.getElementById("pel-oferta"); if(!el)return;
+  var h='<div class="pel-card"><div class="pel-t">✂️ Peluquería · '+esc(sucLbl(o.suc))+' · '+fp(o.monto)+'</div>';
+  if(!pelOf.lista.length){
+    h+='<div class="panel-s">Si querés que te ofrezca cargar el pago al peluquero, indicá quién es el de '+esc(sucLbl(o.suc))+' en <b>Ajustes → Empleados</b>.</div>'
+      +'<div class="btn-row" style="margin-top:10px"><button class="btn btn-sm btn-sec" onclick="pelCerrar();showTab(\'ajustes\');setAjView(\'config\')">Ir a Ajustes</button><button class="btn btn-sm btn-ghost" onclick="pelCerrar()">Cerrar</button></div></div>';
+  } else {
+    h+='<div class="panel-s" style="margin-bottom:6px">¿Cargo el pago como egreso de Personal?</div>';
+    pelOf.lista.forEach(function(p){
+      h+='<div class="pel-row"><span>'+esc(p.n)+' · '+String(p.pct).replace(".",",")+'%</span><b>'+fp(Math.round(o.monto*p.pct/100))+'</b></div>';
+    });
+    h+='<div class="btn-row" style="margin-top:10px"><button class="btn btn-sm" id="pel-btn" onclick="pelCargar()">Cargar egreso</button><button class="btn btn-sm btn-ghost" onclick="pelCerrar()">Ahora no</button></div></div>';
+  }
+  el.innerHTML=h;
+  if(el.scrollIntoView)el.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function pelCerrar(){pelOf=null;var el=document.getElementById("pel-oferta");if(el)el.innerHTML="";}
+function pelCargar(){
+  var o=pelOf; if(!o||!o.lista.length||o.busy)return;
+  o.busy=true; setLoading("pel-btn",true);
+  var d=new Date(o.fecha+"T12:00:00");
+  var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
+  var p=Promise.resolve(), tot=0;
+  o.lista.forEach(function(x){
+    var monto=Math.round(o.monto*x.pct/100); if(monto<=0)return; tot+=monto;
+    p=p.then(function(){return db.collection("movimientos").add({fecha:o.fecha,tipo:"Egreso",suc:o.suc,cat:"Personal",sub:x.n,monto:monto,
+      semana:sem,mes:d.getMonth()+1,notas:pelNota(x.pct,o.monto,""),ts:firebase.firestore.FieldValue.serverTimestamp()});});
+  });
+  p.then(function(){toast("✓ Pago de peluquería cargado: "+fp(tot),"ok");pelCerrar();})
+   .catch(function(e){o.busy=false;setLoading("pel-btn",false);toast("Error: "+e.message,"err");});
 }
 
 // ══ IMPORTACIÓN DE VENTAS (planilla del sistema de ventas) ═════════════════
@@ -3115,7 +3298,7 @@ function duxRenderReview(){
       h+='<div class="dux-card" style="padding:10px 12px">'
         +'<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Veterinaria</span><input class="dux-svc-input" inputmode="numeric" id="dux-vet-'+s+'" value="'+fmtMiles(String(Math.round(vet)))+'" oninput="duxSvcInput()"></div>'
         +'<div class="dux-row" style="border:none;padding:4px 0"><span class="dux-row-lbl">Serv. Peluquería</span><input class="dux-svc-input" inputmode="numeric" id="dux-pelu-'+s+'" value="'+fmtMiles(String(Math.round(pelu)))+'" oninput="duxSvcInput()"></div>'
-        +'<div id="dux-svc-msg-'+s+'" style="font-size:11px;margin-top:8px;line-height:1.5"></div></div>';
+        +'<div id="dux-svc-msg-'+s+'" style="font-size:11px;margin-top:8px;line-height:1.5"></div>'+duxPelHtml(s)+'</div>';
     }
     var noMap=Object.keys(S.rubrosNo);
     if(noMap.length)h+='<div class="dux-warn"><span>ℹ️</span><span>Rubros no reconocidos (no se cargan): '+noMap.map(function(k){return esc(k)+" ("+fp(S.rubrosNo[k])+")";}).join(", ")+'</span></div>';
@@ -3127,7 +3310,7 @@ function duxRenderReview(){
     var ids=Object.keys(S.est);
     if(ids.length){
       h+='<details class="more"><summary>Ver qué se estimó ('+ids.length+' línea'+(ids.length===1?'':'s')+')</summary><div style="margin-top:6px">'
-        +MG_DEF.filter(function(m){return S.est[m.id];}).map(function(m){
+        +mgLineas().filter(function(m){return S.est[m.id];}).map(function(m){
           var E=S.est[m.id];
           return '<div class="dux-row" style="padding:6px 0"><span class="dux-row-lbl">'+esc(m.n)+' <span style="color:var(--muted)">· margen '+String(mgPctDe(m.id)).replace(".",",")+'%</span></span><span class="dux-row-val">'+fp(E.venta)+' → '+fp(E.cmv)+'</span></div>';
         }).join("")
@@ -3143,6 +3326,19 @@ function duxRenderReview(){
   duxSvcInput();
 }
 
+// Opción de cargar el % de peluquería como egreso del peluquero de esa sucursal
+function duxPelHtml(s){
+  var d=duxData, S=d.sucs[s], lista=pelPeluqueros(s); S.pel=lista;
+  var pel0=Object.keys(S.svc).reduce(function(a,k){return /PELUQ/i.test(k)?a+S.svc[k]:a;},0);
+  if(!(pel0>0))return "";
+  if(!lista.length)return '<div class="pel-nota">✂️ Para ofrecerte cargar el pago al peluquero de '+esc(sucLbl(s))+', indicá quién es en Ajustes → Empleados.</div>';
+  return lista.map(function(p,i){
+    var ya=pelYaCargado(p.n,d.ym);
+    return '<label class="pel-chk"><input type="checkbox" id="dux-pelck-'+s+'-'+i+'"'+(ya?'':' checked')+'>'
+      +'<span>Cargar '+String(p.pct).replace(".",",")+'% de peluquería como pago a <b>'+esc(p.n)+'</b>: <b id="dux-pelm-'+s+'-'+i+'">'+fp(Math.round(pel0*p.pct/100))+'</b>'
+      +(ya?'<br><span style="color:var(--ye-txt)">Ojo: ya hay '+fp(ya)+' cargado este mes como peluquería de '+esc(p.n)+'.</span>':'')+'</span></label>';
+  }).join("");
+}
 // Control del reparto de servicios y total de ventas, por sucursal
 function duxSvcInput(){
   var d=duxData; if(!d)return;
@@ -3156,6 +3352,7 @@ function duxSvcInput(){
       else if(dif>0)msg.innerHTML='<span style="color:#c0392b">Faltan asignar '+fp(dif)+' de servicios.</span>';
       else msg.innerHTML='<span style="color:#c0392b">Te pasaste por '+fp(-dif)+' del total de servicios.</span>';
     }
+    (S.pel||[]).forEach(function(p,i){var m=document.getElementById("dux-pelm-"+s+"-"+i);if(m)m.textContent=fp(Math.round(pelu*p.pct/100));});
     var noSvc=Object.keys(S.ingCats).reduce(function(a,k){return a+S.ingCats[k];},0);
     var t=document.getElementById("dux-tot-"+s); if(t)t.textContent=fp(noSvc+vet+pelu);
   });
@@ -3171,7 +3368,7 @@ function duxConfirm(){
   var dObj=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((dObj-new Date(dObj.getFullYear(),0,1))/86400000+new Date(dObj.getFullYear(),0,1).getDay()+1)/7);
   var notaBase="Ventas "+MESES[d.mes-1];
-  var ops=[], nMov=0;
+  var ops=[], nMov=0, nPel=0;
   d.orden.forEach(function(s){
     var S=d.sucs[s], ve=document.getElementById("dux-vet-"+s), pe=document.getElementById("dux-pelu-"+s);
     var vet=ve?(parseMonto(ve.value)||0):0, pelu=pe?(parseMonto(pe.value)||0):0;
@@ -3183,6 +3380,12 @@ function duxConfirm(){
     DUX_CAT_ORDEN.forEach(function(cat){if(S.ingCats[cat])pushMov(cat,S.ingCats[cat]);});
     pushMov("Servicios Veterinaria",vet);
     pushMov("Servicios Peluqueria",pelu);
+    (S.pel||[]).forEach(function(p,i){
+      var ck=document.getElementById("dux-pelck-"+s+"-"+i), monto=Math.round(pelu*p.pct/100);
+      if(!ck||!ck.checked||monto<=0)return;
+      ops.push({t:"mov",datos:{fecha:fecha,tipo:"Egreso",suc:s,cat:"Personal",sub:p.n,monto:monto,semana:sem,mes:d.mes,notas:pelNota(p.pct,pelu,MESES_L[d.mes-1]),ts:firebase.firestore.FieldValue.serverTimestamp()}});
+      nPel++;
+    });
     var ce=document.getElementById("dux-cmv-"+s), cmv=ce?(parseMonto(ce.value)||0):0;
     if(cmv>0)ops.push({t:"cmv",suc:s,monto:cmv});
   });
@@ -3191,7 +3394,7 @@ function duxConfirm(){
   var idx=0, nCmv=0;
   function fin(msg,tipo){setLoading("dux-confirm",false);duxClose();toast(msg,tipo);}
   function next(){
-    if(idx>=ops.length){fin("✓ Importado: "+nMov+" ingresos"+(nCmv?" + CMV de "+nCmv+" sucursal"+(nCmv===1?"":"es"):""),"ok");return;}
+    if(idx>=ops.length){fin("✓ Importado: "+nMov+" ingresos"+(nCmv?" + CMV de "+nCmv+" sucursal"+(nCmv===1?"":"es"):"")+(nPel?" + pago de peluquería":""),"ok");return;}
     var op=ops[idx], pr;
     if(op.t==="mov")pr=db.collection("movimientos").add(op.datos);
     else{
@@ -3736,7 +3939,7 @@ function maeRenameCat(ci){
 // Campos de empleado: splitOc (reparto fijo % Ocampo), comPct, comBase
 function maeSetEmp(si,campo,valor){
   var c=maeCat("Personal"); var s=c&&c.subs[si]; if(!s)return;
-  if(campo==="comBase"){ if(valor)s.comBase=valor; else delete s.comBase; }
+  if(campo==="comBase"||campo==="pelSuc"){ if(valor)s[campo]=valor; else delete s[campo]; }
   else{
     var v=parseFloat(String(valor).replace(",","."));
     if(isNaN(v)||String(valor).trim()===""){delete s[campo];}
@@ -3765,7 +3968,13 @@ function renderAjustes(){
           +'<option value=""'+(base===""?" selected":"")+'>—</option>'
           +'<option value="todos"'+(base==="todos"?" selected":"")+'>Consolidado</option>'
           +'<option value="Ocampo"'+(base==="Ocampo"?" selected":"")+'>Ocampo</option>'
-          +'<option value="Tucuman"'+(base==="Tucuman"?" selected":"")+'>Tucumán</option></select></label></div>'
+          +'<option value="Tucuman"'+(base==="Tucuman"?" selected":"")+'>Tucumán</option></select></label>'
+        +'<label class="mini">Peluquero de<select class="inp" onchange="maeSetEmp('+si+',\'pelSuc\',this.value)">'
+          +'<option value=""'+(!s.pelSuc?" selected":"")+'>—</option>'
+          +'<option value="Ocampo"'+(s.pelSuc==="Ocampo"?" selected":"")+'>Ocampo</option>'
+          +'<option value="Tucuman"'+(s.pelSuc==="Tucuman"?" selected":"")+'>Tucumán</option></select></label>'
+        +(s.pelSuc?'<label class="mini">Le toca<input class="inp" type="number" min="0" max="100" step="1" placeholder="50" value="'+(s.pelPct!=null?s.pelPct:50)+'" onchange="maeSetEmp('+si+',\'pelPct\',this.value)">%</label>':'')
+        +'</div>'
         +'</div>';
     }).join("");
   }
@@ -3990,14 +4199,14 @@ function cierreChecks(s){
   res.push({k:"gastos",e:f.length?"miss":"ok",t:"Gastos habituales",d:f.length?"Faltan "+f.length+" (detalle al lado)":"Todos cargados o marcados como “no aplica”"});
   ["Ocampo","Tucuman"].forEach(function(suc){
     var ing=records.filter(function(r){return r.tipo==="Ingreso"&&r.suc===suc&&ym(r.fecha)===s;});
-    var dux=ing.filter(function(r){return /DUX/.test(r.notas||"");});
+    var dux=ing.filter(function(r){return /^(DUX|Ventas) /.test(r.notas||"");});
     var tot=ing.reduce(function(a,r){return a+r.monto;},0);
     res.push({k:"dux-"+suc,e:dux.length?"ok":(ing.length?"warn":"miss"),t:"Ventas "+sucLbl(suc),
-      d:dux.length?"Importadas de DUX · "+fp(tot):(ing.length?"Hay ventas cargadas a mano ("+fp(tot)+"), sin importación DUX":"Sin ventas cargadas"),
+      d:dux.length?"Importadas de la planilla · "+fp(tot):(ing.length?"Hay ventas cargadas a mano ("+fp(tot)+"), sin importar la planilla":"Sin ventas cargadas"),
       a:dux.length?"":'<button class="btn btn-sm btn-sec" onclick="irDux(\''+suc+'\',\''+s+'\')">Importar</button>'});
   });
   var cmvF=["Ocampo","Tucuman"].filter(function(suc){return cmvStored(m,suc,y)===null;});
-  res.push({k:"cmv",e:cmvF.length?"miss":"ok",t:"CMV",d:cmvF.length?"Falta: "+cmvF.map(sucLbl).join(" y ")+" (se carga con la importación DUX o en Análisis → Devengado)":"Cargado en las dos sucursales"});
+  res.push({k:"cmv",e:cmvF.length?"miss":"ok",t:"CMV",d:cmvF.length?"Falta: "+cmvF.map(sucLbl).join(" y ")+" (se carga al importar las ventas o en Análisis → Devengado)":"Cargado en las dos sucursales"});
   var fraF=["Ocampo","Tucuman"].filter(function(suc){return fraStored(m,suc,y)===null;});
   res.push({k:"fra",e:fraF.length?"miss":"ok",t:"Franquicia",d:fraF.length?"Falta: "+fraF.map(sucLbl).join(" y ")+" (Análisis → Devengado, eligiendo la sucursal)":"Cargada en las dos sucursales",
     a:fraF.length?'<button class="btn btn-sm btn-sec" onclick="irDeveng(\''+fraF[0]+'\','+y+')">Cargar</button>':""});
@@ -4097,7 +4306,7 @@ function comisCalc(){
     +'<div class="dux-tot-row"><span class="panel-s" style="margin:0">Ventas '+baseLbl(comBase)+' '+ymLabel(s)+'</span><b>'+fp(vb)+'</b></div>'
     +'<div class="dux-tot-row"><span class="panel-s" style="margin:0">Comisión '+pct+'%</span><b style="font-family:var(--f-disp);font-size:20px;color:var(--or-d)">'+fp(com)+'</b></div>'
     +'<div class="panel-s" style="margin-top:6px">Se imputa a: '+esc(imp.txt)+' · Personal / '+esc(emp)+'</div></div>';
-  if(vb<=0) h+='<div class="dux-warn" style="margin:8px 0 0">No hay ventas cargadas para esa base en '+ymLabel(s)+'. ¿Falta importar DUX?</div>';
+  if(vb<=0) h+='<div class="dux-warn" style="margin:8px 0 0">No hay ventas cargadas para esa base en '+ymLabel(s)+'. ¿Falta importar las ventas?</div>';
   if(ya.length) h+='<div class="dux-warn" style="margin:8px 0 0">Ya hay una comisión cargada para '+esc(emp)+' en '+ymLabel(s)+': '+fp(yaTot)+'.</div>';
   box.innerHTML=h;
 }
@@ -4178,7 +4387,7 @@ function informeTexto(s,conPedido){
   L.push("");
   L.push("CONTEXTO");
   L.push("- Pet shop, veterinaria y peluquería canina (franquicia La Mascotera) con dos sucursales: Ocampo y Tucumán.");
-  L.push("- Montos en pesos argentinos. Ventas con IVA, importadas del sistema DUX.");
+  L.push("- Montos en pesos argentinos. Ventas con IVA, importadas del sistema de ventas.");
   L.push("- \"General\" = gastos compartidos: se prorratean entre sucursales según las ventas del mes.");
   var spl=splitEmpleados();
   if(spl.length) L.push("- Reparto fijo de personal: "+spl.map(function(e){return e.n+" "+Math.round(e.oc*100)+"% Ocampo / "+Math.round((1-e.oc)*100)+"% Tucumán";}).join("; ")+".");
@@ -4275,7 +4484,7 @@ function respaldoData(){
     app:"La Mascotera",version:3,exportado:new Date().toISOString(),
     movimientos:limpio(records),caja:limpio(cajaRecs),stock:limpio(stockRecs),cmv:limpio(cmvRecs),fra:limpio(fraRecs),
     cierres:limpio(cierresRecs),papelera:limpio(papeleraRecs),pendientes_tg:limpio(pendientesTg),
-    config:{maestros:MAESTROS,recurrentes:recurrentes,destinatarios:destinatariosTg,margenes:mgPct,
+    config:{maestros:MAESTROS,recurrentes:recurrentes,destinatarios:destinatariosTg,margenes:mgDoc(),
       cf:{ocampo:parseFloat(document.getElementById("cf-pct-oc").value)||0,tucuman:parseFloat(document.getElementById("cf-pct-tu").value)||0}}
   };
 }
@@ -4538,7 +4747,7 @@ function rsConfirmar(){
     if(Array.isArray(cfg.recurrentes))ops.push(["config","recurrentes",{items:cfg.recurrentes,ts:firebase.firestore.FieldValue.serverTimestamp()}]);
     if(cfg.cf&&typeof cfg.cf.ocampo==="number")ops.push(["config","cf",{ocampo:cfg.cf.ocampo,tucuman:cfg.cf.tucuman}]);
     if(cfg.destinatarios&&typeof cfg.destinatarios==="object"&&Object.keys(cfg.destinatarios).length)ops.push(["config","destinatarios",{items:cfg.destinatarios}]);
-    if(cfg.margenes&&typeof cfg.margenes==="object"&&Object.keys(cfg.margenes).length)ops.push(["config","margenes",{lineas:cfg.margenes}]);
+    if(cfg.margenes&&typeof cfg.margenes==="object"&&Object.keys(cfg.margenes).length)ops.push(["config","margenes",cfg.margenes.lineas?{lineas:cfg.margenes.lineas,extra:cfg.margenes.extra||[],fechas:cfg.margenes.fechas||{}}:{lineas:cfg.margenes}]);
   }
   if(!ops.length){rsCerrar();return toast("No había nada para recuperar","ok");}
   setLoading("rs-btn",true);
@@ -5182,7 +5391,7 @@ function iaContextoDatos(){
   function R(v){return Math.round(v||0);}
   var cfOc=parseFloat(document.getElementById("cf-pct-oc").value)||0, cfTu=parseFloat(document.getElementById("cf-pct-tu").value)||0;
   L.push("DATOS DE LA MASCOTERA — al "+iaHoyTxt());
-  L.push("- Montos en pesos argentinos. Ventas con IVA (importadas del sistema DUX).");
+  L.push("- Montos en pesos argentinos. Ventas con IVA (importadas del sistema de ventas).");
   L.push("- \"General\" = gastos compartidos: en el RESUMEN ya están prorrateados entre sucursales según las ventas del mes; en el DETALLE figuran como General.");
   var spl=splitEmpleados();
   if(spl.length)L.push("- Reparto fijo de personal: "+spl.map(function(e){return e.n+" "+Math.round(e.oc*100)+"% Ocampo / "+Math.round((1-e.oc)*100)+"% Tucumán";}).join("; ")+".");

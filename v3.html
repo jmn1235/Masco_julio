@@ -568,7 +568,7 @@ nav>.nav-grp:first-child{padding-top:2px}
           <div class="field"><label class="req" for="fm">Monto</label><div class="inp-pre"><span>$</span><input type="text" class="inp big" id="fm" inputmode="numeric" placeholder="0" oninput="onMonto(this)"></div></div>
           <div class="field"><label for="fn">Notas (opcional)</label><input type="text" class="inp" id="fn" placeholder="Descripción..."></div>
           <div class="trow">
-            <div><div class="tlbl">Registrar también como gasto bolsillo</div><div class="tsub">Se agrega a Caja Diaria</div></div>
+            <div><div class="tlbl" id="caj-lbl">Registrar también como gasto bolsillo</div><div class="tsub" id="caj-sub">Lo pagaste con tu plata: se agrega a Caja Diaria</div></div>
             <label class="tswitch"><input type="checkbox" id="caj-toggle" onchange="cajImpact=this.checked"><div class="ttrack"></div></label>
           </div>
           <button class="btn btn-o" id="bcm" onclick="cargarMov()" style="margin:0">Cargar movimiento</button>
@@ -1080,7 +1080,7 @@ nav>.nav-grp:first-child{padding-top:2px}
         <div class="field"><label class="req" for="efm">Monto</label><div class="inp-pre"><span>$</span><input type="text" class="inp big" id="efm" inputmode="numeric" placeholder="0" oninput="onMonto(this)"></div></div>
         <div class="field"><label for="efn">Notas</label><input type="text" class="inp" id="efn" placeholder="Descripción..."></div>
         <div class="trow" id="ecaj-card">
-          <div><div class="tlbl">Imputar a Caja (gasto bolsillo)</div><div class="tsub" id="ecaj-hint">Se registra o actualiza como gasto bolsillo en Caja Diaria.</div></div>
+          <div><div class="tlbl" id="ecaj-lbl">Imputar a Caja (gasto bolsillo)</div><div class="tsub" id="ecaj-hint">Se registra o actualiza como gasto bolsillo en Caja Diaria.</div></div>
           <label class="tswitch"><input type="checkbox" id="ecaj-toggle" onchange="eCajToggle()"><div class="ttrack"></div></label>
         </div>
       </div>
@@ -1408,7 +1408,15 @@ function setTipo(t){
   tipoMov=t;
   document.getElementById("beg").className="sb"+(t==="Egreso"?" se":"");
   document.getElementById("bin").className="sb"+(t==="Ingreso"?" si":"");
+  cajTextos("caj-lbl","caj-sub",t);
   updateCats();
+}
+// Bolsillo: en un egreso lo pagaste vos (Gasto bolsillo); en un ingreso lo cobraste vos (va a Caja como Extracción)
+function cajTipoDe(t){return t==="Ingreso"?"Extraccion":"Gasto";}
+function cajTextos(idL,idS,t){
+  var l=document.getElementById(idL), s=document.getElementById(idS);
+  if(l)l.textContent=t==="Ingreso"?"Registrar también como ingreso de bolsillo":"Registrar también como gasto bolsillo";
+  if(s)s.textContent=t==="Ingreso"?"Lo cobraste vos: va a Caja Diaria como extracción":"Lo pagaste con tu plata: se agrega a Caja Diaria";
 }
 function setMovSuc(s){
   movSuc=s;
@@ -1506,13 +1514,13 @@ function cargarMov(){
   }).then(function(ref){
     if(cajImpact){
       return db.collection("caja").add({
-        fecha:fecha,suc:suc,tipo:"Gasto",monto:monto,movId:ref.id,
+        fecha:fecha,suc:suc,tipo:cajTipoDe(tipoMov),monto:monto,movId:ref.id,
         notas:"["+cat+(sub?" / "+sub:"")+"]"+(notas?" "+notas:""),
         ts:firebase.firestore.FieldValue.serverTimestamp()
       });
     }
   }).then(function(){
-    toast(cajImpact?"✓ Movimiento + Gasto caja guardados":"✓ Guardado","ok");
+    toast(cajImpact?(tipoMov==="Ingreso"?"✓ Ingreso + Extracción en caja guardados":"✓ Movimiento + Gasto caja guardados"):"✓ Guardado","ok");
     movSuc="";setMovSuc("");
     ["fcat","fm","fn","fsub"].forEach(function(id){document.getElementById(id).value="";});
     document.getElementById("rowsub").style.display="none";
@@ -1716,7 +1724,7 @@ function delRec(id,btn){
     var link=cajaRecs.find(function(c){return c.movId&&c.movId===id;});
     borrarConPapelera("movimientos",id).then(function(){
       if(link) return borrarConPapelera("caja",link._id);
-    }).then(function(){toast(link?"Eliminado (con su gasto de caja) · queda en la papelera":"Eliminado · queda en la papelera","warn");})
+    }).then(function(){toast(link?"Eliminado (con su registro de caja) · queda en la papelera":"Eliminado · queda en la papelera","warn");})
       .catch(function(e){toast("Error: "+e.message,"err");});
   });
 }
@@ -1742,8 +1750,6 @@ function openEdit(id){
   var tg=document.getElementById("ecaj-toggle");
   tg.checked=editCajaWanted;
   eCajToggle();
-  // La imputación a caja sólo aplica a Egresos
-  document.getElementById("ecaj-card").style.display=(editTipo==="Egreso")?"flex":"none";
   document.getElementById("modal-edit").classList.add("open");
 }
 function closeEdit(){
@@ -1759,7 +1765,7 @@ function findLinkedCaja(r){
   if(byId)return byId;
   var expectNota="["+r.cat+(r.sub?" / "+r.sub:"")+"]";
   return cajaRecs.find(function(c){
-    return !c.movId && c.tipo==="Gasto" && c.fecha===r.fecha && c.suc===r.suc &&
+    return !c.movId && c.tipo===cajTipoDe(r.tipo) && c.fecha===r.fecha && c.suc===r.suc &&
            Math.abs(c.monto-r.monto)<0.01 && String(c.notas||"").indexOf(expectNota)===0;
   })||null;
 }
@@ -1767,8 +1773,10 @@ function eCajToggle(){
   var on=document.getElementById("ecaj-toggle").checked;
   editCajaWanted=on;
   var hint=document.getElementById("ecaj-hint");
+  var lb=document.getElementById("ecaj-lbl");
+  if(lb) lb.textContent=editTipo==="Ingreso"?"Imputar a Caja (ingreso de bolsillo)":"Imputar a Caja (gasto bolsillo)";
   if(hint) hint.textContent=on
-    ?"Se registrará/actualizará como Gasto bolsillo en Caja Diaria."
+    ?(editTipo==="Ingreso"?"Se registrará/actualizará como Extracción en Caja Diaria (lo cobraste vos).":"Se registrará/actualizará como Gasto bolsillo en Caja Diaria.")
     :(editCajaLinkId?"Al guardar se eliminará la entrada de caja vinculada.":"No se imputa a caja.");
 }
 
@@ -1778,12 +1786,8 @@ function eSetTipo(t){
   document.getElementById("ein").className="sb"+(t==="Ingreso"?" si":"");
   buildCatSelect("efcat",t,"");
   document.getElementById("erowsub").style.display="none";
-  // Imputar a caja sólo tiene sentido para egresos
-  var card=document.getElementById("ecaj-card");
-  if(card){
-    card.style.display=(t==="Egreso")?"flex":"none";
-    if(t!=="Egreso"){var tg=document.getElementById("ecaj-toggle");if(tg){tg.checked=false;editCajaWanted=false;}}
-  }
+  // Bolsillo vale para los dos: en ingresos va a caja como Extracción
+  if(document.getElementById("ecaj-toggle"))eCajToggle();
 }
 function eSetSuc(s){
   editSuc=s;
@@ -1811,7 +1815,7 @@ function guardarEdit(){
   var d=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
   setLoading("ebtn",true);
-  var mId=editId, wantCaja=(editTipo==="Egreso")&&editCajaWanted, linkId=editCajaLinkId;
+  var mId=editId, wantCaja=editCajaWanted, linkId=editCajaLinkId, cTipo=cajTipoDe(editTipo);
   db.collection("movimientos").doc(mId).update({
     fecha:fecha,tipo:editTipo,suc:editSuc,cat:cat,sub:sub||"",monto:monto,
     semana:sem,mes:d.getMonth()+1,notas:notas
@@ -1819,9 +1823,9 @@ function guardarEdit(){
     // Reconciliar imputación a Caja
     var cajaNota="["+cat+(sub?" / "+sub:"")+"]"+(notas?" "+notas:"");
     if(wantCaja&&linkId){
-      return db.collection("caja").doc(linkId).update({fecha:fecha,suc:editSuc,tipo:"Gasto",monto:monto,notas:cajaNota,movId:mId});
+      return db.collection("caja").doc(linkId).update({fecha:fecha,suc:editSuc,tipo:cTipo,monto:monto,notas:cajaNota,movId:mId});
     } else if(wantCaja&&!linkId){
-      return db.collection("caja").add({fecha:fecha,suc:editSuc,tipo:"Gasto",monto:monto,movId:mId,notas:cajaNota,ts:firebase.firestore.FieldValue.serverTimestamp()});
+      return db.collection("caja").add({fecha:fecha,suc:editSuc,tipo:cTipo,monto:monto,movId:mId,notas:cajaNota,ts:firebase.firestore.FieldValue.serverTimestamp()});
     } else if(!wantCaja&&linkId){
       return db.collection("caja").doc(linkId).delete();
     }

@@ -480,6 +480,10 @@ nav>.nav-grp:first-child{padding-top:2px}
 .pel-chk{display:flex;gap:9px;align-items:flex-start;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5;cursor:pointer}
 .pel-chk input{width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:var(--or-d)}
 .pel-nota{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ── Año siempre visible en Análisis ── */
+.fbar.sin-anio .js-anio{display:none!important}
+.anio-tag{display:inline-block;margin-left:8px;padding:1px 9px;border-radius:999px;background:var(--or-l);color:var(--or-txt);font-size:.62em;font-weight:800;vertical-align:middle;letter-spacing:.3px}
 </style>
 </head>
 <body>
@@ -704,7 +708,7 @@ nav>.nav-grp:first-child{padding-top:2px}
 
 <!-- ══════════ ANÁLISIS ══════════ -->
 <section class="screen" id="screen-analisis">
-  <div class="page-h"><h1>Análisis</h1><p>Resultados por mes, rango, devengado, categorías y ratios</p></div>
+  <div class="page-h"><h1>Análisis<span class="anio-tag js-anio-lbl" id="an-anio"></span></h1><p>Resultados por mes, rango, devengado, categorías y ratios</p></div>
   <div class="dst-bar">
     <div class="dst active" onclick="setDashView('resumen',this)">Resumen</div>
     <div class="dst" onclick="setDashView('preguntar',this)">✨ Preguntar</div>
@@ -722,13 +726,14 @@ nav>.nav-grp:first-child{padding-top:2px}
   </div>
 
   <div class="dview active" id="dview-resumen">
+    <div class="sdiv">Totales del año <span class="js-anio-lbl"></span></div>
     <div class="sg2" id="dash-kpis"></div>
     <div id="dash-stock-section"></div>
     <div class="charts2">
-      <div class="chart-card"><h3>Ingresos vs egresos + CF por mes</h3><canvas id="chart-bar" height="200"></canvas></div>
-      <div class="chart-card"><h3>Resultado y margen % mensual</h3><canvas id="chart-line" height="200"></canvas></div>
+      <div class="chart-card"><h3>Ingresos vs egresos + CF por mes · <span class="js-anio-lbl"></span></h3><canvas id="chart-bar" height="200"></canvas></div>
+      <div class="chart-card"><h3>Resultado y margen % mensual · <span class="js-anio-lbl"></span></h3><canvas id="chart-line" height="200"></canvas></div>
     </div>
-    <div class="sdiv">Tabla mensual</div>
+    <div class="sdiv">Tabla mensual <span class="js-anio-lbl"></span></div>
     <div class="dtable-wrap">
       <table class="dtable"><thead><tr><th>Mes</th><th>Ventas</th><th>Egresos</th><th>CF</th><th>Resultado</th><th>Margen</th><th>Caja</th></tr></thead><tbody id="dash-tbody"></tbody></table>
     </div>
@@ -737,7 +742,7 @@ nav>.nav-grp:first-child{padding-top:2px}
   <div class="dview" id="dview-mensual">
     <div class="field" style="max-width:260px;margin-bottom:6px">
       <select class="inp" id="mes-sel" onchange="renderMensualDetalle()">
-        <option value="todos">Todos los meses</option>
+        <option value="todos">Todos los meses del año</option>
         <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option>
         <option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option>
         <option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
@@ -1919,7 +1924,8 @@ function setDashView(v,el){
   el.classList.add("active");
   document.querySelectorAll(".dview").forEach(function(d){d.classList.remove("active");});
   document.getElementById("dview-"+v).classList.add("active");
-  var fb=document.getElementById("dash-fbar"); if(fb) fb.style.display=(v==="preguntar")?"none":"";
+  var fb=document.getElementById("dash-fbar"); if(fb){fb.style.display=(v==="preguntar")?"none":"";fb.classList.toggle("sin-anio",v==="rango"||v==="categ");}
+  var at=document.getElementById("an-anio"); if(at) at.style.display=(v==="rango"||v==="categ"||v==="preguntar")?"none":"";
   renderDashboard();
 }
 // Costo financiero % por sucursal (diferenciado). "todos" = ponderado por ventas.
@@ -2173,7 +2179,7 @@ function renderMensualDetalle(){
   showMonths.forEach(function(m){
     var suf=selMes>0?"":MESES_L[m.m-1];
     // Tabla INGRESOS
-    html+='<div class="sdiv">'+(suf||MESES_L[m.m-1])+' — Ingresos</div>';
+    html+='<div class="sdiv">'+(suf||MESES_L[m.m-1])+' '+CMV_YEAR+' — Ingresos</div>';
     html+='<div class="cat-wrap"><table class="cat-table"><thead><tr><th>Categoría</th><th>Monto</th><th>%</th></tr></thead><tbody>';
     ING_CATS.forEach(function(cat,i){
       var v=m.ingCats[cat]||0;
@@ -2183,7 +2189,7 @@ function renderMensualDetalle(){
     });
     html+='<tr><td>TOTAL VENTAS</td><td class="pos">'+fp(m.ingTotal)+'</td><td class="neut">100%</td></tr></tbody></table></div>';
     // Tabla EGRESOS
-    html+='<div class="sdiv">'+(suf||MESES_L[m.m-1])+' — Egresos</div>';
+    html+='<div class="sdiv">'+(suf||MESES_L[m.m-1])+' '+CMV_YEAR+' — Egresos</div>';
     html+='<div class="cat-wrap"><table class="cat-table"><thead><tr><th>Categoría</th><th>Monto</th><th>%</th></tr></thead><tbody>';
     EGR_CATS.forEach(function(cat){
       var v=m.egrCats[cat]||0;
@@ -2210,7 +2216,7 @@ function renderMensualDetalle(){
     var tC=months.reduce(function(s,m){return s+m.cf;},0);
     var tR=tI-tE-tC;
     var tN=months.reduce(function(s,m){return s+m.neto;},0);
-    html+='<div class="sdiv">TOTALES ANUALES</div>';
+    html+='<div class="sdiv">TOTALES '+CMV_YEAR+'</div>';
     html+='<div class="kpi3">';
     html+='<div class="sc"><div class="sl">Total Ventas</div><div class="sv g">'+fp(tI)+'</div></div>';
     html+='<div class="sc"><div class="sl">Total Egresos</div><div class="sv o">'+fp(tE+tC)+'</div></div>';
@@ -2390,7 +2396,7 @@ function renderDeveng(){
   });
 
   // ── Tabla 1: Rentabilidad devengada + CMV y Franquicia editables ──
-  var html='<div class="sdiv">Rentabilidad devengada (Ventas − CMV − Franquicia − Gastos)</div>';
+  var html='<div class="sdiv">Rentabilidad devengada '+CMV_YEAR+' (Ventas − CMV − Franquicia − Gastos)</div>';
   html+='<div class="dtable-wrap"><table class="dtable"><thead><tr>';
   html+='<th>Mes</th><th>Ventas</th><th>CMV</th><th>Margen bruto</th><th>MB%</th><th>Franquicia</th><th>Gastos op.</th><th>CF</th><th>Result. deveng.</th>';
   html+='</tr></thead><tbody>';
@@ -2432,7 +2438,7 @@ function renderDeveng(){
     +(suc==="todos"?' El consolidado suma Ocampo + Tucumán; para <strong>editar</strong> los valores elegí una sucursal arriba.':'')+'</div>';
 
   // ── Tabla 2: Conciliación Resultado devengado vs Neto de caja ──
-  html+='<div class="sdiv">Conciliación: Devengado vs Caja</div>';
+  html+='<div class="sdiv">Conciliación '+CMV_YEAR+': Devengado vs Caja</div>';
   html+='<div class="enote" style="margin-bottom:10px">El <strong>resultado devengado</strong> y el <strong>neto de caja</strong> no coinciden mes a mes: la diferencia es normal y viene del rezago de acreditación de tarjetas y de los plazos de pago a proveedores. La <strong>diferencia acumulada</strong> es la señal a vigilar.</div>';
   html+='<div class="dtable-wrap"><table class="dtable"><thead><tr>';
   html+='<th>Mes</th><th>Result. deveng.</th><th>Neto caja</th><th>Difer.</th><th>Difer. acum.</th>';
@@ -3720,8 +3726,10 @@ function renderDashStock(){
 // ── RATIOS ─────────────────────────────────────────────────────────────────
 function computeRatiosSuc(suc){
   var months=computeMonthlyFull(suc);
+  // Enero se compara con diciembre del año anterior
+  var dicAnt=CMV_YEAR>CMV_YEAR_INICIO?withYear(CMV_YEAR-1,function(){return computeMonthlyFull(suc)[11];}):null;
   return months.map(function(m,i){
-    var prev=i>0?months[i-1]:null;
+    var prev=i>0?months[i-1]:dicAnt;
     var margen=m.ingTotal>0?m.res/m.ingTotal:0;
     var prevMar=prev&&prev.ingTotal>0?prev.res/prev.ingTotal:null;
     var dMar=prevMar!==null?(margen-prevMar):null;
@@ -3740,7 +3748,7 @@ function ratioTable(rows, suc){
   rows.forEach(function(r){tVentas+=r.ventas;tEgr+=r.egr;tNeto+=r.neto;tRes+=r.res;});
   var tMar=tVentas>0?tRes/tVentas:0;
 
-  var html='<div class="suc-hdr '+ cls+'">'+ label+'</div>';
+  var html='<div class="suc-hdr '+ cls+'">'+ label+' · '+CMV_YEAR+'</div>';
   html+='<div class="rtable-wrap"><table class="rtable"><thead><tr>';
   html+='<th>Mes</th><th>Ventas</th><th>Egresos</th><th>Caja neto</th><th>Resultado</th><th>Margen</th><th>ΔMargen</th><th>Crecim.</th><th>Prov/Vntas</th>';
   html+='</tr></thead><tbody>';
@@ -4785,7 +4793,6 @@ function renderAnioSelects(){
   var anios=aniosConDatos();
   document.querySelectorAll(".js-anio").forEach(function(sel){
     sel.innerHTML=anios.map(function(y){return '<option value="'+y+'"'+(y===CMV_YEAR?' selected':'')+'>'+y+'</option>';}).join("");
-    sel.style.display=anios.length>1?"":"none"; // con un solo año no hace falta mostrarlo
   });
   document.querySelectorAll(".js-anio-lbl").forEach(function(el){el.textContent=CMV_YEAR;});
 }

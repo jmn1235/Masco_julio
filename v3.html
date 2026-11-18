@@ -484,6 +484,26 @@ nav>.nav-grp:first-child{padding-top:2px}
 /* ── Año siempre visible en Análisis ── */
 .fbar.sin-anio .js-anio{display:none!important}
 .anio-tag{display:inline-block;margin-left:8px;padding:1px 9px;border-radius:999px;background:var(--or-l);color:var(--or-txt);font-size:.62em;font-weight:800;vertical-align:middle;letter-spacing:.3px}
+
+/* ── v5 ── */
+.est{color:#B7791F;font-style:italic}
+.cmv-input.est-in::placeholder{color:#B7791F;font-style:italic;opacity:1}
+.est-nota{font-size:12px;color:#8A6116;background:#FFF7E6;border:1px solid #F3DB8E;border-radius:10px;padding:8px 11px;margin:8px 0 4px;line-height:1.5}
+.prow{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:none}
+.prow.off .pn{opacity:.5;text-decoration:line-through}
+.prow .pn{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow select.inp{width:150px;flex:0 0 150px;min-height:34px;padding:5px 26px 5px 9px;font-size:13px}
+@media (max-width:600px){.prow{flex-wrap:wrap;row-gap:4px}.prow .pn{flex:1 1 100%;white-space:normal}.prow select.inp{flex:1 1 auto;width:auto}}
+.app-ver{font-size:11px;color:var(--muted);line-height:1.4}
+.dp-sel{max-width:460px;margin-bottom:12px}
+.mas-sheet{position:fixed;inset:0;background:rgba(20,16,12,.35);z-index:300;display:none;align-items:flex-end}
+.mas-sheet.open{display:flex}
+.mas-box{background:#fff;width:100%;border-radius:20px 20px 0 0;padding:10px 12px calc(14px + var(--safe-bot,0px))}
+.mas-box .mas-h{width:40px;height:4px;border-radius:4px;background:var(--line);margin:4px auto 10px}
+.mas-it{display:flex;align-items:center;gap:12px;width:100%;border:none;background:none;padding:14px 10px;font-size:16px;font-weight:600;color:var(--ink);border-radius:12px;cursor:pointer;text-align:left}
+.mas-it:active,.mas-it:hover{background:var(--or-l)}
+.mas-it svg{width:22px;height:22px;color:var(--or-d);flex-shrink:0}
 </style>
 </head>
 <body>
@@ -517,6 +537,8 @@ nav>.nav-grp:first-child{padding-top:2px}
       <button class="nav-btn" data-tab="historial" onclick="showTab('historial')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></svg>Historial</button>
       <div class="nav-grp">Análisis</div>
       <button class="nav-btn" data-tab="analisis" onclick="showTab('analisis')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="16.5" y="3.5" width="4" height="16.5" rx="1"/></svg>Análisis</button>
+      <button class="nav-btn" data-tab="pagos" onclick="showTab('pagos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 12h7M9 16h7"/></svg>Detalles de pagos</button>
+      <button class="nav-btn" data-tab="cajaan" onclick="showTab('cajaan')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3"/></svg>Caja</button>
       <button class="nav-btn" data-tab="cierre" onclick="showTab('cierre')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15.5 2 2 4-4"/></svg>Cierre de mes<span class="dotn js-cierren"></span></button>
       <div class="nav-grp">Configuración</div>
       <button class="nav-btn" data-tab="ajustes" onclick="showTab('ajustes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Ajustes</button>
@@ -524,6 +546,7 @@ nav>.nav-grp:first-child{padding-top:2px}
     <div class="sb-foot">
       <div class="row"><div class="sdot js-sdot"></div><span class="js-stxt">Conectando...</span></div>
       <div class="row"><span class="badge js-breg">0 mov.</span></div>
+      <div class="row app-ver">Versión 5.0 IA · actualizada el 18/11/2026</div>
       <div class="row user-chip js-user" style="display:none"><span class="js-uemail" style="flex:1;overflow:hidden;text-overflow:ellipsis"></span><button onclick="logout()" title="Cerrar sesión">⏻</button></div>
     </div>
   </aside>
@@ -634,8 +657,6 @@ nav>.nav-grp:first-child{padding-top:2px}
         <div class="card" id="cajalist"></div>
       </div>
     </div>
-    <div class="sdiv">Resumen mensual de caja <span class="js-anio-lbl"></span> <select class="inp sm js-anio anio-sel" onchange="setAnio(this.value)" aria-label="Año"></select></div>
-    <div id="caja-mensual"></div>
   </div>
 
   <!-- STOCK -->
@@ -647,7 +668,7 @@ nav>.nav-grp:first-child{padding-top:2px}
           <div class="field"><span class="lbl req">Sucursal</span>
             <div class="sw"><button class="sb" id="ssoc" onclick="setStockSuc('Ocampo')">Ocampo</button><button class="sb" id="sstu" onclick="setStockSuc('Tucuman')">Tucumán</button></div>
           </div>
-          <div class="field"><label class="req" for="sm">Valuación total del stock</label><div class="inp-pre"><span>$</span><input type="text" class="inp big" id="sm" inputmode="numeric" placeholder="0" oninput="onMonto(this)"></div></div>
+          <div class="field"><label class="req" for="sm">Valuación total del stock (a costo con IVA)</label><div class="inp-pre"><span>$</span><input type="text" class="inp big" id="sm" inputmode="numeric" placeholder="0" oninput="onMonto(this)"></div></div>
           <div class="field"><label for="sn">Notas (opcional)</label><input type="text" class="inp" id="sn" placeholder="Ej: inventario físico..."></div>
           <button class="btn btn-n" id="bsc" onclick="cargarStock()" style="margin:0">Registrar stock</button>
         </div>
@@ -737,6 +758,7 @@ nav>.nav-grp:first-child{padding-top:2px}
     <div class="dtable-wrap">
       <table class="dtable"><thead><tr><th>Mes</th><th>Ventas</th><th>Egresos</th><th>CF</th><th>Resultado</th><th>Margen</th><th>Caja</th></tr></thead><tbody id="dash-tbody"></tbody></table>
     </div>
+    <div id="dash-iibb-nota"></div>
   </div>
 
   <div class="dview" id="dview-mensual">
@@ -760,7 +782,7 @@ nav>.nav-grp:first-child{padding-top:2px}
   </div>
 
   <div class="dview" id="dview-deveng">
-    <div class="enote"><strong>Rentabilidad devengada.</strong> Reemplaza los pagos a <em>Proveedores</em> por el <strong>costo de mercadería vendida (CMV)</strong> y el <strong>costo de franquicia</strong> (Royalty + Publicidad + Sistema), que cargás a mano mes a mes por sucursal. Así comparás las ventas contra el costo real de lo vendido, sin el ruido de los plazos de pago a proveedores.</div>
+    <div class="enote"><strong>Rentabilidad devengada.</strong> Reemplaza los pagos a <em>proveedores de mercadería</em> por el <strong>costo de mercadería vendida (CMV)</strong> (los de insumos y fletes quedan como gasto) y el <strong>costo de franquicia</strong> (Royalty + Publicidad + Sistema), que cargás a mano mes a mes por sucursal. Así comparás las ventas contra el costo real de lo vendido, sin el ruido de los plazos de pago a proveedores.</div>
     <div id="deveng-content"></div>
   </div>
 
@@ -876,6 +898,9 @@ nav>.nav-grp:first-child{padding-top:2px}
         <div class="field"><label for="cf-pct-oc">Ocampo %</label><input class="inp" type="number" id="cf-pct-oc" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()" onchange="cfSave()"></div>
         <div class="field"><label for="cf-pct-tu">Tucumán %</label><input class="inp" type="number" id="cf-pct-tu" value="8.5" min="0" max="100" step="0.1" oninput="renderDashboard()" onchange="cfSave()"></div>
       </div>
+      <div class="panel-t" style="margin-top:16px">IIBB estimado</div>
+      <div class="panel-s" style="margin-bottom:12px">% de las ventas del mes anterior de cada sucursal. Se usa solo en los meses sin Impuestos › IIBB cargado.</div>
+      <div class="field" style="max-width:160px"><label for="iibb-pct">IIBB %</label><input class="inp" type="number" id="iibb-pct" value="1.5" min="0" max="20" step="0.1" onchange="cfSave()"></div>
     </div>
     <div class="panel">
       <div class="panel-t">Gastos recurrentes</div>
@@ -953,6 +978,7 @@ nav>.nav-grp:first-child{padding-top:2px}
 
   <div class="panel">
     <div class="panel-t">Cuenta</div>
+    <div class="app-ver" style="margin:-2px 0 8px">Versión 5.0 IA · actualizada el 18/11/2026</div>
     <div class="user-chip js-user" style="display:none;margin-top:8px;flex-wrap:wrap"><span class="js-uemail" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"></span><button class="btn btn-sm btn-ghost" style="width:auto;border-radius:10px" onclick="logout()">Cerrar sesión</button></div>
   </div>
   </div>
@@ -1041,6 +1067,41 @@ nav>.nav-grp:first-child{padding-top:2px}
   </div>
 </section>
 
+<!-- ══════════ DETALLES DE PAGOS ══════════ -->
+<section class="screen" id="screen-pagos">
+  <div class="page-h"><h1>Detalles de pagos<span class="anio-tag js-anio-lbl"></span></h1><p>Historial de cada proveedor, empleado y categoría de gasto</p></div>
+  <div class="dst-bar" id="dp-tabs">
+    <div class="dst active" data-v="prov" onclick="setDpTipo('prov')">Proveedores</div>
+    <div class="dst" data-v="emp" onclick="setDpTipo('emp')">Empleados</div>
+    <div class="dst" data-v="cat" onclick="setDpTipo('cat')">Categorías</div>
+  </div>
+  <div class="fbar" id="dp-fbar">
+    <select class="inp sm js-anio anio-sel" onchange="setAnio(this.value)" aria-label="Año"></select>
+    <div class="fc ablu" onclick="setDpSuc('todos',this)">Todas</div>
+    <div class="fc" onclick="setDpSuc('Ocampo',this)">Ocampo</div>
+    <div class="fc" onclick="setDpSuc('Tucuman',this)">Tucumán</div>
+    <div class="fc" onclick="setDpSuc('General',this)">General</div>
+  </div>
+  <div class="field dp-sel"><label for="dp-item" id="dp-item-lbl">Proveedor</label><select class="inp" id="dp-item" onchange="dpItemCambio(this.value)"></select></div>
+  <div id="dp-body"></div>
+  <div class="panel-s" style="margin-top:10px">Montos tal como se cargaron: lo cargado como General no se reparte entre sucursales.</div>
+</section>
+
+<!-- ══════════ CAJA (análisis) ══════════ -->
+<section class="screen" id="screen-cajaan">
+  <div class="page-h"><h1>Caja<span class="anio-tag js-anio-lbl"></span></h1><p>Extracciones, gastos de bolsillo y neto, mes a mes</p></div>
+  <div class="fbar" id="ca-fbar">
+    <select class="inp sm js-anio anio-sel" onchange="setAnio(this.value)" aria-label="Año"></select>
+    <div class="fc ablu" onclick="setCaSuc('todos',this)">Todas</div>
+    <div class="fc" onclick="setCaSuc('Ocampo',this)">Ocampo</div>
+    <div class="fc" onclick="setCaSuc('Tucuman',this)">Tucumán</div>
+    <div class="fc" onclick="setCaSuc('General',this)">General</div>
+  </div>
+  <div id="ca-body"></div>
+  <div class="sdiv">Resumen mensual de caja <span class="js-anio-lbl"></span></div>
+  <div id="caja-mensual"></div>
+</section>
+
     </main>
   </div>
 </div>
@@ -1051,8 +1112,10 @@ nav>.nav-grp:first-child{padding-top:2px}
   <button class="bn" data-tab="historial" onclick="showTab('historial')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></svg>Historial</button>
   <button class="bn" data-tab="analisis" onclick="showTab('analisis')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="16.5" y="3.5" width="4" height="16.5" rx="1"/></svg>Análisis</button>
   <button class="bn" data-tab="cierre" onclick="showTab('cierre')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15.5 2 2 4-4"/></svg>Cierre<span class="dotn js-cierren"></span></button>
-  <button class="bn" data-tab="ajustes" onclick="showTab('ajustes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Ajustes</button>
+  <button class="bn" data-tab="mas" onclick="masAbrir()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Más</button>
 </nav>
+
+<div class="mas-sheet" id="mas-sheet" onclick="if(event.target===this)masCerrar()"><div class="mas-box"><div class="mas-h"></div><button class="mas-it" onclick="masIr('pagos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 12h7M9 16h7"/></svg>Detalles de pagos</button><button class="mas-it" onclick="masIr('cajaan')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3"/></svg>Caja</button><button class="mas-it" onclick="masIr('ajustes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Ajustes</button></div></div>
 
 <!-- ══ MODAL EDICIÓN CAJA ══ -->
 <div class="modal-backdrop" id="modal-edit-caja">
@@ -1307,6 +1370,7 @@ function markOnline(){
     renderAlertas();
     if(isA("cierre"))     renderCierre();
     if(isA("cargar")&&cargarView==="comis") renderComis();
+    v5Refresh();
   },function(){setSync("offline");});
 
   db.collection("caja").orderBy("ts","asc").onSnapshot(function(snap){
@@ -1316,6 +1380,7 @@ function markOnline(){
     if(isA("analisis"))  renderDashboard();
     if(isA("historial")&&filterAct==="caja") renderHistorial();
     if(isA("cierre"))    renderCierre();
+    if(isA("cajaan"))    cajaAnRender();
   },function(){setSync("offline");});
 
   db.collection("stock").orderBy("ts","asc").onSnapshot(function(snap){
@@ -1377,6 +1442,7 @@ function markOnline(){
       var eo=document.getElementById("cf-pct-oc"), et=document.getElementById("cf-pct-tu");
       if(eo&&typeof d.ocampo==="number") eo.value=d.ocampo;
       if(et&&typeof d.tucuman==="number") et.value=d.tucuman;
+      if(typeof d.iibb==="number"){IIBB_PCT=d.iibb;var ei=document.getElementById("iibb-pct");if(ei)ei.value=d.iibb;}
     }
     cfLoaded=true; // ya trajimos (o confirmamos que no hay) valor de la nube
     markOnline();
@@ -1509,6 +1575,10 @@ function cargarMov(){
   if(!monto||monto<=0) return toast("Ingresá un monto válido","err");
   var d=new Date(fecha+"T12:00:00");
   var sem=Math.ceil(((d-new Date(d.getFullYear(),0,1))/86400000+new Date(d.getFullYear(),0,1).getDay()+1)/7);
+  if(tipoMov==="Egreso"){
+    var dup=dupBuscar(cat,sub,monto,fecha);
+    if(dup&&!confirm(dupTexto(dup)+"\n\n¿Cargar igual?"))return;
+  }
   setLoading("bcm",true);
   var pelO=(tipoMov==="Ingreso"&&cat==="Servicios Peluqueria"&&(suc==="Ocampo"||suc==="Tucuman"))?{fecha:fecha,suc:suc,monto:monto}:null;
   if(!pelO)pelCerrar();
@@ -1942,7 +2012,9 @@ function cfSave(){
   var oc=parseFloat(document.getElementById("cf-pct-oc").value);
   var tu=parseFloat(document.getElementById("cf-pct-tu").value);
   if(isNaN(oc))oc=0; if(isNaN(tu))tu=0;
-  db.collection("config").doc("cf").set({ocampo:oc,tucuman:tu,ts:firebase.firestore.FieldValue.serverTimestamp()})
+  var ib=parseFloat(document.getElementById("iibb-pct").value); if(isNaN(ib)||ib<0)ib=1.5; IIBB_PCT=ib;
+  if(isA("analisis"))renderDashboard();
+  db.collection("config").doc("cf").set({ocampo:oc,tucuman:tu,iibb:ib,ts:firebase.firestore.FieldValue.serverTimestamp()})
     .then(function(){toast("✓ Costo financiero guardado","ok");})
     .catch(function(e){toast("Error: "+e.message,"err");});
 }
@@ -2038,6 +2110,11 @@ function computeMonthlyFull(suc){
     // Ajuste Gabriel Yapura: 85% Ocampo / 15% Tucumán (afecta Personal por sucursal)
     var gAdj=gabrielAjuste(mm,suc,pf);
     egrCats["Personal"]=egrCats["Personal"]-gAdj.quita+gAdj.pone;
+    // IIBB estimado si no está cargado el real (suma a Impuestos)
+    var iibbEst=iibbEstimado(m,suc); if(iibbEst>0)egrCats["Impuestos"]=(egrCats["Impuestos"]||0)+iibbEst;
+    // Proveedores que no son mercadería (en el Devengado van como gasto)
+    var tiposP=provTiposMapa(), esTipo=function(t){return function(r){return r.cat==="Proveedores"&&(tiposP[r.sub]||"merc")===t;};};
+    var provIns=sumCatP(mm.filter(esTipo("ins")),"Egreso","Proveedores",suc,pf), provFle=sumCatP(mm.filter(esTipo("flete")),"Egreso","Proveedores",suc,pf);
     var egrTotal=Object.values(egrCats).reduce(function(s,v){return s+v;},0);
     // Costo financiero diferenciado por sucursal
     var cf;
@@ -2047,7 +2124,7 @@ function computeMonthlyFull(suc){
     var cajSuc=filtCaja(cm,suc);
     var ext=cajSuc.filter(function(r){return r.tipo==="Extraccion";}).reduce(function(s,r){return s+r.monto;},0);
     var gst=cajSuc.filter(function(r){return r.tipo==="Gasto";}).reduce(function(s,r){return s+r.monto;},0);
-    return{m:m,ingCats:ingCats,ingTotal:ingTotal,egrCats:egrCats,egrTotal:egrTotal,
+    return{m:m,iibbEst:iibbEst,provIns:provIns,provFle:provFle,ingCats:ingCats,ingTotal:ingTotal,egrCats:egrCats,egrTotal:egrTotal,
            cf:cf,res:res,margen:ingTotal>0?res/ingTotal:0,ext:ext,gst:gst,neto:ext-gst};
   });
 }
@@ -2138,9 +2215,10 @@ function renderResumen(){
   ].map(function(k){return'<div class="sc"><div class="sl">'+k[0]+'</div><div class="sv '+k[2]+'">'+k[1]+'</div></div>';}).join("");
   var tbody=document.getElementById("dash-tbody");
   var rows=months.filter(function(m){return m.ingTotal>0||m.egrTotal>0||m.neto!==0;}).map(function(m){
-    return'<tr><td>'+MESES[m.m-1]+'</td><td class="pos">'+fp(m.ingTotal)+'</td><td class="neg">'+fp(m.egrTotal)+'</td><td class="cf">'+fp(m.cf)+'</td><td class="'+(m.res>=0?"pos":"neg")+'">'+fp(m.res)+'</td><td class="neut">'+(m.ingTotal>0?(m.margen*100).toFixed(1)+"%":"-")+'</td><td class="'+(m.neto>=0?"pos":"neg")+'">'+fp(m.neto)+'</td></tr>';
+    return'<tr><td>'+MESES[m.m-1]+'</td><td class="pos">'+fp(m.ingTotal)+'</td><td class="neg">'+fp(m.egrTotal)+(m.iibbEst>0?'<span class="est">*</span>':'')+'</td><td class="cf">'+fp(m.cf)+'</td><td class="'+(m.res>=0?"pos":"neg")+'">'+fp(m.res)+'</td><td class="neut">'+(m.ingTotal>0?(m.margen*100).toFixed(1)+"%":"-")+'</td><td class="'+(m.neto>=0?"pos":"neg")+'">'+fp(m.neto)+'</td></tr>';
   }).join("");
   rows+='<tr class="total-row"><td>TOTAL</td><td class="pos">'+fp(tIng)+'</td><td class="neg">'+fp(tEgr)+'</td><td class="cf">'+fp(tCF)+'</td><td class="'+(tRes>=0?"pos":"neg")+'">'+fp(tRes)+'</td><td class="neut">'+(tIng>0?(tMar*100).toFixed(1)+"%":"-")+'</td><td class="'+(tCaj>=0?"pos":"neg")+'">'+fp(tCaj)+'</td></tr>';
+  var nt=document.getElementById("dash-iibb-nota"); if(nt)nt.innerHTML=iibbNota(months);
   tbody.innerHTML=rows||'<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Sin datos</td></tr>';
   var ingArr=months.map(function(m){return m.ingTotal;});
   var egrPlusCF=months.map(function(m){return m.egrTotal+m.cf;});
@@ -2196,7 +2274,7 @@ function renderMensualDetalle(){
       if(v===0&&!selMes)return;
       var tot=m.egrTotal+m.cf;
       var pct=tot>0?(v/tot*100).toFixed(1):"-";
-      html+='<tr><td>'+cat+'</td><td class="neg">'+fp(v)+'</td><td>'+(v>0?pct+"%":"-")+'</td></tr>';
+      html+='<tr><td>'+cat+(cat==="Impuestos"&&m.iibbEst>0?' <span class="est">(incl. IIBB est. '+fp(m.iibbEst)+')</span>':'')+'</td><td class="neg">'+fp(v)+'</td><td>'+(v>0?pct+"%":"-")+'</td></tr>';
     });
     // CF
     var cfpct=(m.egrTotal+m.cf)>0?(m.cf/(m.egrTotal+m.cf)*100).toFixed(1):"-";
@@ -2348,7 +2426,7 @@ function fraStored(mes,suc,anio){
   var d=fraRecs.find(function(r){return r.mes===mes&&r.suc===suc&&(r.anio||2026)===y;});
   return d?d.monto:null;
 }
-function fraEffective(mes,suc){var st=fraStored(mes,suc);return st!==null?st:0;}
+function fraEffective(mes,suc){var st=fraStored(mes,suc);return st!==null?st:fraEstimada(mes,suc);}
 function fraSave(mes,suc,val){
   var monto=parseMonto(val);
   var id=fraDocId(mes,suc);
@@ -2382,7 +2460,7 @@ function renderDeveng(){
   var curMonth=(_now.getFullYear()===CMV_YEAR)?(_now.getMonth()+1):12;
   var rows=months.map(function(m){
     var ventas=m.ingTotal;
-    var opex=OPEX_CATS.reduce(function(s,c){return s+(m.egrCats[c]||0);},0);
+    var opex=opexDe(m);
     var cmv=cmvForMonth(m.m);
     var fra=fraForMonth(m.m);
     var mb=ventas-cmv;                  // margen bruto (Ventas − CMV)
@@ -2412,11 +2490,13 @@ function renderDeveng(){
         +'oninput="onCmvInput(this)" onchange="cmvSave('+r.m+',\''+suc+'\',this.value)" title="CMV del software de ventas">';
       var fraStoredV=fraStored(r.m,suc);
       var fraVal=fraStoredV!==null?fmtMiles(String(Math.round(fraStoredV))):"";
-      fraCell='<input class="cmv-input" inputmode="numeric" value="'+fraVal+'" placeholder="0" '
+      var fraEstV=fraStoredV===null?fraEstimada(r.m,suc):0;
+      fraCell='<input class="cmv-input'+(fraEstV?' est-in':'')+'" inputmode="numeric" value="'+fraVal+'" placeholder="'+(fraEstV?'≈ '+fmtMiles(String(fraEstV))+' est.':'0')+'" '
         +'oninput="onCmvInput(this)" onchange="fraSave('+r.m+',\''+suc+'\',this.value)" title="Royalty + Publicidad + Sistema de la franquicia">';
     } else {
       cmvCell='<span class="neg">'+fp(r.cmv)+'</span>';
-      fraCell='<span class="neg">'+fp(r.fra)+'</span>';
+      var fe=suc==="todos"?(fraEsEst(r.m,"Ocampo")||fraEsEst(r.m,"Tucuman")):fraEsEst(r.m,suc);
+      fraCell='<span class="neg'+(fe?' est':'')+'">'+(fe?'≈ ':'')+fp(r.fra)+'</span>';
     }
     html+='<tr><td>'+MESES[r.m-1]+'</td>';
     html+='<td class="pos">'+fp(r.ventas)+'</td>';
@@ -2460,7 +2540,14 @@ function renderDeveng(){
     +'<td class="'+(acum>=0?"pos":"neg")+'">'+(acum>=0?"+":"−")+fp(acum)+'</td></tr>';
   html+='</tbody></table></div>';
 
-  el.innerHTML=html;
+  var fEst=rows.filter(function(r){return r.hasData&&(suc==="todos"?(fraEsEst(r.m,"Ocampo")||fraEsEst(r.m,"Tucuman")):fraEsEst(r.m,suc));});
+  var notas="";
+  if(fEst.length)notas+='<div class="est-nota">≈ Franquicia estimada en '+fEst.map(function(r){return MESES[r.m-1];}).join(", ")+': falta cargarla. Se usa el promedio de los meses cargados'
+    +(suc==="todos"?' (Ocampo '+fraPctPromedio("Ocampo").toFixed(1).replace(".",",")+'%, Tucumán '+fraPctPromedio("Tucuman").toFixed(1).replace(".",",")+'%)':' ('+fraPctPromedio(suc).toFixed(1).replace(".",",")+'% de las ventas)')+'.</div>';
+  notas+=iibbNota(months);
+  var pI=months.reduce(function(a,m){return a+(m.provIns||0);},0), pF=months.reduce(function(a,m){return a+(m.provFle||0);},0);
+  if(pI||pF)notas+='<div class="panel-s" style="margin:6px 0">Gastos op. incluye proveedores que no son mercadería: insumos vet/pelu '+fp(pI)+' · fletes '+fp(pF)+'.</div>';
+  el.innerHTML=notas+html;
 }
 
 
@@ -2602,7 +2689,7 @@ function computeDevengMonths(suc){
   }
   return months.map(function(m){
     var ventas=m.ingTotal;
-    var opex=OPEX_CATS.reduce(function(s,c){return s+(m.egrCats[c]||0);},0);
+    var opex=opexDe(m);
     var cmv=cmvForMonth(m.m);
     var fra=fraForMonth(m.m);
     var mb=ventas-cmv;
@@ -3504,7 +3591,7 @@ function hVacio(ico,msg){
 
 // ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
 // Secciones: cargar (inicial) · historial · analisis · cierre · ajustes
-var TAB_TITULOS={cargar:"Cargar",historial:"Historial",analisis:"Análisis",cierre:"Cierre de mes",ajustes:"Ajustes"};
+var TAB_TITULOS={cargar:"Cargar",historial:"Historial",analisis:"Análisis",pagos:"Detalles de pagos",cajaan:"Caja",cierre:"Cierre de mes",ajustes:"Ajustes"};
 var cargarView="mov";
 function showTab(t){
   // compatibilidad con nombres viejos
@@ -3513,6 +3600,7 @@ function showTab(t){
   document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
   document.getElementById("screen-"+t).classList.add("active");
   document.querySelectorAll(".nav-btn,.bn").forEach(function(x){x.classList.toggle("active",x.getAttribute("data-tab")===t);});
+  var mb=document.querySelector('.bn[data-tab="mas"]'); if(mb)mb.classList.toggle("active",["pagos","cajaan","ajustes"].indexOf(t)>=0);
   var tt=document.getElementById("tm-title"); if(tt)tt.textContent=TAB_TITULOS[t]||"";
   window.scrollTo(0,0);
   if(t==="cargar")    {renderAlertas();if(cargarView==="comis")renderComis();}
@@ -3520,6 +3608,8 @@ function showTab(t){
   if(t==="ajustes")   {renderStats();renderAjustes();setAjView(ajView);}
   if(t==="analisis")  renderDashboard();
   if(t==="cierre")    renderCierre();
+  if(t==="pagos")     dpRender();
+  if(t==="cajaan")    cajaAnRender();
 }
 function showCargar(v){
   cargarView=v;
@@ -3547,6 +3637,11 @@ function cargarStock(){
   if(!fecha)          return toast("Completá la fecha","err");
   if(!stockSuc)       return toast("Elegí una sucursal","err");
   if(!monto||monto<=0)return toast("Ingresá un monto válido","err");
+  var ant=stockAnterior(stockSuc,fecha);
+  if(ant&&ant.monto>0){
+    var dvar=(monto-ant.monto)/ant.monto;
+    if(Math.abs(dvar)>0.25&&!confirm("El stock de "+sucLbl(stockSuc)+" cambia "+(dvar>0?"+":"")+(dvar*100).toFixed(0)+"% contra el conteo anterior ("+ant.fecha.split("-").reverse().join("/")+": "+fp(ant.monto)+").\n\nRevisá que esté a costo con IVA. ¿Guardar igual?"))return;
+  }
   setLoading("bsc",true);
   db.collection("stock").add({
     fecha:fecha,suc:stockSuc,monto:monto,mes:mesDe(fecha),notas:notas,
@@ -3994,11 +4089,14 @@ function renderAjustes(){
   var pv=maeCat("Proveedores"), pvI=MAESTROS.egresos.indexOf(pv);
   var ep=document.getElementById("mae-prov");
   if(ep&&pv){
-    ep.innerHTML='<div class="chips">'+pv.subs.map(function(s,si){
-      return '<span class="chip'+(s.off?' off':'')+'">'+esc(s.n)
-        +'<button title="Renombrar" onclick="maeRenameSub('+pvI+','+si+')">✎</button>'
-        +'<button title="'+(s.off?"Reactivar":"Archivar")+'" onclick="maeToggleSub('+pvI+','+si+')">'+(s.off?"↺":"⊘")+'</button></span>';
-    }).join("")+'</div>';
+    ep.innerHTML=pv.subs.map(function(s,si){
+      var t=s.tipo||"merc";
+      return '<div class="prow'+(s.off?' off':'')+'"><span class="pn">'+esc(s.n)+'</span>'
+        +'<select class="inp" aria-label="Tipo de '+esc(s.n)+'" onchange="maeSetProvTipo('+si+',this.value)">'
+        +PROV_TIPOS.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===t?' selected':'')+'>'+o[1]+'</option>';}).join("")+'</select>'
+        +'<button class="rbtn" title="Renombrar" onclick="maeRenameSub('+pvI+','+si+')">✎</button>'
+        +'<button class="rbtn" title="'+(s.off?"Reactivar":"Archivar")+'" onclick="maeToggleSub('+pvI+','+si+')">'+(s.off?"↺":"⊘")+'</button></div>';
+    }).join("");
   }
   // Categorías (sin Personal ni Proveedores, que tienen su propio panel)
   var ec=document.getElementById("mae-cats");
@@ -4220,10 +4318,15 @@ function cierreChecks(s){
   var cmvF=["Ocampo","Tucuman"].filter(function(suc){return cmvStored(m,suc,y)===null;});
   res.push({k:"cmv",e:cmvF.length?"miss":"ok",t:"CMV",d:cmvF.length?"Falta: "+cmvF.map(sucLbl).join(" y ")+" (se carga al importar las ventas o en Análisis → Devengado)":"Cargado en las dos sucursales"});
   var fraF=["Ocampo","Tucuman"].filter(function(suc){return fraStored(m,suc,y)===null;});
-  res.push({k:"fra",e:fraF.length?"miss":"ok",t:"Franquicia",d:fraF.length?"Falta: "+fraF.map(sucLbl).join(" y ")+" (Análisis → Devengado, eligiendo la sucursal)":"Cargada en las dos sucursales",
+  var fraEstTxt=fraF.map(function(suc){var e=withYear(y,function(){return fraEstimada(m,suc);});return e?sucLbl(suc)+" ≈ "+fp(e)+" ("+fraPctPromedio(suc).toFixed(1).replace(".",",")+"%)":"";}).filter(Boolean).join(" · ");
+  res.push({k:"fra",e:fraF.length?"miss":"ok",t:"Franquicia",d:fraF.length?"Falta: "+fraF.map(sucLbl).join(" y ")+" (Análisis → Devengado, eligiendo la sucursal)."+(fraEstTxt?" Mientras tanto se usa el estimado: "+fraEstTxt:""):"Cargada en las dos sucursales",
     a:fraF.length?'<button class="btn btn-sm btn-sec" onclick="irDeveng(\''+fraF[0]+'\','+y+')">Cargar</button>':""});
-  var stF=["Ocampo","Tucuman"].filter(function(suc){return !stockRecs.some(function(r){return r.suc===suc&&ym(r.fecha)===s;});});
-  res.push({k:"stock",e:stF.length?"miss":"ok",t:"Stock",d:stF.length?"Falta la valuación de "+stF.map(sucLbl).join(" y "):"Valuado en las dos sucursales",
+  // Stock: alcanza con un conteo cada 3 meses (el del mes o los dos anteriores)
+  var finMes=ymUltimoDia(s), desdeQ=ymAdd(s,-2);
+  var ultSt={}; ["Ocampo","Tucuman"].forEach(function(suc){ultSt[suc]=stockAnterior(suc,finMes);});
+  var stF=["Ocampo","Tucuman"].filter(function(suc){return !ultSt[suc]||ym(ultSt[suc].fecha)<desdeQ;});
+  res.push({k:"stock",e:stF.length?"miss":"ok",t:"Stock",d:stF.length?"Falta un conteo de los últimos 3 meses en "+stF.map(function(suc){return sucLbl(suc)+(ultSt[suc]?" (el último es del "+ultSt[suc].fecha.split("-").reverse().join("/")+")":"");}).join(" y ")
+      :"Vigente: "+["Ocampo","Tucuman"].map(function(suc){return sucLbl(suc)+" "+ultSt[suc].fecha.split("-").reverse().join("/");}).join(" · ")+" (se pide cada 3 meses)",
     a:stF.length?'<button class="btn btn-sm btn-sec" onclick="showTab(\'cargar\');showCargar(\'stock\')">Cargar</button>':""});
   var cj=cajaRecs.filter(function(r){return ym(r.fecha)===s;});
   res.push({k:"caja",e:cj.length?"ok":"warn",t:"Caja",d:cj.length?cj.length+" movimientos de caja en el mes":"Sin movimientos de caja (revisá si es correcto)"});
@@ -4779,6 +4882,290 @@ function rsConfirmar(){
   }).catch(function(e){setLoading("rs-btn",false);toast("Error: "+e.message+" ("+hechos+" ya restaurados)","err");});
 }
 
+// ══ v5: PROVEEDORES POR TIPO ═══════════════════════════════════════════════
+// Solo la mercadería se reemplaza por el CMV en el Devengado; insumos y fletes son gasto.
+var PROV_TIPOS=[["merc","Mercadería"],["ins","Insumos vet/pelu"],["flete","Fletes"]];
+function provTipoLbl(t){for(var i=0;i<PROV_TIPOS.length;i++){if(PROV_TIPOS[i][0]===t)return PROV_TIPOS[i][1];}return "Mercadería";}
+function provTiposMapa(){
+  var c=maeCat("Proveedores"), o={};
+  if(c)c.subs.forEach(function(s){o[s.n]=s.tipo||"merc";});
+  return o;
+}
+function maeSetProvTipo(si,v){
+  var c=maeCat("Proveedores"), s=c&&c.subs[si]; if(!s)return;
+  if(v&&v!=="merc")s.tipo=v; else delete s.tipo;
+  onMaestrosChange(); maeSave("✓ "+s.n+": "+provTipoLbl(v||"merc"));
+}
+// Gastos operativos del Devengado: todo menos Proveedores, más los proveedores que no son mercadería
+function opexDe(m){
+  return OPEX_CATS.reduce(function(s,c){return s+(m.egrCats[c]||0);},0)+(m.provIns||0)+(m.provFle||0);
+}
+
+// ══ v5: FRANQUICIA ESTIMADA ════════════════════════════════════════════════
+// Si un mes no tiene la franquicia cargada, se usa el % promedio de los meses cargados de esa sucursal
+// (o 6,7 % si todavía no hay ninguno), y se marca como estimado.
+var FRA_PCT_DEF=6.7;
+function ventasYM(suc,ymS){
+  var t=0;
+  for(var i=0;i<records.length;i++){var r=records[i];if(r.tipo==="Ingreso"&&ym(r.fecha)===ymS&&(suc==="todos"||r.suc===suc))t+=r.monto;}
+  return t;
+}
+function fraPctPromedio(suc){
+  var f=0, v=0;
+  fraRecs.forEach(function(r){
+    if(r.suc!==suc||!(r.monto>0))return;
+    var vv=ventasYM(suc,(r.anio||2026)+"-"+p2(r.mes)); if(vv>0){f+=r.monto;v+=vv;}
+  });
+  return v>0?f/v*100:FRA_PCT_DEF;
+}
+function fraEstimada(mes,suc){
+  var ymS=CMV_YEAR+"-"+p2(mes); if(ymS>ymHoy())return 0;
+  var v=ventasYM(suc,ymS); return v>0?Math.round(v*fraPctPromedio(suc)/100):0;
+}
+function fraEsEst(mes,suc){return fraStored(mes,suc)===null&&fraEstimada(mes,suc)>0;}
+
+// ══ v5: IIBB ESTIMADO ══════════════════════════════════════════════════════
+// Si un mes no tiene IIBB cargado (Impuestos › IIBB), se estima con un % (1,5 por defecto, editable)
+// de las ventas del mes anterior de cada sucursal. Se suma en todo Análisis y se marca como estimado.
+var IIBB_PCT=1.5;
+function iibbReal(ymS){
+  for(var i=0;i<records.length;i++){var r=records[i];if(r.tipo==="Egreso"&&r.cat==="Impuestos"&&mgNorm(r.sub)==="IIBB"&&ym(r.fecha)===ymS)return true;}
+  return false;
+}
+function iibbEstimado(m,suc){
+  var ymS=CMV_YEAR+"-"+p2(m);
+  if(ymS>ymHoy()||ymS<CMV_YEAR_INICIO+"-"+p2(DEVENG_START_MONTH))return 0;
+  if(iibbReal(ymS))return 0;
+  var prev=ymAdd(ymS,-1);
+  var v=suc==="todos"?ventasYM("Ocampo",prev)+ventasYM("Tucuman",prev):ventasYM(suc,prev);
+  return Math.round(v*IIBB_PCT/100);
+}
+function iibbNota(months){
+  var est=months.filter(function(m){return m.iibbEst>0;});
+  if(!est.length)return "";
+  return '<div class="est-nota">* Incluye IIBB estimado ('+String(IIBB_PCT).replace(".",",")+'% de las ventas del mes anterior) porque no está cargado el real: '
+    +est.map(function(m){return MESES[m.m-1]+' '+fp(m.iibbEst);}).join(" · ")+'. Se reemplaza solo cuando cargás Impuestos › IIBB.</div>';
+}
+
+// ══ v5: DUPLICADOS ═════════════════════════════════════════════════════════
+// Mismo gasto (categoría y subcategoría) por el mismo monto dentro de 7 días, en cualquier sucursal
+function dupBuscar(cat,sub,monto,fecha,excluirId){
+  if(!sub||!(monto>0)||!fecha)return null;
+  var f0=new Date(fecha+"T12:00:00").getTime();
+  return records.filter(function(r){
+    return r._id!==excluirId&&r.tipo==="Egreso"&&r.cat===cat&&(r.sub||"")===sub&&Math.abs(r.monto-monto)<1
+      &&Math.abs(new Date(r.fecha+"T12:00:00").getTime()-f0)<=7*86400000;
+  })[0]||null;
+}
+function dupTexto(d){return "Ya hay un pago a "+d.sub+" por "+fp(d.monto)+" el "+String(d.fecha).split("-").reverse().join("/")+" ("+sucLbl(d.suc)+").";}
+
+// ══ v5: STOCK ══════════════════════════════════════════════════════════════
+function stockAnterior(suc,fecha){
+  var a=stockRecs.filter(function(r){return r.suc===suc&&r.fecha<=fecha;}).sort(function(x,y){return x.fecha<y.fecha?-1:x.fecha>y.fecha?1:0;});
+  return a.length?a[a.length-1]:null;
+}
+
+// ══ v5: DETALLES DE PAGOS ══════════════════════════════════════════════════
+var dpTipo="prov", dpSuc="todos", dpSel={prov:"",emp:"",cat:""}, dpCharts=[];
+var DP_SUC_COL={Ocampo:"#D4470F",Tucuman:"#2FA88F",General:"#9C8E7E"};
+function dpDestroy(){dpCharts.forEach(function(c){try{c.destroy();}catch(e){}});dpCharts=[];}
+function setDpTipo(t){
+  dpTipo=t;
+  document.querySelectorAll("#dp-tabs .dst").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-v")===t);});
+  dpRender();
+}
+function setDpSuc(s,el){
+  dpSuc=s;
+  document.querySelectorAll("#dp-fbar .fc").forEach(function(c){c.classList.remove("ablu");});
+  if(el)el.classList.add("ablu");
+  dpRender();
+}
+function dpRecs(){
+  return records.filter(function(r){return r.tipo==="Egreso"&&gm(r.fecha)>0&&(dpSuc==="todos"||r.suc===dpSuc);});
+}
+function dpAgrupar(recs,campo){
+  var o={};
+  recs.forEach(function(r){var k=r[campo]||"(sin subcategoría)";(o[k]||(o[k]={n:k,tot:0,cant:0})).tot+=r.monto;o[k].cant++;});
+  return Object.keys(o).map(function(k){return o[k];}).sort(function(a,b){return b.tot-a.tot;});
+}
+function dpRender(){
+  var body=document.getElementById("dp-body"), selEl=document.getElementById("dp-item");
+  if(!body||!selEl)return;
+  dpDestroy();
+  var recs=dpRecs(), grupos, opts;
+  if(dpTipo==="cat"){
+    grupos=dpAgrupar(recs,"cat");
+    opts='<option value="">Todas las categorías</option>'+grupos.map(function(g){return '<option value="'+esc(g.n)+'">'+esc(g.n)+' — '+fp(g.tot)+'</option>';}).join("");
+  } else {
+    var cat=dpTipo==="prov"?"Proveedores":"Personal", tipos=provTiposMapa();
+    grupos=dpAgrupar(recs.filter(function(r){return r.cat===cat;}),"sub");
+    opts=grupos.length?grupos.map(function(g){
+      return '<option value="'+esc(g.n)+'">'+esc(g.n)+(dpTipo==="prov"&&tipos[g.n]&&tipos[g.n]!=="merc"?' ('+provTipoLbl(tipos[g.n])+')':'')+' — '+fp(g.tot)+'</option>';
+    }).join(""):'<option value="">Sin pagos en '+CMV_YEAR+'</option>';
+  }
+  selEl.innerHTML=opts;
+  var sel=dpSel[dpTipo];
+  if(dpTipo!=="cat"&&(!sel||!grupos.some(function(g){return g.n===sel;})))sel=grupos.length?grupos[0].n:"";
+  if(dpTipo==="cat"&&sel&&!grupos.some(function(g){return g.n===sel;}))sel="";
+  dpSel[dpTipo]=sel; selEl.value=sel;
+  var lbl=document.getElementById("dp-item-lbl");
+  if(lbl)lbl.textContent=dpTipo==="prov"?"Proveedor":dpTipo==="emp"?"Empleado":"Categoría";
+  if(!recs.length){body.innerHTML='<div class="empty"><div class="eico">🧾</div><p>Sin pagos en '+CMV_YEAR+(dpSuc!=="todos"?" para "+sucLbl(dpSuc):"")+'.</p></div>';return;}
+  if(dpTipo==="cat"&&!sel){dpRenderTodas(body,recs,grupos);return;}
+  if(!sel){body.innerHTML='<div class="empty"><div class="eico">🧾</div><p>Sin pagos en '+CMV_YEAR+'.</p></div>';return;}
+  var filtro=dpTipo==="cat"?recs.filter(function(r){return r.cat===sel;})
+    :recs.filter(function(r){return r.cat===(dpTipo==="prov"?"Proveedores":"Personal")&&(r.sub||"(sin subcategoría)")===sel;});
+  dpRenderItem(body,filtro,sel);
+}
+function dpPorMes(recs,serie){
+  // serie: función r → clave; devuelve {clave:[12 montos]}
+  var o={};
+  recs.forEach(function(r){var k=serie(r), m=gm(r.fecha); if(!m)return; (o[k]||(o[k]=[0,0,0,0,0,0,0,0,0,0,0,0]))[m-1]+=r.monto;});
+  return o;
+}
+function dpChartBar(id,series,colores,apilado){
+  var el=document.getElementById(id); if(!el)return;
+  var ks=Object.keys(series);
+  dpCharts.push(new Chart(el.getContext("2d"),{type:"bar",
+    data:{labels:MESES,datasets:ks.map(function(k,i){return {label:k==="Tucuman"?"Tucumán":k,data:series[k],backgroundColor:colores[k]||EGR_PALETTE[i%EGR_PALETTE.length],borderRadius:4};})},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:ks.length>1,labels:{color:"#6B6B6B",font:{size:10},boxWidth:10}}},
+      scales:{x:{stacked:!!apilado,ticks:{color:"#6B6B6B",font:{size:9}},grid:{display:false}},
+              y:{stacked:!!apilado,ticks:{color:"#6B6B6B",font:{size:9},callback:function(v){return fpk(v);}},grid:{color:"rgba(0,0,0,.05)"}}}}}));
+}
+function fpk(v){v=Math.abs(v);return v>=1e6?"$"+(v/1e6).toFixed(1).replace(".",",")+"M":v>=1e3?"$"+Math.round(v/1e3)+"k":"$"+Math.round(v);}
+function dpKpis(recs){
+  var tot=recs.reduce(function(a,r){return a+r.monto;},0);
+  var meses={}; recs.forEach(function(r){meses[gm(r.fecha)]=1;});
+  var nM=Object.keys(meses).length;
+  var ult=recs.slice().sort(function(a,b){return a.fecha<b.fecha?1:-1;})[0];
+  return '<div class="sg2">'
+    +'<div class="sc"><div class="sl">Total '+CMV_YEAR+'</div><div class="sv o">'+fp(tot)+'</div></div>'
+    +'<div class="sc"><div class="sl">Promedio por mes</div><div class="sv">'+fp(nM?tot/nM:0)+'</div><div class="panel-s">'+nM+' mes'+(nM===1?'':'es')+' con pagos</div></div>'
+    +'<div class="sc"><div class="sl">Pagos</div><div class="sv">'+recs.length+'</div></div>'
+    +'<div class="sc"><div class="sl">Último pago</div><div class="sv" style="font-size:18px">'+(ult?fp(ult.monto):"—")+'</div><div class="panel-s">'+(ult?ult.fecha.split("-").reverse().join("/")+" · "+esc(sucLbl(ult.suc)):"")+'</div></div>'
+    +'</div>';
+}
+function dpLista(recs,max){
+  var r2=recs.slice().sort(function(a,b){return a.fecha<b.fecha?1:a.fecha>b.fecha?-1:0;});
+  var html='<div class="card">'+r2.slice(0,max).map(function(r){
+    return '<div class="ri"><div class="rdot" style="background:'+(DP_SUC_COL[r.suc]||"#999")+'"></div>'
+      +'<div class="rb"><div class="rt">'+esc(r.sub||r.cat)+' · '+esc(sucLbl(r.suc))+'</div>'
+      +'<div class="rs">'+r.fecha.split("-").reverse().join("/")+(r.notas?' · '+esc(r.notas):'')+'</div></div>'
+      +'<span class="rm neg">'+fp(r.monto)+'</span>'
+      +'<div class="rbtns"><button class="rbtn rbtn-e" title="Editar" onclick="openEdit(\''+r._id+'\')">✎</button></div></div>';
+  }).join("")+'</div>';
+  if(r2.length>max)html+='<div class="panel-s" style="margin-top:6px">Se muestran los últimos '+max+' de '+r2.length+'. El resto está en Historial.</div>';
+  return html;
+}
+function dpRenderItem(body,recs,nombre){
+  var html=dpKpis(recs);
+  var tipoTxt="";
+  if(dpTipo==="prov"){var t=provTiposMapa()[nombre]||"merc";tipoTxt='<span class="tag">'+provTipoLbl(t)+'</span>';}
+  html+='<div class="chart-card" style="margin-top:12px"><h3>'+esc(nombre)+' · por mes '+CMV_YEAR+' '+tipoTxt+'</h3><canvas id="dp-ch1" height="190"></canvas></div>';
+  // Por sucursal
+  var porSuc=dpAgrupar(recs,"suc"), tot=recs.reduce(function(a,r){return a+r.monto;},0);
+  if(porSuc.length>1){
+    html+='<div class="sdiv">Por sucursal</div><div class="cat-wrap"><table class="cat-table"><thead><tr><th>Sucursal</th><th>Monto</th><th>%</th></tr></thead><tbody>'
+      +porSuc.map(function(g){return '<tr><td>'+esc(sucLbl(g.n))+'</td><td class="neg">'+fp(g.tot)+'</td><td class="neut">'+(tot>0?(g.tot/tot*100).toFixed(1):"0")+'%</td></tr>';}).join("")
+      +'</tbody></table></div>';
+  }
+  // En una categoría: subcategorías
+  if(dpTipo==="cat"){
+    var subs=dpAgrupar(recs,"sub");
+    html+='<div class="sdiv">Subcategorías</div><div class="cat-wrap"><table class="cat-table"><thead><tr><th>Subcategoría</th><th>Monto</th><th>%</th><th>Pagos</th></tr></thead><tbody>'
+      +subs.map(function(g){
+        var link=(nombre==="Proveedores"||nombre==="Personal")&&g.n!=="(sin subcategoría)"?' style="cursor:pointer;text-decoration:underline" onclick="dpIr(\''+(nombre==="Proveedores"?"prov":"emp")+'\',\''+esc(g.n).replace(/'/g,"\\'")+'\')"':'';
+        return '<tr><td'+link+'>'+esc(g.n)+'</td><td class="neg">'+fp(g.tot)+'</td><td class="neut">'+(tot>0?(g.tot/tot*100).toFixed(1):"0")+'%</td><td>'+g.cant+'</td></tr>';
+      }).join("")+'</tbody></table></div>';
+  }
+  html+='<div class="sdiv">Pagos</div>'+dpLista(recs,60);
+  body.innerHTML=html;
+  if(dpTipo==="cat"){
+    var subsTop=dpAgrupar(recs,"sub").slice(0,6).map(function(g){return g.n;});
+    dpChartBar("dp-ch1",dpPorMes(recs,function(r){var k=r.sub||"(sin subcategoría)";return subsTop.indexOf(k)>=0?k:"Otras";}),{},true);
+  } else {
+    dpChartBar("dp-ch1",dpPorMes(recs,function(r){return r.suc;}),DP_SUC_COL,true);
+  }
+}
+function dpRenderTodas(body,recs,grupos){
+  var tot=recs.reduce(function(a,r){return a+r.monto;},0);
+  var html=dpKpis(recs);
+  html+='<div class="chart-card" style="margin-top:12px"><h3>Egresos por categoría y mes · '+CMV_YEAR+'</h3><canvas id="dp-ch1" height="200"></canvas></div>';
+  html+='<div class="sdiv">Categorías</div><div class="cat-wrap"><table class="cat-table"><thead><tr><th>Categoría</th><th>Monto</th><th>%</th><th>Pagos</th></tr></thead><tbody>'
+    +grupos.map(function(g){return '<tr><td style="cursor:pointer;text-decoration:underline" onclick="dpIr(\'cat\',\''+esc(g.n).replace(/'/g,"\\'")+'\')">'+esc(g.n)+'</td><td class="neg">'+fp(g.tot)+'</td><td class="neut">'+(tot>0?(g.tot/tot*100).toFixed(1):"0")+'%</td><td>'+g.cant+'</td></tr>';}).join("")
+    +'</tbody></table></div>';
+  body.innerHTML=html;
+  var col={}; EGR_CATS.forEach(function(c,i){col[c]=EGR_PALETTE[i%EGR_PALETTE.length];});
+  dpChartBar("dp-ch1",dpPorMes(recs,function(r){return r.cat;}),col,true);
+}
+function dpIr(tipo,nombre){dpSel[tipo]=nombre;setDpTipo(tipo);window.scrollTo(0,0);}
+function dpItemCambio(v){dpSel[dpTipo]=v;dpRender();}
+
+// ══ v5: CAJA (análisis) ════════════════════════════════════════════════════
+var caSuc="todos", caCharts=[];
+function setCaSuc(s,el){
+  caSuc=s;
+  document.querySelectorAll("#ca-fbar .fc").forEach(function(c){c.classList.remove("ablu");});
+  if(el)el.classList.add("ablu");
+  cajaAnRender();
+}
+function cajaAnRender(){
+  var el=document.getElementById("ca-body"); if(!el)return;
+  caCharts.forEach(function(c){try{c.destroy();}catch(e){}}); caCharts=[];
+  var recs=cajaRecs.filter(function(r){return gm(r.fecha)>0&&(caSuc==="todos"||r.suc===caSuc);});
+  renderCajaMensual();
+  if(!recs.length){el.innerHTML='<div class="empty"><div class="eico">💵</div><p>Sin movimientos de caja en '+CMV_YEAR+(caSuc!=="todos"?" para "+sucLbl(caSuc):"")+'.</p></div>';return;}
+  var ext=[0,0,0,0,0,0,0,0,0,0,0,0], gst=[0,0,0,0,0,0,0,0,0,0,0,0];
+  recs.forEach(function(r){var m=gm(r.fecha)-1; if(r.tipo==="Extraccion")ext[m]+=r.monto; else if(r.tipo==="Gasto")gst[m]+=r.monto;});
+  var neto=ext.map(function(v,i){return (v||gst[i])?v-gst[i]:null;}), acum=[], a=0, primero=-1, ultimo=0;
+  for(var i=0;i<12;i++){if(ext[i]||gst[i]){ultimo=i;if(primero<0)primero=i;}}
+  ext.forEach(function(v,i){a+=v-gst[i];acum.push(i>=primero&&i<=ultimo?a:null);});
+  var tE=ext.reduce(function(s,v){return s+v;},0), tG=gst.reduce(function(s,v){return s+v;},0), tN=tE-tG;
+  var mesesCon=ext.filter(function(v,i){return v||gst[i];}).length;
+  var html='<div class="sg2">'
+    +'<div class="sc"><div class="sl">Extracciones</div><div class="sv g">'+fp(tE)+'</div></div>'
+    +'<div class="sc"><div class="sl">Gastos bolsillo</div><div class="sv o">'+fp(tG)+'</div></div>'
+    +'<div class="sc"><div class="sl">Neto del año</div><div class="sv '+(tN>=0?"t":"r")+'">'+fp(tN)+'</div></div>'
+    +'<div class="sc"><div class="sl">Neto promedio por mes</div><div class="sv">'+fp(mesesCon?tN/mesesCon:0)+'</div></div></div>';
+  html+='<div class="charts2"><div class="chart-card"><h3>Extracciones vs gastos bolsillo · '+CMV_YEAR+'</h3><canvas id="ca-ch1" height="200"></canvas></div>'
+    +'<div class="chart-card"><h3>Neto acumulado · '+CMV_YEAR+'</h3><canvas id="ca-ch2" height="200"></canvas></div></div>';
+  // Gastos de bolsillo por categoría (los que vienen de un movimiento vinculado o con [categoría] en la nota)
+  var porCat={};
+  recs.filter(function(r){return r.tipo==="Gasto";}).forEach(function(r){
+    var mv=r.movId?records.filter(function(x){return x._id===r.movId;})[0]:null;
+    var k=mv?mv.cat:((String(r.notas||"").match(/^\[([^\]\/]+)/)||[])[1]||"Sin categoría").trim();
+    porCat[k]=(porCat[k]||0)+r.monto;
+  });
+  var ks=Object.keys(porCat).sort(function(x,y){return porCat[y]-porCat[x];});
+  if(ks.length){
+    html+='<div class="sdiv">Gastos de bolsillo por categoría</div><div class="cat-wrap"><table class="cat-table"><thead><tr><th>Categoría</th><th>Monto</th><th>%</th></tr></thead><tbody>'
+      +ks.map(function(k){return '<tr><td>'+esc(k)+'</td><td class="neg">'+fp(porCat[k])+'</td><td class="neut">'+(tG>0?(porCat[k]/tG*100).toFixed(1):"0")+'%</td></tr>';}).join("")
+      +'</tbody></table></div>';
+  }
+  el.innerHTML=html;
+  caCharts.push(new Chart(document.getElementById("ca-ch1").getContext("2d"),{type:"bar",
+    data:{labels:MESES,datasets:[
+      {type:"line",label:"Neto",data:neto,borderColor:"#1F5F93",backgroundColor:"#1F5F93",tension:0,pointRadius:3,spanGaps:true,order:0},
+      {label:"Extracciones",data:ext,backgroundColor:"#2FA88F",borderRadius:4,order:1},
+      {label:"Gastos bolsillo",data:gst,backgroundColor:"#FF9F1C",borderRadius:4,order:1}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:"#6B6B6B",font:{size:10},boxWidth:10}}},
+      scales:{x:{ticks:{color:"#6B6B6B",font:{size:9}},grid:{display:false}},y:{ticks:{color:"#6B6B6B",font:{size:9},callback:function(v){return (v<0?"-":"")+fpk(v);}},grid:{color:"rgba(0,0,0,.05)"}}}}}));
+  caCharts.push(new Chart(document.getElementById("ca-ch2").getContext("2d"),{type:"line",
+    data:{labels:MESES,datasets:[{label:"Neto acumulado",data:acum,borderColor:"#D4470F",backgroundColor:"rgba(212,71,15,.12)",fill:true,tension:0,pointRadius:3,spanGaps:false}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:"#6B6B6B",font:{size:9}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:"#6B6B6B",font:{size:9},callback:function(v){return (v<0?"-":"")+fpk(v);}},grid:{color:"rgba(0,0,0,.05)"}}}}}));
+}
+
+// ══ v5: MENÚ "MÁS" (celular) y refresco de las secciones nuevas ═══════════
+function masAbrir(){document.getElementById("mas-sheet").classList.add("open");}
+function masCerrar(){document.getElementById("mas-sheet").classList.remove("open");}
+function masIr(t){masCerrar();showTab(t);}
+function v5Refresh(){
+  if(isA("pagos"))dpRender();
+  if(isA("cajaan"))cajaAnRender();
+}
+
+
 // ══ AÑO DE TRABAJO ════════════════════════════════════════════════════════
 var CMV_YEAR_INICIO=2026; // primer año con datos en la app
 // Años para el selector: desde 2026 hasta el mayor entre el año actual y el último con datos
@@ -4802,6 +5189,7 @@ function setAnio(y){
   renderAnioSelects();
   renderCajaMensual(); renderStockHist();
   if(isA("analisis")) renderDashboard();
+  v5Refresh();
   toast("Mostrando "+y,"blu");
 }
 
@@ -5145,6 +5533,8 @@ function iaDuplicado(it){
   if(it.tipo==="Extraccion"){
     return cajaRecs.filter(function(r){return r.tipo==="Extraccion"&&r.suc===it.suc&&r.fecha===it.fecha&&Math.abs(r.monto-it.monto)<1;})[0]||null;
   }
+  // Egresos con subcategoría: mismo gasto y monto dentro de 7 días, en cualquier sucursal
+  if(it.tipo==="Egreso"&&it.sub)return dupBuscar(it.cat,it.sub,it.monto,it.fecha);
   return records.filter(function(r){
     return r.tipo===it.tipo&&r.suc===it.suc&&r.cat===it.cat&&(r.sub||"")===(it.sub||"")&&ym(r.fecha)===ym(it.fecha)&&Math.abs(r.monto-it.monto)<1;
   })[0]||null;
